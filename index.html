@@ -382,6 +382,11 @@
   .nb-empty{text-align:center;font-family:'Caveat',cursive;font-size:20px;opacity:.6;padding:18px 0}
   .nb-who{text-align:center;margin:-2px 0 10px;font-size:14px}
   .nb-who button{margin:6px 4px 0;border:1px solid rgba(247,198,211,.4);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:9px 16px;font:700 14px 'Nunito';cursor:pointer}
+  .hoy-new[hidden],.nb-pill[hidden]{display:none!important}
+  .hoy-new{margin:18px auto 0;display:block;background:rgba(255,255,255,.12);border:1px solid var(--gold);color:#fff;border-radius:999px;padding:11px 18px;font:800 15px 'Nunito';cursor:pointer;animation:beat 1.6s ease-in-out infinite}
+  .nb-pill{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:45;background:linear-gradient(135deg,var(--rose),#b3204f);color:#fff;border:0;border-radius:999px;padding:10px 16px;font:800 14px 'Nunito';box-shadow:0 10px 24px rgba(0,0,0,.4);cursor:pointer;animation:pop .5s cubic-bezier(.2,.9,.3,1.3);white-space:nowrap}
+  body.editing .nb-pill{top:44px}
+  .nb-m.new{box-shadow:0 0 0 3px var(--gold)}
   /* Lo que viene */
   .ev-add{display:grid;gap:8px;margin-bottom:14px}
   .ev-add input{min-width:0;border:1px solid rgba(247,198,211,.35);background:rgba(255,255,255,.08);color:#fff;border-radius:14px;padding:12px 12px;font:15px 'Nunito',sans-serif;outline:none;color-scheme:dark;-webkit-user-select:text;user-select:text}
@@ -521,6 +526,7 @@
   <div class="hoy-msg" id="hoyMsg"></div>
   <div class="hoy-sep">♥</div>
   <div class="hoy-fix" id="hoyFix"></div>
+  <button class="hoy-new" id="hoyNew" hidden></button>
   <div class="hoy-sign" id="hoySign"></div>
   <button class="btn" id="hoyBtn">Continuar ♥</button>
 </div></div>
@@ -530,6 +536,7 @@
   <textarea id="memoTxt" maxlength="300" rows="3" placeholder="¿Cómo nos fue? ✍️"></textarea>
   <button class="btn small" id="memoSave">Guardar recuerdo 💗</button><div class="memo-st" id="memoSt"></div></div>
 </div></div>
+<button class="nb-pill" id="nbPill" hidden></button>
 <div class="celebrate" id="celebrate"><div class="cel-t">¡Feliz</div><div class="cel-n" id="celN">8</div><div class="cel-t" id="celT">meses, mi amor!</div><button class="btn" id="celBtn" style="margin-top:26px">Gracias ♥</button></div>
 <div class="credits" id="credits"><button class="cr-x" id="crX" aria-label="Cerrar">×</button><div id="crBgs"></div><div class="cr-roll" id="crRoll"></div></div>
 <div id="hearts"></div>
@@ -1176,7 +1183,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     location.replace(location.pathname);
   };
@@ -1801,7 +1808,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const me=()=>{if(EDIT)return 'yo';try{return localStorage.getItem('yo-soy')||''}catch(e){return ''}};
   const keep=()=>{try{localStorage.setItem(CK,JSON.stringify(notes))}catch(e){}};
   const name=w=>w==='yo'?C.yo:C.ella;
-  function render(){
+  let render=function(){
     const live=notes.filter(x=>!x.x).sort((a,b)=>a.a-b.a).slice(-60), m=me();
     list.innerHTML=live.length?'':'<div class="nb-empty">aún no hay notitas… ¡escribe la primera! 💌</div>';
     live.forEach(x=>{
@@ -1814,7 +1821,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
       d.append(meta); list.append(d);
     });
     list.scrollTop=list.scrollHeight;
-  }
+  };
   function askWho(cb){
     who.hidden=false; who.innerHTML='';
     const q=document.createElement('div'); q.textContent='¿Quién escribe desde este celular?'; who.append(q);
@@ -1833,6 +1840,28 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     if(!me())askWho(go); else go();
   });
   if(!GG.on)st.textContent='Las notitas se guardan en este celular';
+  /* --- notitas nuevas para quien no las escribió --- */
+  const pill=document.getElementById('nbPill'), hoyNew=document.getElementById('hoyNew');
+  const SK='notas-visto'; let seen=+(localStorage.getItem(SK)||0)||0;
+  const mine=()=>me()||(EDIT?'yo':'ella');
+  const unread=()=>notes.filter(x=>!x.x&&x.w!==mine()&&x.a>seen);
+  const markSeen=()=>{if(!unread().length)return;seen=Date.now();try{localStorage.setItem(SK,String(seen))}catch(_){}badge()};
+  const goBuzon=()=>{document.getElementById('buzon').scrollIntoView({behavior:'smooth'});pill.hidden=true;setTimeout(markSeen,1800)};
+  pill.onclick=goBuzon;
+  function badge(){
+    const u=unread(), n=u.length, from=n?(u[0].w==='yo'?C.yo:C.ella):'';
+    const txt=n?`💌 ${n===1?'Tienes 1 notita nueva':'Tienes '+n+' notitas nuevas'} de ${from}`:'';
+    const locked=document.body.classList.contains('locked')||document.getElementById('hoyOv').classList.contains('open');
+    pill.textContent=txt; pill.hidden=!n||locked||buzonVis;
+    hoyNew.textContent=txt?txt+' → leer':''; hoyNew.hidden=!n;
+    list.querySelectorAll('.nb-m.them').forEach(e=>e.classList.remove('new'));
+  }
+  hoyNew.onclick=()=>{document.getElementById('hoyBtn').click();setTimeout(goBuzon,520)};
+  let buzonVis=false;
+  new IntersectionObserver(es=>es.forEach(e=>{buzonVis=e.isIntersecting;if(buzonVis&&unread().length){setTimeout(()=>{if(buzonVis)markSeen()},1500)}badge()}),{threshold:.35}).observe(list);
+  const _render=render; render=function(){_render();badge()};
+  window.addEventListener('hoyClosed',badge); window.addEventListener('unlocked',()=>setTimeout(badge,700));
+  setInterval(()=>{if(!document.hidden)refresh()},60000);
   render(); refresh(); document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
 })();
 
