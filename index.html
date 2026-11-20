@@ -156,6 +156,9 @@
   .wheel-wrap{position:relative;width:300px;max-width:100%;margin:0 auto}
   .wheel-wrap::before{content:"";position:absolute;top:-6px;left:50%;transform:translateX(-50%);z-index:2;border:14px solid transparent;border-top:26px solid var(--gold);filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
   #wheel{width:100%;display:block;border-radius:50%;box-shadow:0 14px 36px rgba(0,0,0,.45),0 0 0 6px rgba(233,184,114,.6);transition:transform 4.5s cubic-bezier(.12,.8,.15,1)}
+  .wheel-used{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+  .wu-t{width:100%;font-size:12.5px;opacity:.7;margin-bottom:2px}
+  .wu{font-size:12.5px;background:rgba(255,255,255,.1);border:1px solid rgba(247,198,211,.25);border-radius:999px;padding:4px 10px;text-decoration:line-through;text-decoration-color:rgba(247,198,211,.6)}
   #spin:disabled{opacity:.6;cursor:default;filter:grayscale(.3)}
   .wheel-res{margin-top:16px;font-family:'Caveat',cursive;font-size:28px;color:var(--blush);min-height:40px}
   /* Lista */
@@ -733,7 +736,7 @@
     <h2>Ruleta de citas</h2>
     <div class="sub">¿qué hacemos en nuestra próxima cita?</div>
     <div class="wheel-wrap"><canvas id="wheel" width="600" height="600"></canvas></div>
-    <div style="text-align:center"><button class="btn" id="spin">🎡 Girar</button><div class="wheel-res" id="wheelRes"></div></div>
+    <div style="text-align:center"><button class="btn" id="spin">🎡 Girar</button><div class="wheel-res" id="wheelRes"></div><div class="wheel-used" id="wheelUsed"></div></div>
   </section>
 
   <!-- PLANES (KANBAN) -->
@@ -937,8 +940,14 @@ const JUEGOS=(()=>{
   const save=()=>{try{localStorage.setItem(LK,JSON.stringify(st))}catch(e){}};
   const get=n=>{const x=st[n];return x&&x.k===keyOf(n)?x:null};
   const subs=[];
-  async function push(){ if(!GG.on)return; try{const r=await GG.pull('juegos.bin',true)||{}; ['rasca','ruleta'].forEach(n=>{const a=st[n],b=r[n];if(b&&(!a||(b.u||0)>(a.u||0)))st[n]=b}); save(); await GG.push('juegos.bin',st)}catch(e){setTimeout(push,15000)} }
-  async function refresh(){ if(!GG.on)return; try{const r=await GG.pull('juegos.bin')||{}; let ch=false; ['rasca','ruleta'].forEach(n=>{const a=st[n],b=r[n];if(b&&(!a||(b.u||0)>(a.u||0))){st[n]=b;ch=true}}); if(ch){save();subs.forEach(f=>f())}}catch(e){} }
+  function mergeOne(n,a,b){
+    if(!b)return a; if(!a)return b;
+    if(n==='ruleta'&&a.k===b.k){const m={};[...(a.used||[]),...(b.used||[])].forEach(x=>{if(x&&x.opt&&(!m[x.opt]||x.at<m[x.opt].at))m[x.opt]=x});
+      return Object.assign({},a,{u:Math.max(a.u||0,b.u||0),used:Object.values(m).sort((p,q)=>p.at-q.at)})}
+    return (b.u||0)>(a.u||0)?b:a;
+  }
+  async function push(){ if(!GG.on)return; try{const r=await GG.pull('juegos.bin',true)||{}; ['rasca','ruleta'].forEach(n=>{st[n]=mergeOne(n,st[n],r[n])}); save(); await GG.push('juegos.bin',st)}catch(e){setTimeout(push,15000)} }
+  async function refresh(){ if(!GG.on)return; try{const r=await GG.pull('juegos.bin')||{}; const before=JSON.stringify(st); ['rasca','ruleta'].forEach(n=>{st[n]=mergeOne(n,st[n],r[n])}); if(JSON.stringify(st)!==before){save();subs.forEach(f=>f())}}catch(e){} }
   function set(n,v){st[n]=Object.assign({k:keyOf(n),u:Date.now(),at:Date.now()},v);save();push()}
   setTimeout(refresh,300); document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
   return {get,set,on:f=>subs.push(f)};
@@ -956,7 +965,7 @@ function avisar(txt,tipo){
   if(EDIT)return;
   try{if(localStorage.getItem('yo-soy')==='yo')return}catch(e){}
   if(!avOn(tipo))return;
-  const gap=tipo==='entrada'?30*60*1000:({ruleta:1,abrazo:1,rasca:1,secreto:1}[tipo]?60*1000:0);
+  const gap=tipo==='entrada'?30*60*1000:({abrazo:1,secreto:1}[tipo]?60*1000:0);
   try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
   if(AV.ntfy)fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:tipo==='nota'?'💌 Notita de '+C.ella:'🎟️ Vale canjeado',message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
 }
@@ -1271,34 +1280,49 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   });
 })();
 
-/* ====== Ruleta de citas ====== */
+/* ====== Ruleta de citas (cada opción que sale se desactiva hasta reiniciar) ====== */
 (function(){
   const P=(C.ruleta.length?C.ruleta:['💗 Sorpresa']).slice(0,12).map(FILL);
   const WC=['#e85d84','#f7c6d3','#b3204f','#ffd9e3','#e9b872','#fbe3d6','#8e1f45','#ffb3c6'];
   const cv=document.getElementById('wheel'), x=cv.getContext('2d'), n=P.length, a=2*Math.PI/n;
-  P.forEach((p,i)=>{
-    x.beginPath();x.moveTo(300,300);x.arc(300,300,295,i*a-Math.PI/2,(i+1)*a-Math.PI/2);x.closePath();x.fillStyle=WC[i%WC.length];x.fill();
-    x.strokeStyle='rgba(255,255,255,.6)';x.lineWidth=3;x.stroke();
-    x.save();x.translate(300,300);x.rotate(i*a+a/2-Math.PI/2);x.textAlign='right';
-    x.fillStyle=[0,2,6].includes(i%8)?'#fff':'#3b0d1c';x.font=`700 ${n>9?20:n>8?23:26}px Nunito, sans-serif`;x.fillText(p,275,9);x.restore();
-  });
-  x.beginPath();x.arc(300,300,34,0,7);x.fillStyle='#fff';x.fill();x.font='34px serif';x.textAlign='center';x.fillText('💗',300,312);
-  let rot=0, busy=false;
-  const btn=document.getElementById('spin'), res=document.getElementById('wheelRes');
-  const angleFor=k=>360-(k*360/n+360/n/2);
-  function applyClaimed(){
-    const g=JUEGOS.get('ruleta'); if(!g)return false;
-    const k=P.indexOf(g.opt); if(k>=0&&!busy){cv.style.transition='none';rot=angleFor(k);cv.style.transform=`rotate(${rot}deg)`;void cv.offsetWidth;cv.style.transition=''}
-    btn.disabled=true; btn.textContent='🎡 Ya giraste la ruleta';
-    res.textContent='Próxima cita: '+g.opt+' ♥'; return true;
+  const btn=document.getElementById('spin'), res=document.getElementById('wheelRes'), usedBox=document.getElementById('wheelUsed');
+  const usedList=()=>{const g=JUEGOS.get('ruleta');return g?(g.used||(g.opt?[{opt:g.opt,at:g.at||Date.now()}]:[])):[]};
+  const usedSet=()=>new Set(usedList().map(u=>u.opt));
+  function draw(){
+    const U=usedSet(); x.clearRect(0,0,600,600);
+    P.forEach((p,i)=>{
+      const off=U.has(p);
+      x.beginPath();x.moveTo(300,300);x.arc(300,300,295,i*a-Math.PI/2,(i+1)*a-Math.PI/2);x.closePath();x.fillStyle=off?'#5b3a46':WC[i%WC.length];x.fill();
+      x.strokeStyle='rgba(255,255,255,.6)';x.lineWidth=3;x.stroke();
+      x.save();x.translate(300,300);x.rotate(i*a+a/2-Math.PI/2);x.textAlign='right';
+      x.fillStyle=off?'rgba(255,255,255,.45)':([0,2,6].includes(i%8)?'#fff':'#3b0d1c');x.font=`700 ${n>9?20:n>8?23:26}px Nunito, sans-serif`;x.fillText((off?'✓ ':'')+p,275,9);x.restore();
+    });
+    x.beginPath();x.arc(300,300,34,0,7);x.fillStyle='#fff';x.fill();x.font='34px serif';x.textAlign='center';x.fillText('💗',300,312);
   }
-  applyClaimed(); JUEGOS.on(()=>{if(!busy)applyClaimed()});
+  let rot=0, busy=false;
+  const angleFor=k=>360-(k*360/n+360/n/2);
+  function paint(){
+    draw(); const L=usedList(), left=P.filter(p=>!usedSet().has(p));
+    if(!busy){
+      if(L.length){const last=L[L.length-1]; res.textContent='Próxima cita: '+last.opt+' ♥';
+        const k=P.indexOf(last.opt); if(k>=0&&rot===0){cv.style.transition='none';rot=angleFor(k);cv.style.transform=`rotate(${rot}deg)`;void cv.offsetWidth;cv.style.transition=''}}
+      else res.textContent='';
+      btn.disabled=!left.length; btn.textContent=left.length?(L.length?'🎡 Girar otra vez':'🎡 Girar'):'💗 Ya salieron todas';
+    }
+    usedBox.innerHTML=''; if(L.length){const t=document.createElement('div');t.className='wu-t';t.textContent=left.length?`Ya salieron (${L.length} de ${n}):`:'¡Ya salieron todas! Cuando quieras, '+C.yo+' la reinicia 💗';usedBox.append(t);
+      L.slice().reverse().forEach(u=>{const c=document.createElement('span');c.className='wu';c.textContent=u.opt+' · '+fmtDia(u.at);usedBox.append(c)})}
+  }
+  paint(); JUEGOS.on(()=>{if(!busy)paint()});
   btn.onclick=()=>{
-    if(busy||JUEGOS.get('ruleta'))return; busy=true; res.textContent='';
-    const k=Math.floor(Math.random()*n);
+    if(busy)return; const U=usedSet(), avail=P.map((p,i)=>i).filter(i=>!U.has(P[i])); if(!avail.length)return;
+    busy=true; res.textContent=''; btn.disabled=true;
+    const k=avail[Math.floor(Math.random()*avail.length)];
     rot+= 360*6 + ((angleFor(k)-(rot%360))+360)%360;
     cv.style.transform=`rotate(${rot}deg)`;
-    setTimeout(()=>{JUEGOS.set('ruleta',{opt:P[k]});busy=false;applyClaimed();avisar(`🎡 ${C.ella} giró la ruleta de citas: ${P[k]}`,'ruleta');burst(20)},4600);
+    setTimeout(()=>{
+      JUEGOS.set('ruleta',{used:[...usedList(),{opt:P[k],at:Date.now()}]});
+      busy=false; paint(); avisar(`🎡 ${C.ella} giró la ruleta de citas: ${P[k]}`,'ruleta'); burst(20);
+    },4600);
   };
 })();
 
@@ -2245,7 +2269,7 @@ function initEditor(){
         h('div',{class:'ed-note'},'Vuelve a dejar todo como nuevo en el celular de Ale (y en el tuyo). Los planes, notitas, eventos y fotos no se borran.'),
         bt('Reiniciar todo',()=>{D.reinicio=String(Date.now())},'vales sin usar, cartas sin abrir, rasca y gana y ruleta listos para usarse otra vez.'),
         bt('Reiniciar solo el rasca y gana',()=>{D.rr=Date.now()},'el rasca y gana se podrá raspar otra vez.'),
-        bt('Reiniciar solo la ruleta',()=>{D.rq=Date.now()},'la ruleta se podrá girar otra vez.'),
+        bt('Reiniciar solo la ruleta',()=>{D.rq=Date.now()},'todas las opciones de la ruleta vuelven a estar disponibles.'),
         bt('Reiniciar solo los vales',()=>{D.reinicioVales=Date.now()},'todos los vales vuelven a estar sin usar.'),msg]));
       return;
     }
