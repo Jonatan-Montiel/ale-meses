@@ -692,6 +692,21 @@
     <div class="kb-st" id="kbSt"></div>
   </section>
 
+  <!-- APRENDER (KANBAN) -->
+  <section id="aprender">
+    <h2>Cosas que aprender juntos</h2>
+    <div class="sub">escribe lo que quieras que aprendamos juntos</div>
+    <form class="kb-add" id="apForm" autocomplete="off">
+      <input id="apIn" maxlength="160" placeholder="Ej. Aprender a hacer pan casero 🥖">
+      <button type="submit" aria-label="Agregar">＋</button>
+    </form>
+    <div class="kb">
+      <div class="kb-col" data-c="p"><div class="kb-h"><span>📚 Por aprender</span><b id="apNp">0</b></div><div class="kb-list" id="apP"></div></div>
+      <div class="kb-col done" data-c="d"><div class="kb-h"><span>🎓 ¡Ya lo aprendimos!</span><b id="apNd">0</b></div><div class="kb-list" id="apD"></div></div>
+    </div>
+    <div class="kb-st" id="apSt"></div>
+  </section>
+
   <!-- CIELO -->
   <section id="cielo">
     <h2>El cielo de esa noche</h2>
@@ -756,6 +771,7 @@
   <a href="#rompecabezas">Puzzle</a>
   <a href="#ruleta">Ruleta</a>
   <a href="#planes">Planes</a>
+  <a href="#aprender">Aprender</a>
   <a href="#cielo">Cielo</a>
   <a href="#sorpresas">Sorpresas</a>
   <a href="#constelacion">Estrellas</a>
@@ -999,7 +1015,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     location.replace(location.pathname);
   };
@@ -1130,13 +1146,13 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   };
 })();
 
-/* ====== Planes (kanban) ====== */
-(function(){
-  const CFG=C.kanban||{}, CACHE='planes-cache';
+/* ====== Tableros tipo kanban (planes y aprender) ====== */
+function makeBoard(B){
+  const CFG=C.kanban||{}, CACHE=B.cache, FILE=B.file, $=id=>document.getElementById(B.p+id);
   const nowT=()=>Date.now(), uid=()=>nowT().toString(36)+Math.random().toString(36).slice(2,7);
   let cards=[]; try{cards=JSON.parse(localStorage.getItem(CACHE)||'null')||[]}catch(e){}
-  if(!cards.length&&!CFG.gist){cards=(C.lista||[]).map(t=>({id:uid(),t:FILL(t),c:'p',a:nowT(),u:0}))}
-  const P=document.getElementById('kbP'), Dn=document.getElementById('kbD'), st=document.getElementById('kbSt');
+  if(!cards.length&&!CFG.gist){cards=(B.seed||[]).map(t=>({id:uid(),t:FILL(t),c:'p',a:nowT(),u:0}))}
+  const P=$('P'), Dn=$('D'), st=$('St');
   const fmtD=t=>{const d=new Date(t);return d.toLocaleDateString('es-MX',d.getFullYear()===new Date().getFullYear()?{day:'numeric',month:'short'}:{day:'numeric',month:'short',year:'2-digit'})};
   const remote=!!(CFG.gist&&CFG.token);
   const say=t=>st.textContent=t;
@@ -1145,10 +1161,10 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   function render(){
     const live=cards.filter(x=>!x.x);
     const pend=live.filter(x=>x.c==='p').sort((a,b)=>a.a-b.a), done=live.filter(x=>x.c==='d').sort((a,b)=>(b.d||0)-(a.d||0));
-    document.getElementById('kbNp').textContent=pend.length; document.getElementById('kbNd').textContent=done.length;
+    $('Np').textContent=pend.length; $('Nd').textContent=done.length;
     P.innerHTML=''; Dn.innerHTML='';
-    if(!pend.length)P.innerHTML='<div class="kb-empty">¿qué hacemos? escríbelo arriba ✍️</div>';
-    if(!done.length)Dn.innerHTML='<div class="kb-empty">aquí irán nuestros recuerdos 💗</div>';
+    if(!pend.length)P.innerHTML='<div class="kb-empty">'+B.emptyP+'</div>';
+    if(!done.length)Dn.innerHTML='<div class="kb-empty">'+B.emptyD+'</div>';
     pend.forEach(x=>P.append(card(x))); done.forEach(x=>Dn.append(card(x)));
   }
   function card(x){
@@ -1157,7 +1173,7 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
     const f=document.createElement('div'); f.className='kb-f';
     const d=document.createElement('span'); d.className='kb-d'; d.textContent=x.c==='d'?('✓ '+fmtD(x.d||x.u)):fmtD(x.a);
     const b=document.createElement('div'); b.className='kb-b';
-    const mv=document.createElement('button'); mv.className=x.c==='p'?'go':''; mv.textContent=x.c==='p'?'✓':'↩'; mv.title=x.c==='p'?'¡Lo hicimos!':'Regresar a pendientes';
+    const mv=document.createElement('button'); mv.className=x.c==='p'?'go':''; mv.textContent=x.c==='p'?'✓':'↩'; mv.title=x.c==='p'?B.doneTitle:'Regresar a pendientes';
     mv.onclick=()=>move(x.id,x.c==='p'?'d':'p');
     const ed=document.createElement('button'); ed.textContent='✎'; ed.title='Editar';
     ed.onclick=()=>{t.contentEditable='true';t.focus();const r=document.createRange();r.selectNodeContents(t);r.collapse(false);const s=getSelection();s.removeAllRanges();s.addRange(r)};
@@ -1172,13 +1188,13 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
     return el;
   }
   function move(id,c){const x=cards.find(y=>y.id===id);if(!x||x.c===c)return;x.c=c;x.u=nowT();if(c==='d'){x.d=nowT();burst(30);if(window.confetti)confetti(70)}changed()}
-  document.querySelectorAll('.kb-col').forEach(col=>{
+  document.querySelectorAll('#'+B.sec+' .kb-col').forEach(col=>{
     col.addEventListener('dragover',e=>{e.preventDefault();col.classList.add('over')});
     col.addEventListener('dragleave',()=>col.classList.remove('over'));
     col.addEventListener('drop',e=>{e.preventDefault();col.classList.remove('over');move(e.dataTransfer.getData('text/plain'),col.dataset.c)});
   });
-  document.getElementById('kbForm').addEventListener('submit',e=>{
-    e.preventDefault(); const i=document.getElementById('kbIn'), v=i.value.trim().slice(0,160); if(!v)return;
+  $('Form').addEventListener('submit',e=>{
+    e.preventDefault(); const i=$('In'), v=i.value.trim().slice(0,160); if(!v)return;
     cards.push({id:uid(),t:v,c:'p',a:nowT(),u:nowT()}); i.value=''; burst(10); changed();
   });
   /* --- sincronización cifrada (gist privado) --- */
@@ -1187,7 +1203,7 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   async function pull(){
     const r=await fetch(`https://api.github.com/gists/${CFG.gist}?t=${nowT()}`,{headers:auth(),cache:'no-store'});
     if(!r.ok)throw new Error(r.status);
-    const j=await r.json(), f=j.files&&j.files['planes.bin']; if(!f||!f.content)return [];
+    const j=await r.json(), f=j.files&&j.files[FILE]; if(!f||!f.content)return [];
     let txt=f.content; if(f.truncated&&f.raw_url){txt=await (await fetch(f.raw_url,{headers:auth()})).text()}
     const u=Uint8Array.from(atob(txt.trim()),c=>c.charCodeAt(0));
     return JSON.parse(new TextDecoder().decode(await decBuf(u.buffer))).cards||[];
@@ -1195,7 +1211,7 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   async function push(){
     const enc=await encBuf(new TextEncoder().encode(JSON.stringify({cards})));
     let bin='';for(let i=0;i<enc.length;i+=0x8000)bin+=String.fromCharCode.apply(null,enc.subarray(i,i+0x8000));
-    const r=await fetch(`https://api.github.com/gists/${CFG.gist}`,{method:'PATCH',headers:Object.assign({'Content-Type':'application/json'},auth()),body:JSON.stringify({files:{'planes.bin':{content:btoa(bin)}}})});
+    const r=await fetch(`https://api.github.com/gists/${CFG.gist}`,{method:'PATCH',headers:Object.assign({'Content-Type':'application/json'},auth()),body:JSON.stringify({files:{[FILE]:{content:btoa(bin)}}})});
     if(!r.ok)throw new Error(r.status);
   }
   let timer=null, busy=false, again=false;
@@ -1211,7 +1227,9 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   if(remote){refresh().then(()=>{ if(cards.some(x=>(x.u||0)===0)){cards.forEach(x=>x.u=x.u||nowT());sync()} });
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
     window.addEventListener('online',sync);}
-})();
+}
+makeBoard({sec:'planes',p:'kb',file:'planes.bin',cache:'planes-cache',seed:C.lista,emptyP:'¿qué hacemos? escríbelo arriba ✍️',emptyD:'aquí irán nuestros recuerdos 💗',doneTitle:'¡Lo hicimos!'});
+makeBoard({sec:'aprender',p:'ap',file:'aprender.bin',cache:'aprender-cache',seed:[],emptyP:'¿qué aprendemos? escríbelo arriba 📚',emptyD:'aquí irá todo lo que ya aprendimos juntos 🎓',doneTitle:'¡Ya lo aprendimos!'});
 
 /* ====== Sorpresa de cada mes ====== */
 (function(){
@@ -1868,7 +1886,7 @@ function initEditor(){
         }catch(e){msg.textContent='No se pudo activar: '+e.message+'.';msg.className='ed-note bad'}
       }
       body.append(section('📝 '+sec.t,[
-        h('div',{class:'ed-note',html:'Ale puede agregar planes (y moverlos a «¡Lo logramos!») y <b>subir fotos al carrusel</b> desde su celular, sin entrar al editor. Para que se guarden en línea (y tú también los veas) se usa un <b>gist privado y cifrado</b> de GitHub con un token que <b>solo</b> puede tocar gists, nunca tu repo.'}),
+        h('div',{class:'ed-note',html:'Ale puede agregar planes y cosas que aprender (y marcarlas como hechas) y <b>subir fotos al carrusel</b> desde su celular, sin entrar al editor. Para que se guarden en línea (y tú también los veas) se usa un <b>gist privado y cifrado</b> de GitHub con un token que <b>solo</b> puede tocar gists, nunca tu repo.'}),
         h('label',{class:'ed-lab'},h('span',null,'Token solo de Gists'),tk),
         h('button',{class:'ed-btn',onclick:activate},D.kanban.gist?'Actualizar token':'Activar planes compartidos'),msg,
         D.kanban.gist?h('button',{class:'ed-btn',style:'background:#7a6168',onclick:restore},'Mostrar de nuevo las fotos ocultas'):null,restMsg,
