@@ -346,6 +346,21 @@
   .car-actions .btn{margin-top:0}
   .car-actions [hidden]{display:none!important}
   .btn.alt{background:rgba(255,255,255,.12);box-shadow:none;border:1px solid rgba(247,198,211,.35)}
+  /* Mensaje del día en grande */
+  .hoy-ov{position:fixed;inset:0;z-index:47;display:none;align-items:center;justify-content:center;padding:22px;
+    background:radial-gradient(circle at 50% 35%,rgba(110,28,60,.99),rgba(18,3,10,.995))}
+  .hoy-ov.open{display:flex;animation:fadeIn .6s ease}
+  .hoy-ov.out{animation:fadeOut .5s ease forwards}
+  @keyframes fadeOut{to{opacity:0}}
+  .hoy-card{max-width:420px;width:100%;text-align:center;animation:rise .9s cubic-bezier(.2,.9,.3,1.1)}
+  @keyframes rise{from{transform:translateY(40px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+  .hoy-ico{font-size:58px;animation:beat 1.6s ease-in-out infinite;filter:drop-shadow(0 8px 20px rgba(232,93,132,.5))}
+  .hoy-date{margin-top:10px;font-size:12.5px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .hoy-msg{font-family:'Fraunces',serif;font-style:italic;font-size:31px;line-height:1.3;margin:18px 0 6px;color:#fff;text-wrap:balance}
+  .hoy-sep{color:var(--rose);font-size:18px;margin:14px 0 8px;letter-spacing:10px}
+  .hoy-fix{font-family:'Caveat',cursive;font-size:32px;line-height:1.2;color:var(--blush);text-wrap:balance}
+  .hoy-sign{font-family:'Caveat',cursive;font-size:28px;color:var(--gold);margin-top:10px}
+  #hoyBtn{margin-top:26px}
   /* Galería */
   .gallery{columns:2;column-gap:12px}
   .pic{break-inside:avoid;margin:0 0 12px;background:var(--cream);padding:7px 7px 22px;border-radius:6px;
@@ -455,6 +470,15 @@
   <div class="pad" id="pad"></div>
 </div>
 <div class="secret" id="secret"><div class="paper"><button class="x" id="secretX" aria-label="Cerrar">×</button><p style="font-size:30px">🤫💗</p><p>¡Encontraste el mensaje secreto!</p><p id="secretTxt"></p><p class="sign"></p></div></div>
+<div class="hoy-ov" id="hoyOv" role="dialog" aria-label="Mensaje de hoy"><div class="hoy-card">
+  <div class="hoy-ico">💌</div>
+  <div class="hoy-date" id="hoyDate"></div>
+  <div class="hoy-msg" id="hoyMsg"></div>
+  <div class="hoy-sep">♥</div>
+  <div class="hoy-fix" id="hoyFix"></div>
+  <div class="hoy-sign" id="hoySign"></div>
+  <button class="btn" id="hoyBtn">Gracias, mi amor ♥</button>
+</div></div>
 <div class="celebrate" id="celebrate"><div class="cel-t">¡Feliz</div><div class="cel-n" id="celN">8</div><div class="cel-t" id="celT">meses, mi amor!</div><button class="btn" id="celBtn" style="margin-top:26px">Gracias ♥</button></div>
 <div class="credits" id="credits"><button class="cr-x" id="crX" aria-label="Cerrar">×</button><div id="crBgs"></div><div class="cr-roll" id="crRoll"></div></div>
 <div id="hearts"></div>
@@ -993,6 +1017,17 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   const doy=Math.floor((now-new Date(now.getFullYear(),0,0))/86400000);
   document.getElementById('daily').textContent=D[doy%D.length];
   document.getElementById('dailyL').textContent='Mensaje de hoy · '+now.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+  // Mensaje en grande cada vez que entra (después del candado)
+  const ov=document.getElementById('hoyOv');
+  document.getElementById('hoyDate').textContent=now.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('hoyMsg').textContent=D[doy%D.length];
+  document.getElementById('hoyFix').textContent=FILL(C.mensajeFijo||'Te amo mucho, {ella}, y siempre voy a estar para ti.');
+  document.getElementById('hoySign').textContent=SIGN;
+  let shown=false;
+  const close=()=>{if(!ov.classList.contains('open'))return;ov.classList.add('out');setTimeout(()=>{ov.classList.remove('open','out');window.dispatchEvent(new Event('hoyClosed'))},480)};
+  window.addEventListener('unlocked',()=>{if(shown)return;shown=true;setTimeout(()=>{ov.classList.add('open');burst(35)},500)});
+  document.getElementById('hoyBtn').onclick=close;
+  ov.addEventListener('click',e=>{if(e.target===ov)close()});
 })();
 
 /* ====== Easter egg: 8 toques en el 8 ====== */
@@ -1277,13 +1312,13 @@ document.addEventListener('pointerdown',e=>{
 /* ====== Celebración cada 12 ====== */
 (function(){
   const mx=MXNOW, n=monthsAt(mx);
-  window.addEventListener('unlocked',()=>{
+  window.addEventListener('hoyClosed',()=>{
     if(mx.getDate()!==SD||n<1)return;
     if(n>12&&n%12!==0)return;
     const big=n%12===0;
     document.getElementById('celN').textContent=big?n/12:n;
     document.getElementById('celT').textContent=big?(n===12?'año juntos, mi amor!':'años juntos, mi amor!'):'meses, mi amor!';
-    setTimeout(()=>{document.getElementById('celebrate').classList.add('open');confetti(140);burst(60)},900);
+    setTimeout(()=>{document.getElementById('celebrate').classList.add('open');confetti(140);burst(60)},350);
   });
   document.getElementById('celBtn').onclick=()=>document.getElementById('celebrate').classList.remove('open');
   window.confetti=function(k){
@@ -1660,7 +1695,7 @@ let CUR=null;
 const SCHEMA=[
   {t:'Nombres, fecha y candado',f:[['ella','Su nombre','text'],['yo','Tu nombre (firma)','text'],['inicio','Fecha en que empezó todo','date'],['pin','Código del candado (4 números)','text'],['pistas','Pistas del candado (una por intento fallido)','list']]},
   {t:'Saludos según la hora',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
-  {t:'Mensaje del día',f:[['mensajesDia','Frases (cambia una cada día)','list']]},
+  {t:'Mensaje del día',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2],['mensajesDia','Frases (cambia una cada día)','list']]},
   {t:'Nuestra canción',f:[['cancion.titulo','Título','text'],['cancion.artista','Artista','text'],['cancion.link','Link (Spotify, YouTube…)','text']]},
   {t:'Carta principal',f:[['carta','Texto · deja una línea vacía entre párrafos','textarea',10]]},
   {t:'Ábrela cuando…',f:[['abrela','Cartas','objlist',[['emoji','Emoji','text'],['cuando','Ábrela cuando…','text'],['texto','Texto de la carta','textarea']]]]},
