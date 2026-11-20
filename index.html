@@ -554,7 +554,7 @@
   <!-- POLAROID -->
   <section id="polaroid">
     <h2>Una foto por revelar</h2>
-    <div class="sub">tócala y espera un poquito…</div>
+    <div class="sub" id="polaSub">tócala y espera un poquito…</div>
     <div class="pola" id="pola"><div class="pola-img" id="polaImg"></div><div class="pola-cap" id="polaCap">toca para revelar</div></div>
   </section>
 
@@ -1185,14 +1185,21 @@ document.addEventListener('pointerdown',e=>{
   h.style.left=e.clientX+'px'; h.style.top=e.clientY+'px'; document.body.appendChild(h); setTimeout(()=>h.remove(),1000);
 },{passive:true});
 
-/* ====== Polaroid que se revela ====== */
+/* ====== Polaroid que se revela (foto al azar de la galería) ====== */
 (function(){
-  const p=document.getElementById('pola');
-  document.getElementById('polaImg').style.backgroundImage=`url("${PHOTOS[Math.max(0,Math.min(PHOTOS.length-1,(C.fotoPolaroid||1)-1))]}")`;
+  const p=document.getElementById('pola'), img=document.getElementById('polaImg'), cap=document.getElementById('polaCap'), sub=document.getElementById('polaSub');
+  let last=-1, busy=false;
+  const pool=()=>{const g=(typeof galShown==='function')?galShown().map(x=>x.src):[];return g.length?g:PHOTOS};
+  function pick(){const L=pool();if(!L.length)return;let k;do{k=Math.floor(Math.random()*L.length)}while(L.length>1&&k===last);last=k;img.style.backgroundImage=`url("${L[k]}")`}
+  pick();
   p.addEventListener('click',()=>{
-    if(p.classList.contains('dev'))return;
-    p.classList.add('dev'); document.getElementById('polaCap').textContent='revelando…';
-    setTimeout(()=>{document.getElementById('polaCap').textContent=FILL(C.polaroidTexto);burst(20)},6500);
+    if(busy)return;
+    if(p.classList.contains('dev')){
+      img.style.transition='none'; p.classList.remove('dev'); pick(); void img.offsetWidth; img.style.transition='';
+      cap.textContent='toca para revelar'; sub.textContent='tócala y espera un poquito…'; return;
+    }
+    busy=true; p.classList.add('dev'); cap.textContent='revelando…';
+    setTimeout(()=>{cap.textContent=FILL(C.polaroidTexto);sub.textContent='tócala otra vez para revelar otra foto ✨';burst(20);busy=false},6500);
   });
 })();
 
@@ -1658,7 +1665,7 @@ const SCHEMA=[
   {t:'Carta principal',f:[['carta','Texto · deja una línea vacía entre párrafos','textarea',10]]},
   {t:'Ábrela cuando…',f:[['abrela','Cartas','objlist',[['emoji','Emoji','text'],['cuando','Ábrela cuando…','text'],['texto','Texto de la carta','textarea']]]]},
   {t:'Carta que se escribe sola',f:[['cartaSola','Texto','textarea',9]]},
-  {t:'Fotos',f:[['fotos','Galería (también se usan en el memorama y los créditos)','photos'],['fotoPolaroid','Número de foto para la polaroid','number'],['polaroidTexto','Texto al revelar la polaroid','text'],['fotoRompecabezas','Número de foto para el rompecabezas','number']]},
+  {t:'Fotos',f:[['fotos','Galería (también se usan en el memorama y los créditos)','photos'],['polaroidTexto','Texto al revelar la polaroid (la foto sale al azar)','text'],['fotoRompecabezas','Número de foto para el rompecabezas','number']]},
   {t:'Razones por las que te quiero',f:[['razones','Razones','list']]},
   {t:'Galleta de la fortuna',f:[['fortunas','Mensajes de la galleta','list']]},
   {t:'Rasca y gana',f:[['rasca.emoji','Emoji','text'],['rasca.titulo','Título del premio','text'],['rasca.texto','Texto del premio','textarea',3]]},
