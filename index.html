@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://formsubmit.co https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -929,14 +929,12 @@ const GG=(()=>{
   }
   return {on,pull,push,merge,shrink,newPhoto,photo};
 })();
-/* ---- Avisos a Jon (notificación con ntfy y/o correo con FormSubmit) ---- */
+/* ---- Avisos a Jon (notificación con ntfy) ---- */
 const AV=C.avisos||{};
 function avisar(txt,tipo){
   if(EDIT)return;
   if(tipo==='nota'&&AV.notas===false)return;
   if(AV.ntfy)fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:tipo==='nota'?'💌 Notita de '+C.ella:'🎟️ Vale canjeado',message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
-  if(AV.email)fetch('https://formsubmit.co/ajax/'+encodeURIComponent(AV.email.trim()),{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
-    body:JSON.stringify({_subject:txt.slice(0,90),Mensaje:txt,_template:'box',_captcha:'false'})}).catch(()=>{});
 }
 const fmtDia=t=>new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short'});
 const fmtHora=t=>new Date(t).toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'});
@@ -2106,13 +2104,11 @@ function initEditor(){
       const msg=h('div',{class:'ed-note'});
       async function test(){
         msg.textContent='Enviando prueba…';msg.className='ed-note'; const add=t=>{if(msg.textContent==='Enviando prueba…')msg.textContent='';msg.textContent+=t}; const txt='🎟️ Prueba: así te va a llegar el aviso cuando '+(D.ella||'Ale')+' canjee un vale 💗'; let any=false;
-        if(A.email){any=true;try{const r=await fetch('https://formsubmit.co/ajax/'+encodeURIComponent(A.email),{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({_subject:txt,Mensaje:txt,_template:'box',_captcha:'false'})});
-          const j=await r.json().catch(()=>({}));msg.textContent=(j.success==='true'||j.success===true)?'✅ Correo enviado. ':'📧 Revisa tu correo: la primera vez FormSubmit te pide confirmar. ';}catch(e){msg.textContent='No se pudo mandar el correo. '}}
         if(A.ntfy){any=true;try{const r=await fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:A.ntfy,title:'🎟️ Prueba de aviso',message:txt,tags:['heart'],priority:4})});add(r.ok?'🔔 Notificación enviada a ntfy. ':'No se pudo mandar a ntfy. ')}catch(e){add('No se pudo mandar a ntfy. ')}}
-        if(!any){msg.textContent='Genera tu nombre secreto de ntfy o escribe tu correo.';msg.className='ed-note bad'}else msg.className='ed-note ok';
+        if(!any){msg.textContent='Primero genera tu nombre secreto de ntfy y guarda.';msg.className='ed-note bad'}else msg.className='ed-note ok';
       }
       body.append(section('🔔 '+sec.t,[
-        h('div',{class:'ed-note',html:'Cuando Ale canjee un vale (o te deje una notita) te llega un aviso automático, sin que ella haga nada. Puedes usar <b>notificación en tu celular (ntfy)</b>, <b>correo</b> o los dos. Guarda y luego toca «Enviar prueba».'}),
+        h('div',{class:'ed-note',html:'Cuando Ale canjee un vale (o te deje una notita) te llega un aviso automático, sin que ella haga nada. Te llega como <b>notificación en tu celular</b> con la app gratuita <b>ntfy</b>. Guarda y luego toca «Enviar prueba».'}),
         (()=>{const t=inp('ntfy','toca «Generar» abajo');
           const gen=h('button',{class:'ed-btn',style:'background:#7a6168',onclick:()=>{const r=[...crypto.getRandomValues(new Uint8Array(15))].map(x=>'abcdefghijkmnpqrstuvwxyz23456789'[x%32]).join('');t.value='nl-'+r;A.ntfy=t.value;markDirty()}},'Generar nombre secreto');
           return h('div',null,h('label',{class:'ed-lab'},h('span',null,'🔔 Notificación en tu celular (app ntfy) · nombre secreto'),t),gen,
@@ -2122,11 +2118,9 @@ function initEditor(){
               '<li>En ntfy toca <b>＋</b> (Subscribe to topic) y escribe <b>exactamente</b> el nombre secreto de arriba. Deja el servidor como viene (ntfy.sh).</li>'+
               '<li>Regresa aquí y toca <b>Enviar prueba</b>: te debe llegar una notificación.</li>'+
               '<li>Cópialo tal cual y no lo compartas: quien tenga ese nombre podría ver los avisos.</li>'})))})(),
-        h('label',{class:'ed-lab'},h('span',null,'📧 Tu correo'),inp('email','tucorreo@gmail.com','email')),
-        h('details',{class:'ed-how'},h('summary',null,'¿Cómo activo el correo?'),h('ol',{html:'<li>Escribe tu correo arriba y toca <b>Enviar prueba</b>.</li><li>Te llega un correo de <b>FormSubmit</b>: toca <b>Activate Form</b>. Listo, desde ahí te llegan los avisos.</li><li>(Opcional) En ese correo te dan un código raro; puedes pegarlo aquí en lugar de tu correo para no tenerlo escrito.</li>'})),
         h('label',{class:'ed-lab',style:'display:flex;gap:8px;align-items:center'},notas,h('span',{style:'margin:0'},'Avisarme también cuando me deje una notita en el buzón')),
         h('button',{class:'ed-btn',onclick:test},'Enviar prueba'),msg,
-        h('div',{class:'ed-note',html:'Nota: el texto del aviso (ej. «Ale canjeó un vale: Un masaje») pasa por el servicio de aviso que elijas (ntfy o correo); el resto de la app sigue cifrado.'})
+        h('div',{class:'ed-note',html:'Nota: el texto del aviso (ej. «Ale canjeó un vale: Un masaje») pasa por el servidor de ntfy; el resto de la app sigue cifrado.'})
       ]));
       return;
     }
