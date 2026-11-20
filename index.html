@@ -931,9 +931,19 @@ const GG=(()=>{
 })();
 /* ---- Avisos a Jon (notificación con ntfy) ---- */
 const AV=C.avisos||{};
+const AV_TIPOS=window.AV_TIPOS=[['vale','🎟️ Canjea un vale'],['nota','💌 Te deja una notita en el buzón'],['ruleta','🎡 Gira la ruleta de citas'],['abrela','💌 Abre una carta «Ábrela cuando…»'],
+  ['abrazo','🤗 Te manda un abrazo (corazón presionado)'],['rasca','🌠 Raspa el rasca y gana'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Agrega o aprende algo nuevo'],
+  ['evento','🗓️ Agrega algo a «Lo que viene»'],['foto','📷 Sube fotos al carrusel'],['recuerdo','📷 Guarda un recuerdo de algo que hicieron'],['sorpresa','🎁 Abre la sorpresa del mes'],
+  ['capsula','⏳ Abre la cápsula del tiempo'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (máx. 1 aviso cada 30 min)']];
+const AV_OFF_DEF=window.AV_OFF_DEF={entrada:1};
+const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'&&AV.notas===false)return false;return !off[t]};
+const AV_LAST={};
 function avisar(txt,tipo){
   if(EDIT)return;
-  if(tipo==='nota'&&AV.notas===false)return;
+  try{if(localStorage.getItem('yo-soy')==='yo')return}catch(e){}
+  if(!avOn(tipo))return;
+  const gap=tipo==='entrada'?30*60*1000:({ruleta:1,abrazo:1,rasca:1,secreto:1}[tipo]?60*1000:0);
+  try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
   if(AV.ntfy)fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:tipo==='nota'?'💌 Notita de '+C.ella:'🎟️ Vale canjeado',message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
 }
 const fmtDia=t=>new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short'});
@@ -1068,7 +1078,7 @@ galRender();
         GAL.items.unshift({own:true,id,a:now,src:URL.createObjectURL(blob)}); carIdx=0; galRender(); car.scrollLeft=0;
       }catch(e){st.textContent='No pude subir una foto'+(e.message==='formato'?' (formato no compatible, prueba con JPG)':'')+'. Intenta otra vez.'}
     }
-    if(okN){try{await pushIdx();st.textContent=okN===1?'¡Foto agregada! 💗':`¡${okN} fotos agregadas! 💗`;burst(25)}catch(e){st.textContent='Las fotos se subieron pero no se pudieron registrar. Intenta de nuevo.'}}
+    if(okN){avisar(`📷 ${C.ella} subió ${okN===1?'una foto':okN+' fotos'} al carrusel`,'foto');try{await pushIdx();st.textContent=okN===1?'¡Foto agregada! 💗':`¡${okN} fotos agregadas! 💗`;burst(25)}catch(e){st.textContent='Las fotos se subieron pero no se pudieron registrar. Intenta de nuevo.'}}
     add.disabled=false;
   };
   pullIdx().then(r=>{idx=r;apply()}).catch(()=>{});
@@ -1161,7 +1171,7 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
     b.onclick=()=>{
       m.querySelector('.when-t').textContent=`Ábrela cuando ${w[1]} ${w[0]}`;
       m.querySelector('.wtxt').textContent=w[2];
-      m.classList.add('open'); b.classList.add('read'); read[i]=1; burst(10);
+      m.classList.add('open'); b.classList.add('read'); read[i]=1; burst(10); avisar(`💌 ${C.ella} abrió la carta «Ábrela cuando ${w[1]}» ${w[0]}`,'abrela');
       try{localStorage.setItem('abrela-ale-'+RK,JSON.stringify(read))}catch(e){}
     };
     wrap.appendChild(b);
@@ -1192,7 +1202,7 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   m.innerHTML='<div class="paper"><button class="x" aria-label="Cerrar">×</button><div class="when-t">Para mi amor del futuro ⏳</div><p class="ctxt"></p><p class="sign"></p></div>';
   document.body.appendChild(m);
   m.querySelector('.x').onclick=()=>m.classList.remove('open');
-  btn.onclick=()=>{if(!ready)return;m.querySelector('.ctxt').textContent=dec();m.classList.add('open');burst(50)};
+  btn.onclick=()=>{if(!ready)return;avisar(`⏳ ${C.ella} abrió la cápsula del tiempo`,'capsula');m.querySelector('.ctxt').textContent=dec();m.classList.add('open');burst(50)};
 })();
 
 /* ====== Mensaje del día ====== */
@@ -1209,7 +1219,7 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   document.getElementById('hoySign').textContent=SIGN;
   let shown=false;
   const close=()=>{if(!ov.classList.contains('open'))return;ov.classList.add('out');setTimeout(()=>{ov.classList.remove('open','out');window.dispatchEvent(new Event('hoyClosed'))},480)};
-  window.addEventListener('unlocked',()=>{if(shown)return;shown=true;setTimeout(()=>{ov.classList.add('open');burst(35)},500)});
+  window.addEventListener('unlocked',()=>{avisar(`👀 ${C.ella} está viendo nuestra app`,'entrada');if(shown)return;shown=true;setTimeout(()=>{ov.classList.add('open');burst(35)},500)});
   document.getElementById('hoyBtn').onclick=close;
   ov.addEventListener('click',e=>{if(e.target===ov)close()});
 })();
@@ -1227,7 +1237,7 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
     e.addEventListener('click',()=>{
     n++; clearTimeout(t); t=setTimeout(()=>n=0,2500);
     e.classList.remove('boing'); void e.offsetWidth; e.classList.add('boing');
-    if(n>=TAPS){n=0;document.getElementById('secret').classList.add('open');burst(90)}
+    if(n>=TAPS){n=0;avisar(`🤫 ${C.ella} encontró el mensaje secreto`,'secreto');document.getElementById('secret').classList.add('open');burst(90)}
   });
   document.getElementById('secretX').onclick=()=>document.getElementById('secret').classList.remove('open');
 })();
@@ -1266,7 +1276,7 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
     const target=360-(k*360/n+360/n/2);
     rot+= 360*6 + ((target-(rot%360))+360)%360;
     cv.style.transform=`rotate(${rot}deg)`;
-    setTimeout(()=>{document.getElementById('wheelRes').textContent='Próxima cita: '+P[k]+' ♥';burst(20);busy=false},4600);
+    setTimeout(()=>{document.getElementById('wheelRes').textContent='Próxima cita: '+P[k]+' ♥';avisar(`🎡 ${C.ella} giró la ruleta de citas: ${P[k]}`,'ruleta');burst(20);busy=false},4600);
   };
 })();
 
@@ -1280,7 +1290,7 @@ const MEMO=(()=>{
     try{blob=await GG.shrink(f);img.style.display='block';img.style.backgroundImage=`url("${URL.createObjectURL(blob)}")`;pick.textContent='📷 Cambiar foto';st.textContent=''}catch(e){st.textContent='No pude leer esa foto, prueba con otra'}};
   save.onclick=async()=>{
     if(!cur)return; save.disabled=true; st.textContent='Guardando…';
-    try{ if(blob)cur.ph=await GG.newPhoto(blob); cur.n=txt.value.trim().slice(0,300); cur.u=Date.now(); m.classList.remove('open'); burst(25); cb&&cb(); }
+    try{ avisar(`📷 ${C.ella} guardó un recuerdo de: ${cur.t}`,'recuerdo'); if(blob)cur.ph=await GG.newPhoto(blob); cur.n=txt.value.trim().slice(0,300); cur.u=Date.now(); m.classList.remove('open'); burst(25); cb&&cb(); }
     catch(e){st.textContent='No se pudo guardar, intenta de nuevo'}
     save.disabled=false;
   };
@@ -1344,7 +1354,7 @@ function makeBoard(B){
     el.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',x.id);e.dataTransfer.effectAllowed='move'});
     return el;
   }
-  function move(id,c){const x=cards.find(y=>y.id===id);if(!x||x.c===c)return;x.c=c;x.u=nowT();if(c==='d'){x.d=nowT();burst(30);if(window.confetti)confetti(70)}changed()}
+  function move(id,c){const x=cards.find(y=>y.id===id);if(!x||x.c===c)return;x.c=c;x.u=nowT();if(c==='d'){avisar(`${B.avDone} ${x.t}`,B.avTipo);x.d=nowT();burst(30);if(window.confetti)confetti(70)}changed()}
   document.querySelectorAll('#'+B.sec+' .kb-col').forEach(col=>{
     col.addEventListener('dragover',e=>{e.preventDefault();col.classList.add('over')});
     col.addEventListener('dragleave',()=>col.classList.remove('over'));
@@ -1352,7 +1362,7 @@ function makeBoard(B){
   });
   $('Form').addEventListener('submit',e=>{
     e.preventDefault(); const i=$('In'), v=i.value.trim().slice(0,160); if(!v)return;
-    cards.push({id:uid(),t:v,c:'p',a:nowT(),u:nowT()}); i.value=''; burst(10); changed();
+    cards.push({id:uid(),t:v,c:'p',a:nowT(),u:nowT()}); avisar(`${B.avNew} ${v}`,B.avTipo); i.value=''; burst(10); changed();
   });
   /* --- sincronización cifrada (gist privado) --- */
   const GH={Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
@@ -1385,8 +1395,8 @@ function makeBoard(B){
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
     window.addEventListener('online',sync);}
 }
-makeBoard({sec:'planes',p:'kb',file:'planes.bin',cache:'planes-cache',seed:C.lista,emptyP:'¿qué hacemos? escríbelo arriba ✍️',emptyD:'aquí irán nuestros recuerdos 💗',doneTitle:'¡Lo hicimos!'});
-makeBoard({sec:'aprender',p:'ap',file:'aprender.bin',cache:'aprender-cache',seed:[],emptyP:'¿qué aprendemos? escríbelo arriba 📚',emptyD:'aquí irá todo lo que ya aprendimos juntos 🎓',doneTitle:'¡Ya lo aprendimos!'});
+makeBoard({avTipo:'plan',avNew:'📝 '+C.ella+' agregó un plan:',avDone:'🎉 ¡Lo logramos! '+C.ella+' marcó como hecho:',sec:'planes',p:'kb',file:'planes.bin',cache:'planes-cache',seed:C.lista,emptyP:'¿qué hacemos? escríbelo arriba ✍️',emptyD:'aquí irán nuestros recuerdos 💗',doneTitle:'¡Lo hicimos!'});
+makeBoard({avTipo:'aprender',avNew:'📚 '+C.ella+' quiere que aprendamos:',avDone:'🎓 ¡Ya lo aprendimos! '+C.ella+' marcó:',sec:'aprender',p:'ap',file:'aprender.bin',cache:'aprender-cache',seed:[],emptyP:'¿qué aprendemos? escríbelo arriba 📚',emptyD:'aquí irá todo lo que ya aprendimos juntos 🎓',doneTitle:'¡Ya lo aprendimos!'});
 
 /* ====== Sorpresa de cada mes ====== */
 (function(){
@@ -1410,7 +1420,7 @@ makeBoard({sec:'aprender',p:'ap',file:'aprender.bin',cache:'aprender-cache',seed
     b.innerHTML=`<span class="mi">${open?esc(e):'🔒'}</span>${esc(l)}<small>${open?'¡Ábrela!':'faltan '+days+' días'}</small>`;
     b.onclick=()=>{
       if(!open){b.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:300});return}
-      m.querySelector('.when-t').textContent=dec(t)+' '+e; m.querySelector('.stxt').textContent=dec(msg); m.classList.add('open'); burst(25);
+      m.querySelector('.when-t').textContent=dec(t)+' '+e; avisar(`🎁 ${C.ella} abrió la sorpresa de ${l}`,'sorpresa'); m.querySelector('.stxt').textContent=dec(msg); m.classList.add('open'); burst(25);
     };
     w.appendChild(b);
   });
@@ -1578,7 +1588,7 @@ document.addEventListener('pointerdown',e=>{
   function set(p){fill.setAttribute('y',92-92*p);pct.textContent=Math.round(p*100)+'%'}
   function loop(ts){
     if(t0===null)t0=ts; const p=Math.min(1,(ts-t0)/DUR); set(p);
-    if(p>=1){done=true;h.classList.remove('pressing');msg.textContent='¡Te mandé un abrazo gigante! 🤗💗';confetti(60);burst(50);return}
+    if(p>=1){done=true;h.classList.remove('pressing');msg.textContent='¡Te mandé un abrazo gigante! 🤗💗';avisar(`🤗 ${C.ella} te mandó un abrazo gigante`,'abrazo');confetti(60);burst(50);return}
     raf=requestAnimationFrame(loop);
   }
   function start(e){e.preventDefault(); if(done){done=false;set(0);msg.textContent=''} h.classList.add('pressing');msg.textContent='sigue, sigue…';t0=null;raf=requestAnimationFrame(loop)}
@@ -1679,7 +1689,7 @@ document.getElementById('jar').addEventListener('click',()=>{
   function check(){
     const d=ctx.getImageData(0,0,cv.width,cv.height).data;let clear=0;
     for(let i=3;i<d.length;i+=64)if(d[i]===0)clear++;
-    if(clear/(d.length/64)>.5){done=true;cv.style.opacity=0;setTimeout(()=>cv.style.display='none',800);burst(30)}
+    if(clear/(d.length/64)>.5){done=true;avisar(`🌠 ${C.ella} raspó el rasca y gana: ${FILL(C.rasca.titulo)}`,'rasca');cv.style.opacity=0;setTimeout(()=>cv.style.display='none',800);burst(30)}
   }
   let down=false;
   cv.addEventListener('pointerdown',e=>{down=true;scratch(e)});
@@ -1795,6 +1805,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   document.getElementById('evForm').addEventListener('submit',e=>{
     e.preventDefault(); const t=document.getElementById('evT').value.trim().slice(0,80), f=fIn.value, h=document.getElementById('evH').value;
     if(!t||!f){st.textContent=!t?'Escribe qué es 🙂':'Elige la fecha 🗓️';return}
+    avisar(`🗓️ ${C.ella} agregó a «Lo que viene»: ${t} · ${new Date(f+'T12:00:00-06:00').toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'})}${h?' '+h:''}`,'evento');
     evs.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),t,f,h,u:Date.now()}); document.getElementById('evT').value='';fIn.value='';document.getElementById('evH').value=''; burst(12); changed();
   });
   render(); refresh(); setInterval(render,30000); document.addEventListener('visibilitychange',()=>{if(!document.hidden){refresh();render()}});
@@ -2028,7 +2039,7 @@ const SCHEMA=[
   {t:'Frase final y mensajitos',f:[['fraseFinal','Frase final · *palabra* = cursiva rosa','textarea',3],['mensajitos','Mensajitos del botón «un poquito más de amor»','list']]},
   {t:'Créditos de película',f:[['creditos','Créditos','objlist',[['rol','Rol','text'],['quien','Quién / qué','text']]]]},
   {t:'WhatsApp',f:[['whatsapp.numero','Tu número (con lada, ej. 5255…)','text'],['whatsapp.mensajes','Botones','objlist',[['emoji','Emoji','text'],['boton','Texto del botón','text'],['mensaje','Mensaje que se envía','textarea',2]]]]},
-  {t:'Avisos cuando Ale canjee un vale',special:'avisos'},
+  {t:'Avisos a tu celular',special:'avisos'},
   {t:'Reiniciar para Ale',special:'reset'},
 ];
 const getP=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
@@ -2108,7 +2119,7 @@ function initEditor(){
         if(!any){msg.textContent='Primero genera tu nombre secreto de ntfy y guarda.';msg.className='ed-note bad'}else msg.className='ed-note ok';
       }
       body.append(section('🔔 '+sec.t,[
-        h('div',{class:'ed-note',html:'Cuando Ale canjee un vale (o te deje una notita) te llega un aviso automático, sin que ella haga nada. Te llega como <b>notificación en tu celular</b> con la app gratuita <b>ntfy</b>. Guarda y luego toca «Enviar prueba».'}),
+        h('div',{class:'ed-note',html:'Cuando Ale use la app (canjea un vale, gira la ruleta, te deja una notita…) te llega un aviso automático, sin que ella haga nada. Abajo eliges de qué cosas. Te llega como <b>notificación en tu celular</b> con la app gratuita <b>ntfy</b>. Guarda y luego toca «Enviar prueba».'}),
         (()=>{const t=inp('ntfy','toca «Generar» abajo');
           const gen=h('button',{class:'ed-btn',style:'background:#7a6168',onclick:()=>{const r=[...crypto.getRandomValues(new Uint8Array(15))].map(x=>'abcdefghijkmnpqrstuvwxyz23456789'[x%32]).join('');t.value='nl-'+r;A.ntfy=t.value;markDirty()}},'Generar nombre secreto');
           return h('div',null,h('label',{class:'ed-lab'},h('span',null,'🔔 Notificación en tu celular (app ntfy) · nombre secreto'),t),gen,
@@ -2118,7 +2129,10 @@ function initEditor(){
               '<li>En ntfy toca <b>＋</b> (Subscribe to topic) y escribe <b>exactamente</b> el nombre secreto de arriba. Deja el servidor como viene (ntfy.sh).</li>'+
               '<li>Regresa aquí y toca <b>Enviar prueba</b>: te debe llegar una notificación.</li>'+
               '<li>Cópialo tal cual y no lo compartas: quien tenga ese nombre podría ver los avisos.</li>'})))})(),
-        h('label',{class:'ed-lab',style:'display:flex;gap:8px;align-items:center'},notas,h('span',{style:'margin:0'},'Avisarme también cuando me deje una notita en el buzón')),
+        h('div',{class:'ed-flab',style:'margin-top:6px'},'¿De qué quieres que te avise? (cuando lo haga '+(D.ella||'Ale')+')'),
+        h('div',{class:'ed-list'},AV_TIPOS.map(([k,l])=>{const cb=h('input',{type:'checkbox'});const off=Object.assign({},AV_OFF_DEF,A.off||{});cb.checked=!(off[k]||(k==='nota'&&A.notas===false));
+          cb.addEventListener('change',()=>{A.off=Object.assign({},AV_OFF_DEF,A.off||{});A.off[k]=cb.checked?0:1;if(k==='nota')A.notas=cb.checked;markDirty()});
+          return h('label',{class:'ed-lab',style:'display:flex;gap:10px;align-items:center;margin:0'},cb,h('span',{style:'margin:0;font-size:14px;color:#2a0a14;font-weight:600'},l))})),
         h('button',{class:'ed-btn',onclick:test},'Enviar prueba'),msg,
         h('div',{class:'ed-note',html:'Nota: el texto del aviso (ej. «Ale canjeó un vale: Un masaje») pasa por el servidor de ntfy; el resto de la app sigue cifrado.'})
       ]));
