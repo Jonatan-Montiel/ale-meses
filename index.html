@@ -326,6 +326,26 @@
   .kb-empty{font-size:12.5px;opacity:.55;text-align:center;padding:16px 4px;font-family:'Caveat',cursive;font-size:19px}
   .kb-st{text-align:center;font-size:12.5px;opacity:.7;margin-top:12px;min-height:18px}
   @media (max-width:360px){.kb{grid-template-columns:1fr}}
+  /* Carrusel */
+  .car{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:12px 11% 18px;margin:0 -20px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+  .car::-webkit-scrollbar{display:none}
+  .slide{flex:0 0 min(76vw,360px);scroll-snap-align:center;margin:0;background:var(--cream);padding:8px 8px 28px;border-radius:6px;box-shadow:0 12px 28px rgba(0,0,0,.4);
+    transform:rotate(var(--r)) scale(.88);opacity:.55;transition:transform .4s ease,opacity .4s ease;position:relative;cursor:pointer}
+  .slide.on{transform:rotate(0) scale(1);opacity:1}
+  .slide .ph{aspect-ratio:4/5;overflow:hidden;border-radius:3px;background:#f0dcd6;display:grid;place-items:center}
+  .slide img{width:100%;height:100%;object-fit:cover;display:block}
+  .slide figcaption{position:absolute;bottom:4px;left:10px;right:30px;font-family:'Caveat',cursive;font-size:18px;color:#b3204f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .slide::after{content:"♥";position:absolute;bottom:6px;right:10px;color:var(--rose);font-size:14px}
+  .slide .del{position:absolute;top:14px;right:14px;border:0;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:700 12px 'Nunito';padding:6px 9px;cursor:pointer}
+  .slide .del.warn{background:#b3204f}
+  .ph-load{font-size:32px;animation:beat 1.2s ease-in-out infinite}
+  .car-nav{display:flex;align-items:center;justify-content:center;gap:18px}
+  .car-nav button{width:42px;height:42px;border-radius:50%;border:1px solid rgba(247,198,211,.3);background:rgba(255,255,255,.08);color:#fff;font-size:22px;cursor:pointer}
+  .car-count{font-family:'Caveat',cursive;font-size:24px;color:var(--blush);min-width:70px;text-align:center}
+  .car-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  .car-actions .btn{margin-top:0}
+  .car-actions [hidden]{display:none!important}
+  .btn.alt{background:rgba(255,255,255,.12);box-shadow:none;border:1px solid rgba(247,198,211,.35)}
   /* Galería */
   .gallery{columns:2;column-gap:12px}
   .pic{break-inside:avoid;margin:0 0 12px;background:var(--cream);padding:7px 7px 22px;border-radius:6px;
@@ -520,9 +540,15 @@
   <!-- MOMENTOS -->
   <section id="momentos">
     <h2>Nuestros momentos</h2>
-    <div class="sub">toca una foto ♥</div>
-    <div class="gallery" id="gallery"></div>
-    <div style="text-align:center"><button class="btn" id="playShow">▶ Ver como película</button></div>
+    <div class="sub">desliza y toca una foto ♥</div>
+    <div class="car" id="car"></div>
+    <div class="car-nav"><button id="carPrev" aria-label="Anterior">‹</button><div class="car-count" id="carCount"></div><button id="carNext" aria-label="Siguiente">›</button></div>
+    <div class="car-actions">
+      <button class="btn small" id="playShow">▶ Ver como película</button>
+      <button class="btn small alt" id="carAdd" hidden>📷 Agregar foto</button>
+      <input type="file" id="carFile" accept="image/*" multiple hidden>
+    </div>
+    <div class="kb-st" id="carSt"></div>
   </section>
 
   <!-- POLAROID -->
@@ -746,21 +772,11 @@ document.getElementById('capTxt').textContent='Se abre el '+fdate(C.capsula.fech
 document.getElementById('finalQ').innerHTML=RICH(C.fraseFinal);
 const photoURL=p=>/^(https?:|data:|blob:)/.test(p)?p:p;
 
-/* ====== Galería ====== */
+/* ====== Galería (carrusel) ====== */
 const PHOTOS = (C.fotos||[]).map(photoURL);
-const gal = document.getElementById('gallery');
 const tilts = [-3,2,-1.5,3,-2,1,2.5,-2.5,1.5,-1,3,-3,2];
-PHOTOS.forEach((src,i)=>{
-  const f=document.createElement('figure');
-  f.className='pic'; f.style.setProperty('--r',tilts[i%tilts.length]+'deg');
-  f.style.transitionDelay=(i%2)*120+'ms';
-  f.innerHTML=`<img src="${esc(src)}" alt="" loading="lazy">`;
-  f.addEventListener('click',()=>openLB(i,false));
-  gal.appendChild(f);
-});
-const gio = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');gio.unobserve(e.target)}}),{threshold:.12});
-document.querySelectorAll('.pic').forEach(p=>gio.observe(p));
-
+const GAL={items:PHOTOS.map(src=>({src,own:false}))};
+const car=document.getElementById('car');
 /* Visor / película */
 const lb=document.createElement('div'); lb.className='lb';
 lb.innerHTML=`<button class="lb-close" aria-label="Cerrar">×</button><div class="lb-frame"></div>
@@ -768,13 +784,43 @@ lb.innerHTML=`<button class="lb-close" aria-label="Cerrar">×</button><div class
 <div class="lb-bar"><button id="lbPrev" aria-label="Anterior">‹</button><div class="lb-count"></div><button id="lbNext" aria-label="Siguiente">›</button></div>`;
 document.body.appendChild(lb);
 const frame=lb.querySelector('.lb-frame'), dots=lb.querySelector('.dots');
-PHOTOS.forEach(src=>{const im=new Image();im.src=src;frame.appendChild(im);dots.appendChild(document.createElement('i'))});
-let cur=0, timer=null;
+let cur=0, timer=null, carIdx=0;
+function galShown(){return GAL.items.filter(x=>x.src)}
+function galRender(keep){
+  const sl=car.scrollLeft; car.innerHTML='';
+  GAL.items.forEach((it,i)=>{
+    const s=document.createElement('figure'); s.className='slide'+(i===carIdx?' on':''); s.style.setProperty('--r',tilts[i%tilts.length]+'deg'); if(it.id)s.dataset.id=it.id;
+    s.innerHTML=`<div class="ph">${it.src?`<img src="${esc(it.src)}" alt="" loading="lazy">`:'<div class="ph-load">💗</div>'}</div><figcaption>${it.own?('📷 '+esc(fmtShort(it.a))):'&nbsp;'}</figcaption>`;
+    if(it.own&&GAL.canEdit){const d=document.createElement('button');d.className='del';d.textContent='✕';let armed=false;
+      d.onclick=e=>{e.stopPropagation();if(!armed){armed=true;d.textContent='¿Quitar?';d.classList.add('warn');setTimeout(()=>{armed=false;d.textContent='✕';d.classList.remove('warn')},2500);return}GAL.remove(it.id)};s.append(d)}
+    s.addEventListener('click',()=>{const k=galShown().indexOf(it);if(k>=0)openLB(k,false)});
+    car.appendChild(s);
+  });
+  carPad(); if(keep)car.scrollLeft=sl;
+  frame.innerHTML=''; dots.innerHTML='';
+  const sh=galShown();
+  sh.forEach(it=>{const im=new Image();im.src=it.src;frame.appendChild(im)});
+  if(sh.length<=20)sh.forEach(()=>dots.appendChild(document.createElement('i')));
+  carCount();
+}
+const fmtShort=t=>t?new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short'}):'';
+function carCount(){document.getElementById('carCount').textContent=GAL.items.length?`${carIdx+1} / ${GAL.items.length}`:''}
+const slideW=s=>parseFloat(getComputedStyle(s).width)||s.offsetWidth;
+function carStep(){const s=car.children[0];return s?slideW(s)+14:300}
+function carPad(){const s=car.children[0];if(!s)return;const p=Math.max(0,(car.clientWidth-slideW(s))/2);car.style.paddingLeft=car.style.paddingRight=p+'px'}
+window.addEventListener('resize',carPad);
+car.addEventListener('scroll',()=>{const k=Math.round(car.scrollLeft/carStep());if(k!==carIdx){carIdx=Math.max(0,Math.min(GAL.items.length-1,k));[...car.children].forEach((c,i)=>c.classList.toggle('on',i===carIdx));carCount()}},{passive:true});
+const carGo=k=>{car.scrollTo({left:k*carStep(),behavior:'smooth'})};
+document.getElementById('carPrev').onclick=()=>carGo(carIdx>0?carIdx-1:GAL.items.length-1);
+document.getElementById('carNext').onclick=()=>carGo(carIdx<GAL.items.length-1?carIdx+1:0);
+let lastTouch=0; ['pointerdown','touchstart','wheel'].forEach(ev=>car.addEventListener(ev,()=>lastTouch=Date.now(),{passive:true}));
+let carVis=false; new IntersectionObserver(es=>es.forEach(e=>carVis=e.isIntersecting),{threshold:.4}).observe(car);
+setInterval(()=>{if(carVis&&!document.hidden&&Date.now()-lastTouch>7000&&GAL.items.length>1&&!lb.classList.contains('open'))carGo(carIdx<GAL.items.length-1?carIdx+1:0)},4500);
 function show(i){
-  cur=(i+PHOTOS.length)%PHOTOS.length;
+  const n=galShown().length; if(!n)return; cur=(i+n)%n;
   frame.querySelectorAll('img').forEach((im,k)=>{im.classList.remove('on');if(k===cur){void im.offsetWidth;im.classList.add('on')}});
   dots.querySelectorAll('i').forEach((d,k)=>d.classList.toggle('on',k===cur));
-  lb.querySelector('.lb-count').textContent=`${cur+1} / ${PHOTOS.length}`;
+  lb.querySelector('.lb-count').textContent=`${cur+1} / ${n}`;
 }
 function openLB(i,auto){lb.classList.add('open');show(i);clearInterval(timer);if(auto){timer=setInterval(()=>show(cur+1),4000)}}
 function closeLB(){lb.classList.remove('open');clearInterval(timer)}
@@ -785,6 +831,78 @@ document.getElementById('playShow').onclick=()=>{openLB(0,true);burst(25)};
 let sx=null;
 frame.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
 frame.addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){clearInterval(timer);show(cur+(dx<0?1:-1))}sx=null});
+galRender();
+
+/* --- Fotos que sube Ale (cada foto en su propio gist privado y cifrado) --- */
+(function(){
+  const K=C.kanban||{}; if(!(K.gist&&K.token))return;
+  GAL.canEdit=true;
+  const H=()=>({Authorization:'Bearer '+K.token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'});
+  const st=document.getElementById('carSt'), add=document.getElementById('carAdd'), file=document.getElementById('carFile');
+  add.hidden=false;
+  let idx=[];
+  const b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+  const unb64=t=>Uint8Array.from(atob(t.trim()),c=>c.charCodeAt(0));
+  async function gistFile(id,name){
+    const r=await fetch(`https://api.github.com/gists/${id}?t=${Date.now()}`,{headers:H(),cache:'no-store'}); if(!r.ok)throw new Error(r.status);
+    const f=((await r.json()).files||{})[name]; if(!f)return null;
+    if(f.truncated&&f.raw_url)return await (await fetch(f.raw_url)).text();
+    return f.content;
+  }
+  async function pullIdx(){const t=await gistFile(K.gist,'fotos.bin');if(!t)return [];return JSON.parse(new TextDecoder().decode(await decBuf(unb64(t).buffer))).fotos||[]}
+  const merge=(a,b)=>{const m={};[...a,...b].forEach(x=>{if(!m[x.id]||(x.u||0)>(m[x.id].u||0))m[x.id]=x});return Object.values(m)};
+  async function pushIdx(){
+    idx=merge(idx,await pullIdx());
+    const enc=await encBuf(new TextEncoder().encode(JSON.stringify({fotos:idx})));
+    const r=await fetch(`https://api.github.com/gists/${K.gist}`,{method:'PATCH',headers:Object.assign({'Content-Type':'application/json'},H()),body:JSON.stringify({files:{'fotos.bin':{content:b64(enc)}}})});
+    if(!r.ok)throw new Error(r.status);
+  }
+  const cacheKey='fotos-ale-cache';
+  function apply(){
+    const own=idx.filter(x=>!x.x).sort((a,b)=>b.a-a.a);
+    const old={}; GAL.items.filter(x=>x.own).forEach(x=>old[x.id]=x.src);
+    GAL.items=[...own.map(x=>({own:true,id:x.id,a:x.a,src:old[x.id]||''})),...GAL.items.filter(x=>!x.own)];
+    galRender(true); own.forEach(x=>{if(!old[x.id])load(x.id)});
+  }
+  let q=Promise.resolve();
+  function load(id){q=q.then(async()=>{try{
+      const t=await gistFile(id,'f.bin'); if(!t)return;
+      const url=URL.createObjectURL(new Blob([await decBuf(unb64(t).buffer)],{type:'image/jpeg'}));
+      const it=GAL.items.find(x=>x.id===id); if(it){it.src=url;galRender(true)}
+    }catch(e){}})}
+  GAL.remove=async id=>{
+    const x=idx.find(y=>y.id===id); if(!x)return; x.x=1;x.u=Date.now(); apply();
+    try{await pushIdx();st.textContent='Foto quitada';fetch(`https://api.github.com/gists/${id}`,{method:'DELETE',headers:H()}).catch(()=>{})}catch(e){st.textContent='No se pudo quitar ahorita, intenta de nuevo'}
+  };
+  async function shrinkImg(f){
+    let bmp; try{bmp=await createImageBitmap(f,{imageOrientation:'from-image'})}catch(e){
+      bmp=await new Promise((ok,ko)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ko(new Error('formato'));im.src=URL.createObjectURL(f)})}
+    const sc=Math.min(1,1200/Math.max(bmp.width,bmp.height)), cv=document.createElement('canvas');
+    cv.width=Math.round(bmp.width*sc);cv.height=Math.round(bmp.height*sc);cv.getContext('2d').drawImage(bmp,0,0,cv.width,cv.height);
+    return await new Promise(ok=>cv.toBlob(ok,'image/jpeg',.8));
+  }
+  add.onclick=()=>file.click();
+  file.onchange=async()=>{
+    const fs=[...file.files]; file.value=''; if(!fs.length)return; add.disabled=true;
+    let okN=0;
+    for(let i=0;i<fs.length;i++){
+      st.textContent=`Subiendo foto ${i+1} de ${fs.length}… 📷`;
+      try{
+        const blob=await shrinkImg(fs[i]);
+        const enc=await encBuf(new Uint8Array(await blob.arrayBuffer()));
+        const r=await fetch('https://api.github.com/gists',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H()),body:JSON.stringify({description:'♥',public:false,files:{'f.bin':{content:b64(enc)}}})});
+        if(!r.ok)throw new Error(r.status);
+        const id=(await r.json()).id, now=Date.now();
+        idx.push({id,a:now,u:now}); okN++;
+        GAL.items.unshift({own:true,id,a:now,src:URL.createObjectURL(blob)}); carIdx=0; galRender(); car.scrollLeft=0;
+      }catch(e){st.textContent='No pude subir una foto'+(e.message==='formato'?' (formato no compatible, prueba con JPG)':'')+'. Intenta otra vez.'}
+    }
+    if(okN){try{await pushIdx();st.textContent=okN===1?'¡Foto agregada! 💗':`¡${okN} fotos agregadas! 💗`;burst(25)}catch(e){st.textContent='Las fotos se subieron pero no se pudieron registrar. Intenta de nuevo.'}}
+    add.disabled=false;
+  };
+  pullIdx().then(r=>{idx=r;apply()}).catch(()=>{});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullIdx().then(r=>{const b=JSON.stringify(idx);idx=merge(idx,r);if(JSON.stringify(idx)!==b)apply()}).catch(()=>{})});
+})();
 
 /* ====== Candado ====== */
 (function(){
@@ -1542,7 +1660,7 @@ const SCHEMA=[
   {t:'Rasca y gana',f:[['rasca.emoji','Emoji','text'],['rasca.titulo','Título del premio','text'],['rasca.texto','Texto del premio','textarea',3]]},
   {t:'Vales de amor',f:[['vales','Vales','objlist',[['emoji','Emoji','text'],['titulo','Vale por…','text'],['detalle','Detalle','text']]]]},
   {t:'Ruleta de citas',f:[['ruleta','Opciones (máximo 12)','list']]},
-  {t:'Nuestros planes (kanban de Ale)',special:'kanban'},
+  {t:'Planes y fotos de Ale',special:'kanban'},
   {t:'El cielo de esa noche',f:[['horaCielo','Hora del cielo (el día que empezó todo)','time']]},
   {t:'Sorpresas de cada mes',f:[['sorpresas','Sorpresas con fecha','objlist',[['emoji','Emoji','text'],['nombre','Nombre en la tarjeta (ej. 9 meses)','text'],['fecha','Se abre el','date'],['titulo','Título','text'],['texto','Mensaje','textarea']]],['sorpresasExtra','Sorpresas automáticas para los meses siguientes','objlist',[['emoji','Emoji','text'],['texto','Mensaje','textarea']]]]},
   {t:'Cápsula del tiempo',f:[['capsula.fecha','Se abre el','date'],['capsula.texto','Mensaje','textarea',8]]},
@@ -1621,7 +1739,7 @@ function initEditor(){
     if(sec.special==='kanban'){
       D.kanban=D.kanban||{};
       const tk=h('input',{class:'ed-in',type:'password',placeholder:'github_pat_… (solo con permiso de Gists)',value:D.kanban.token||'',autocomplete:'off'});
-      const msg=h('div',{class:'ed-note'},D.kanban.gist?('✅ Activado. Lo que escriba Ale se guarda cifrado y tú también lo ves.'):'Sin activar: lo que escriba Ale solo se queda en su celular.');
+      const msg=h('div',{class:'ed-note'},D.kanban.gist?('✅ Activado. Los planes y fotos que agregue Ale se guardan cifrados y tú también los ves.'):'Sin activar: lo que escriba Ale solo se queda en su celular.');
       async function activate(){
         const t=tk.value.trim(); if(!t){msg.textContent='Pega primero el token de Gists.';msg.className='ed-note bad';return}
         msg.textContent='Activando…';msg.className='ed-note';
@@ -1642,7 +1760,7 @@ function initEditor(){
         }catch(e){msg.textContent='No se pudo activar: '+e.message+'.';msg.className='ed-note bad'}
       }
       body.append(section('📝 '+sec.t,[
-        h('div',{class:'ed-note',html:'Ale puede agregar planes y moverlos a «¡Lo logramos!» desde su celular. Para que se guarden en línea (y tú también los veas) se usa un <b>gist privado y cifrado</b> de GitHub con un token que <b>solo</b> puede tocar gists, nunca tu repo.'}),
+        h('div',{class:'ed-note',html:'Ale puede agregar planes (y moverlos a «¡Lo logramos!») y <b>subir fotos al carrusel</b> desde su celular, sin entrar al editor. Para que se guarden en línea (y tú también los veas) se usa un <b>gist privado y cifrado</b> de GitHub con un token que <b>solo</b> puede tocar gists, nunca tu repo.'}),
         h('label',{class:'ed-lab'},h('span',null,'Token solo de Gists'),tk),
         h('button',{class:'ed-btn',onclick:activate},D.kanban.gist?'Actualizar token':'Activar planes compartidos'),msg,
         h('details',{class:'ed-how'},h('summary',null,'¿Cómo saco ese token?'),h('ol',{html:
