@@ -82,7 +82,7 @@
   .paper .sign{text-align:right;color:#b3204f;font-weight:700;font-size:28px}
 
   /* Candado */
-  #lock{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;
+  #lock{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;
     background:radial-gradient(120% 80% at 50% 0%, #6b1838 0%, var(--wine) 55%, #1e0610 100%);transition:opacity .8s ease, transform .8s ease}
   #lock.out{opacity:0;transform:scale(1.15);pointer-events:none}
   .lock-ico{font-size:54px;transition:transform .4s}
@@ -361,6 +361,8 @@
   .hoy-fix{font-family:'Caveat',cursive;font-size:32px;line-height:1.2;color:var(--blush);text-wrap:balance}
   .hoy-sign{font-family:'Caveat',cursive;font-size:28px;color:var(--gold);margin-top:10px}
   #hoyBtn{margin-top:26px}
+  .pad button:disabled{opacity:.35}
+  .logout{margin-top:26px;background:none;border:1px solid rgba(247,198,211,.3);color:var(--blush);border-radius:999px;padding:10px 16px;font:700 13px 'Nunito';cursor:pointer;opacity:.8}
   /* Galería */
   .gallery{columns:2;column-gap:12px}
   .pic{break-inside:avoid;margin:0 0 12px;background:var(--cream);padding:7px 7px 22px;border-radius:6px;
@@ -733,6 +735,7 @@
     <div><button class="btn" id="crBtn" style="background:linear-gradient(135deg,#222,#000);margin-top:14px">🎬 Ver los créditos</button></div>
     <div class="card" style="margin-top:28px"><div class="daily-l">Estoy pensando en ti</div><div style="font-size:14px;opacity:.8">Toca uno y mándamelo cuando quieras</div>
       <div class="wa" id="wa"></div></div>
+    <div><button class="logout" id="logoutBtn" style="display:none"></button></div>
   </section>
 </main>
 
@@ -934,14 +937,26 @@ galRender();
 
 /* ====== Candado ====== */
 (function(){
-  const CODE=String(C.pin||'').padStart(4,'0'), pad=document.getElementById('pad'), dots=document.querySelectorAll('#pinDots i');
-  let v='', tries=0;
+  const CODE=String(C.pin||'').padStart(4,'0'), lock=document.getElementById('lock'), pad=document.getElementById('pad'), dots=document.querySelectorAll('#pinDots i'), msg=document.getElementById('pinMsg');
+  const MAX=5, WAIT=5*60*1000, IDLE=5*60*1000, AWAY=2*60*1000;
+  const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}}, set=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+  let v='', open=false, cd=null;
   ['1','2','3','4','5','6','7','8','9','♥','0','⌫'].forEach(k=>{
     const b=document.createElement('button'); b.textContent=k; if(k==='♥'||k==='⌫')b.className='ghost';
     b.addEventListener('click',()=>press(k)); pad.appendChild(b);
   });
+  const btns=()=>pad.querySelectorAll('button');
   function paint(){dots.forEach((d,i)=>d.classList.toggle('f',i<v.length))}
+  /* ---- Pausa tras varios intentos fallidos ---- */
+  function lockedFor(){return Math.max(0,(+get('pin-until')||0)-Date.now())}
+  function checkWait(){
+    const ms=lockedFor(); btns().forEach(b=>b.disabled=ms>0);
+    if(ms>0){const m=Math.floor(ms/60000), s=Math.ceil(ms%60000/1000)%60; msg.textContent=`Demasiados intentos. Espera ${m}:${String(s).padStart(2,'0')}`;
+      clearTimeout(cd); cd=setTimeout(checkWait,1000)}
+    else if(msg.textContent.startsWith('Demasiados')){msg.textContent=''}
+  }
   function press(k){
+    if(lockedFor()>0)return;
     if(k==='⌫'){v=v.slice(0,-1);paint();return}
     if(k==='♥'){burst(8);return}
     if(v.length>=4)return; v+=k; paint();
@@ -949,15 +964,45 @@ galRender();
   }
   function test(){
     if(v===CODE){
-      document.getElementById('lockIco').textContent='🔓';
-      document.getElementById('pinMsg').textContent='Bienvenida, mi amor ♥';
-      setTimeout(()=>{document.getElementById('lock').classList.add('out');document.body.classList.remove('locked');burst(45);window.dispatchEvent(new Event('unlocked'))},600);
-      setTimeout(()=>document.getElementById('lock').remove(),1500);
+      set('pin-fails','0');
+      document.getElementById('lockIco').textContent='🔓'; msg.textContent='Bienvenida, mi amor ♥';
+      setTimeout(()=>{lock.classList.add('out');document.body.classList.remove('locked');burst(45);open=true;last=Date.now();window.dispatchEvent(new Event('unlocked'))},600);
+      setTimeout(()=>{if(open)lock.style.display='none'},1500);
     }else{
       const d=document.getElementById('pinDots'); d.classList.remove('err'); void d.offsetWidth; d.classList.add('err');
-      document.getElementById('pinMsg').textContent='Código incorrecto'; tries++; v=''; setTimeout(paint,300); setTimeout(()=>{if(!v)document.getElementById('pinMsg').textContent=''},2200);
+      const n=(+get('pin-fails')||0)+1; v=''; setTimeout(paint,300);
+      if(n>=MAX){set('pin-fails','0');set('pin-until',String(Date.now()+WAIT));checkWait();return}
+      set('pin-fails',String(n));
+      msg.textContent=`Código incorrecto · te quedan ${MAX-n} ${MAX-n===1?'intento':'intentos'}`;
+      setTimeout(()=>{if(!v&&!lockedFor())msg.textContent=''},2500);
     }
   }
+  /* ---- Volver a bloquear si se deja sin usar o al regresar de otra app ---- */
+  function relock(){
+    if(!open||!document.getElementById('lock'))return; open=false; v=''; paint();
+    document.querySelectorAll('.lb.open,.modal.open,.secret.open,.credits.open').forEach(e=>e.classList.remove('open'));
+    document.getElementById('lockIco').textContent='🔒'; msg.textContent='';
+    lock.style.display=''; void lock.offsetWidth; lock.classList.remove('out'); document.body.classList.add('locked'); checkWait();
+  }
+  let last=Date.now(), hiddenAt=0;
+  ['pointerdown','keydown','scroll','touchstart'].forEach(ev=>window.addEventListener(ev,()=>{last=Date.now()},{passive:true,capture:true}));
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){hiddenAt=Date.now()}
+    else if(hiddenAt&&Date.now()-hiddenAt>=AWAY){relock()}
+  });
+  setInterval(()=>{if(open&&!document.hidden&&Date.now()-last>=IDLE)relock()},15000);
+  checkWait();
+})();
+
+/* ====== Cerrar sesión en este dispositivo ====== */
+(function(){
+  const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
+  b.onclick=()=>{
+    if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{sessionStorage.clear()}catch(e){}
+    location.replace(location.pathname);
+  };
 })();
 
 /* ====== Ábrela cuando ====== */
