@@ -962,12 +962,12 @@ const AV_OFF_DEF=window.AV_OFF_DEF={entrada:1};
 const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'&&AV.notas===false)return false;return !off[t]};
 const AV_LAST={};
 function avisar(txt,tipo){
-  if(EDIT)return;
-  try{if(localStorage.getItem('yo-soy')==='yo')return}catch(e){}
+  const prueba=AV.prueba&&Date.now()<(+AV.prueba||0);
+  if(!prueba){ if(EDIT)return; try{if(localStorage.getItem('yo-soy')==='yo')return}catch(e){} }
   if(!avOn(tipo))return;
   const gap=tipo==='entrada'?30*60*1000:({abrazo:1,secreto:1}[tipo]?60*1000:0);
   try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
-  if(AV.ntfy)fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:tipo==='nota'?'💌 Notita de '+C.ella:'🎟️ Vale canjeado',message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
+  if(AV.ntfy)fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:({vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+C.ella,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo para ti',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',entrada:'👀 '+C.ella+' está en la app'}[tipo]||'💗 '+C.ella)+(prueba?' (prueba)':''),message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
 }
 const fmtDia=t=>new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short'});
 const fmtHora=t=>new Date(t).toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'});
@@ -2204,6 +2204,9 @@ function initEditor(){
           cb.addEventListener('change',()=>{A.off=Object.assign({},AV_OFF_DEF,A.off||{});A.off[k]=cb.checked?0:1;if(k==='nota')A.notas=cb.checked;markDirty()});
           return h('label',{class:'ed-lab',style:'display:flex;gap:10px;align-items:center;margin:0'},cb,h('span',{style:'margin:0;font-size:14px;color:#2a0a14;font-weight:600'},l))})),
         h('button',{class:'ed-btn',onclick:test},'Enviar prueba'),msg,
+        (()=>{const on=A.prueba&&Date.now()<(+A.prueba||0); const pm=h('div',{class:'ed-note'+(on?' ok':'')},on?('🧪 Modo prueba activo hasta las '+new Date(+A.prueba).toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'})+' · después se apaga solo'):'');
+          const b=h('button',{class:'ed-btn',style:'background:#7a6168',onclick:()=>{A.prueba=Date.now()+60*60*1000;markDirty();pm.textContent='🧪 Listo: toca «Guardar cambios». Durante 1 hora te van a llegar avisos también de lo que hagas tú (aquí o en tu celular), para que pruebes. Después se apaga solo.';pm.className='ed-note ok'}},'🧪 Modo prueba (1 hora)');
+          return h('div',null,h('div',{class:'ed-note',html:'Normalmente <b>no te avisa de lo que haces tú</b> (desde este editor o desde un celular donde elegiste «Soy '+(D.yo||'Jon')+'»). Para probar los avisos reales, activa el modo prueba:'}),b,pm)})(),
         h('div',{class:'ed-note',html:'Nota: el texto del aviso (ej. «Ale canjeó un vale: Un masaje») pasa por el servidor de ntfy; el resto de la app sigue cifrado.'})
       ]));
       return;
