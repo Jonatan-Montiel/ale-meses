@@ -406,6 +406,7 @@
   #memoTxt{width:100%;border:1.5px solid #ead8d1;border-radius:12px;padding:10px;font:16px 'Nunito';resize:none;box-sizing:border-box;margin-bottom:10px;-webkit-user-select:text;user-select:text}
   .memo-st{font:13px 'Nunito';color:#7a6168;margin-top:8px;min-height:16px;text-align:center}
   #memoEdit{text-align:center}
+  .av-toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:99;background:#10b981;color:#fff;font:700 13px 'Nunito',sans-serif;padding:9px 14px;border-radius:999px;box-shadow:0 8px 20px rgba(0,0,0,.35);animation:pop .4s}
   /* Galería */
   .gallery{columns:2;column-gap:12px}
   .pic{break-inside:avoid;margin:0 0 12px;background:var(--cream);padding:7px 7px 22px;border-radius:6px;
@@ -963,10 +964,13 @@ const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'
 const AV_LAST={};
 function avisar(txt,tipo){
   const prueba=AV.prueba&&Date.now()<(+AV.prueba||0);
+  const toast=t=>{if(!prueba)return;const d=document.createElement('div');d.className='av-toast';d.textContent=t;document.body.append(d);setTimeout(()=>d.remove(),3800)};
+  if(!AV.ntfy){toast('🧪 Sin aviso: falta el nombre secreto de ntfy');return}
   if(!prueba){ if(EDIT)return; try{if(localStorage.getItem('yo-soy')==='yo')return}catch(e){} }
-  if(!avOn(tipo))return;
+  if(!avOn(tipo)){toast('🧪 Sin aviso: este tipo está apagado en tu editor');return}
   const gap=tipo==='entrada'?30*60*1000:({abrazo:1,secreto:1}[tipo]?60*1000:0);
   try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
+  toast('🧪 Aviso enviado a ntfy ✓');
   if(AV.ntfy)fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:({vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+C.ella,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo para ti',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',entrada:'👀 '+C.ella+' está en la app'}[tipo]||'💗 '+C.ella)+(prueba?' (prueba)':''),message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
 }
 const fmtDia=t=>new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short'});
