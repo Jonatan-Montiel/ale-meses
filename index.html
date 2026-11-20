@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -387,6 +387,80 @@
   .nb-pill{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:45;background:linear-gradient(135deg,var(--rose),#b3204f);color:#fff;border:0;border-radius:999px;padding:10px 16px;font:800 14px 'Nunito';box-shadow:0 10px 24px rgba(0,0,0,.4);cursor:pointer;animation:pop .5s cubic-bezier(.2,.9,.3,1.3);white-space:nowrap}
   body.editing .nb-pill{top:44px}
   .nb-m.new{box-shadow:0 0 0 3px var(--gold)}
+
+  /* Racha */
+  .rch{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .rch-fire{font-size:54px;line-height:1;animation:float 3s ease-in-out infinite}
+  .rch-fire.off{filter:grayscale(1);opacity:.45;animation:none}
+  .rch-n b{display:block;font-family:'Fraunces',serif;font-size:52px;font-weight:600;line-height:1;color:#fff}
+  .rch-n span{font-size:13px;letter-spacing:1.3px;text-transform:uppercase;opacity:.75}
+  .rch-week{display:flex;gap:8px;margin:12px 0 4px}
+  .rch-week div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;opacity:.75}
+  .rch-week i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:15px;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.25)}
+  .rch-week .on i{background:linear-gradient(135deg,#ffb347,var(--rose));border-color:transparent}
+  .rch-week .today i{box-shadow:0 0 0 2px var(--gold)}
+  .rch-bar{width:100%;height:8px;border-radius:8px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:8px}
+  .rch-bar i{display:block;height:100%;width:0;border-radius:8px;background:linear-gradient(90deg,var(--gold),var(--rose));transition:width .8s}
+  .rch-next{font-size:14px;opacity:.85;margin-top:4px}
+  .rch-prizes{display:grid;gap:10px;margin-top:14px}
+  .rch-p{display:flex;align-items:center;gap:12px;text-align:left;width:100%;background:rgba(255,247,240,.07);border:1px solid rgba(247,198,211,.18);border-radius:16px;padding:12px 14px;color:var(--cream);font:inherit;cursor:pointer}
+  .rch-p .e{font-size:28px}
+  .rch-p b{display:block;font-size:15px}
+  .rch-p small{font-size:12.5px;opacity:.7}
+  .rch-p.lock{opacity:.55;cursor:default}
+  .rch-p.ok{background:linear-gradient(160deg,#fbe3d6,#f2c3b0);color:var(--ink);border:0}
+  .rch-p p{margin-top:6px;font-size:14px;line-height:1.35}
+  /* Ánimo */
+  .an-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .an-b{background:rgba(255,247,240,.07);border:1px solid rgba(247,198,211,.2);border-radius:18px;padding:12px 4px 10px;color:var(--cream);font:700 13px 'Nunito';cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s}
+  .an-b span{font-size:34px;line-height:1}
+  .an-b:active{transform:scale(.94)}
+  .an-b.sel{background:linear-gradient(135deg,var(--rose),#b3204f);border-color:transparent}
+  .an-res{margin-top:14px;animation:pop .45s cubic-bezier(.2,.9,.3,1.3)}
+  .an-res .daily{font-size:20px}
+  .an-res .sg{font-family:'Caveat',cursive;font-size:22px;color:var(--gold);margin-top:8px}
+  .an-hoy{text-align:center;font-size:14px;opacity:.85;margin-top:12px;line-height:1.6}
+  /* Carta del mes */
+  .cm-env{text-align:center}
+  .cm-env .e{font-size:46px}
+  .cm-env h3{font-family:'Fraunces',serif;font-size:22px;margin:6px 0 2px}
+  .cm-env .t{font-family:'Caveat',cursive;font-size:22px;color:var(--blush)}
+  .cm-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+  .cm-chips button{background:rgba(255,255,255,.1);border:1px solid rgba(247,198,211,.3);color:#fff;border-radius:999px;padding:7px 13px;font:700 13px 'Nunito';cursor:pointer}
+  .cm-chips button.cur{background:var(--rose);border-color:transparent}
+  .cm-next{text-align:center;font-size:13.5px;opacity:.75;margin-top:12px}
+  /* Voz */
+  .vz-list{display:grid;gap:10px;max-height:380px;overflow-y:auto;padding:2px}
+  .vz-m{display:flex;align-items:center;gap:10px;max-width:88%;background:rgba(255,247,240,.08);border:1px solid rgba(247,198,211,.2);border-radius:18px 18px 18px 6px;padding:10px 12px}
+  .vz-m.me{margin-left:auto;background:linear-gradient(135deg,rgba(232,93,132,.45),rgba(179,32,79,.45));border-radius:18px 18px 6px 18px}
+  .vz-play{flex:none;width:42px;height:42px;border-radius:50%;border:0;background:#fff;color:var(--wine);font-size:17px;cursor:pointer}
+  .vz-body{flex:1;min-width:120px}
+  .vz-bar{height:5px;border-radius:5px;background:rgba(255,255,255,.2);overflow:hidden}
+  .vz-bar i{display:block;height:100%;width:0;background:var(--gold)}
+  .vz-meta{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;opacity:.75;margin-top:6px}
+  .vz-x{background:none;border:0;color:#fff;opacity:.6;font-size:13px;cursor:pointer}
+  .vz-rec{text-align:center;margin-top:6px}
+  .vz-rec .btn.rec{background:linear-gradient(135deg,#ff4d6d,#c9184a);animation:beat 1.4s ease-in-out infinite}
+  .vz-prev{margin-top:14px}
+  .vz-prev audio{width:100%;max-width:320px}
+  /* Rueda de comida */
+  #fdWheel{width:100%;display:block;border-radius:50%;box-shadow:0 14px 36px rgba(0,0,0,.45),0 0 0 6px rgba(233,184,114,.6);transition:transform 4.5s cubic-bezier(.12,.8,.15,1)}
+  /* Calificación de pelis */
+  .kb-rate{margin-top:8px;border-top:1px dashed #e8cfc8;padding-top:6px;display:grid;gap:2px}
+  .kb-rr{display:flex;align-items:center;gap:1px;font-size:12px;color:#7a6168}
+  .kb-rr span{width:42px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .kb-star{background:none;border:0;padding:0 1px;font-size:16px;line-height:1;color:#e2cfc9;cursor:pointer}
+  .kb-star.on{color:#e9a23b}
+  .kb-star:disabled{cursor:default}
+  /* Árbol */
+  .tree{display:block;margin:0 auto;background:none;border:0;cursor:pointer;width:290px;max-width:100%}
+  .tree svg{width:100%;display:block;overflow:visible}
+  .tr-sway{transform-origin:150px 268px}
+  @keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+  .tree.shake .tr-sway{animation:shakeT .7s ease-in-out}
+  @keyframes shakeT{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}50%{transform:rotate(3deg)}75%{transform:rotate(-2deg)}}
+  .tr-leaf{animation:leafIn .6s ease both}
+  @keyframes leafIn{from{opacity:0}to{opacity:1}}
   /* Lo que viene */
   .ev-add{display:grid;gap:8px;margin-bottom:14px}
   .ev-add input{min-width:0;border:1px solid rgba(247,198,211,.35);background:rgba(255,255,255,.08);color:#fff;border-radius:14px;padding:12px 12px;font:15px 'Nunito',sans-serif;outline:none;color-scheme:dark;-webkit-user-select:text;user-select:text}
@@ -571,6 +645,29 @@
     <div class="card"><div class="daily-l" id="dailyL">Mensaje de hoy</div><div class="daily" id="daily"></div></div>
   </section>
 
+  <!-- RACHA -->
+  <section id="racha">
+    <h2>Racha de visitas</h2>
+    <div class="sub" id="rchSub">entra todos los días y desbloquea premios</div>
+    <div class="card rch">
+      <div class="rch-fire" id="rchFire">🔥</div>
+      <div class="rch-n"><b id="rchN">0</b><span id="rchL">días seguidos</span></div>
+      <div class="rch-week" id="rchWeek"></div>
+      <div class="rch-bar"><i id="rchBar"></i></div>
+      <div class="rch-next" id="rchNext"></div>
+    </div>
+    <div class="rch-prizes" id="rchPrizes"></div>
+  </section>
+
+  <!-- ÁNIMO -->
+  <section id="animo">
+    <h2>¿Cómo te sientes hoy?</h2>
+    <div class="sub" id="anSub">toca una carita y cuéntame</div>
+    <div class="an-grid" id="anGrid"></div>
+    <div class="card an-res" id="anRes" hidden></div>
+    <div class="an-hoy" id="anHoy"></div>
+  </section>
+
   <!-- CANCIÓN -->
   <section id="cancion">
     <h2>Nuestra canción</h2>
@@ -604,6 +701,13 @@
     </div>
   </section>
 
+  <!-- CARTA DEL MES -->
+  <section id="cartames">
+    <h2>Carta del mes</h2>
+    <div class="sub">cada día 12 se abre una carta nueva</div>
+    <div id="cmBox"></div>
+  </section>
+
   <!-- ÁBRELA CUANDO -->
   <section id="abrela">
     <h2>Ábrela cuando…</h2>
@@ -622,6 +726,18 @@
       <button type="submit" aria-label="Enviar">➤</button>
     </form>
     <div class="kb-st" id="nbSt"></div>
+  </section>
+
+  <!-- MENSAJES DE VOZ -->
+  <section id="voz">
+    <h2>Mensajes de voz</h2>
+    <div class="sub">para cuando quieras escuchar mi voz 🎙️</div>
+    <div class="vz-list" id="vzList"></div>
+    <div class="vz-rec">
+      <button class="btn" id="vzBtn">🎙️ Grabar mensaje</button>
+      <div class="vz-prev" id="vzPrev" hidden><audio id="vzAud" controls></audio><div><button class="btn small" id="vzSend">💌 Enviar</button> <button class="btn small alt" id="vzDel">🗑️ Borrar</button></div></div>
+    </div>
+    <div class="kb-st" id="vzSt"></div>
   </section>
 
   <!-- MÁQUINA DE ESCRIBIR -->
@@ -746,6 +862,14 @@
     <div style="text-align:center"><button class="btn" id="spin">🎡 Girar</button><div class="wheel-res" id="wheelRes"></div><div class="wheel-used" id="wheelUsed"></div></div>
   </section>
 
+  <!-- RUEDA DE LA COMIDA -->
+  <section id="comida">
+    <h2>¿Qué comemos?</h2>
+    <div class="sub">para cuando ninguno de los dos sabe qué cenar 😋</div>
+    <div class="wheel-wrap"><canvas id="fdWheel" width="600" height="600"></canvas></div>
+    <div style="text-align:center"><button class="btn" id="fdSpin">🍽️ Girar</button><div class="wheel-res" id="fdRes"></div></div>
+  </section>
+
   <!-- PLANES (KANBAN) -->
   <section id="planes">
     <h2>Nuestros planes</h2>
@@ -776,6 +900,21 @@
     <div class="kb-st" id="apSt"></div>
   </section>
 
+  <!-- PELIS Y SERIES (KANBAN) -->
+  <section id="pelis">
+    <h2>Pelis y series</h2>
+    <div class="sub">lo que queremos ver juntos 🍿</div>
+    <form class="kb-add" id="plForm" autocomplete="off">
+      <input id="plIn" maxlength="160" placeholder="Ej. Ver Interestelar 🚀">
+      <button type="submit" aria-label="Agregar">＋</button>
+    </form>
+    <div class="kb">
+      <div class="kb-col" data-c="p"><div class="kb-h"><span>🍿 Por ver</span><b id="plNp">0</b></div><div class="kb-list" id="plP"></div></div>
+      <div class="kb-col done" data-c="d"><div class="kb-h"><span>✅ Ya la vimos</span><b id="plNd">0</b></div><div class="kb-list" id="plD"></div></div>
+    </div>
+    <div class="kb-st" id="plSt"></div>
+  </section>
+
   <!-- LO QUE VIENE -->
   <section id="viene">
     <h2>Lo que viene</h2>
@@ -801,6 +940,14 @@
     <h2>Sorpresa de cada mes</h2>
     <div class="sub" id="surSub">cada mes se abre una nueva</div>
     <div class="months" id="months"></div>
+  </section>
+
+  <!-- ÁRBOL -->
+  <section id="arbol">
+    <h2>Nuestro árbol</h2>
+    <div class="sub" id="arSub"></div>
+    <button class="tree" id="tree" aria-label="Nuestro árbol"><svg viewBox="0 0 300 300" id="treeSvg"></svg></button>
+    <div class="tap" id="arTxt"></div>
   </section>
 
   <!-- CONSTELACIÓN -->
@@ -838,10 +985,14 @@
 <nav>
   <a href="#inicio">Inicio</a>
   <a href="#contador">Tiempo</a>
+  <a href="#racha">Racha</a>
+  <a href="#animo">Ánimo</a>
   <a href="#carta">Carta</a>
   <a href="#cancion">Canción</a>
+  <a href="#cartames">Carta del mes</a>
   <a href="#abrela">Ábrela</a>
   <a href="#buzon">Buzón</a>
+  <a href="#voz">Voz</a>
   <a href="#escribir">Carta 2</a>
   <a href="#momentos">Fotos</a>
   <a href="#razones">Razones</a>
@@ -852,11 +1003,14 @@
   <a href="#memorama">Memorama</a>
   <a href="#rompecabezas">Puzzle</a>
   <a href="#ruleta">Ruleta</a>
+  <a href="#comida">Comida</a>
   <a href="#planes">Planes</a>
   <a href="#aprender">Aprender</a>
+  <a href="#pelis">Pelis</a>
   <a href="#viene">Lo que viene</a>
   <a href="#cielo">Cielo</a>
   <a href="#sorpresas">Sorpresas</a>
+  <a href="#arbol">Árbol</a>
   <a href="#constelacion">Estrellas</a>
   <a href="#capsula">Cápsula</a>
 </nav>
@@ -932,11 +1086,11 @@ const GG=(()=>{
     const r=await fetch('https://api.github.com/gists',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H()),body:JSON.stringify({description:'♥',public:false,files:{'f.bin':{content:b64(enc)}}})});
     if(!r.ok)throw new Error(r.status); const id=(await r.json()).id; PC[id]=URL.createObjectURL(blob); return id;
   }
-  async function photo(id){
+  async function photo(id,type){
     if(PC[id])return PC[id];
     const r=await fetch(`https://api.github.com/gists/${id}`,{headers:H(),cache:'no-store'}); if(!r.ok)throw new Error(r.status);
     const t=await text(((await r.json()).files||{})['f.bin']); if(!t)throw new Error('vacía');
-    return PC[id]=URL.createObjectURL(new Blob([await decBuf(unb64(t).buffer)],{type:'image/jpeg'}));
+    return PC[id]=URL.createObjectURL(new Blob([await decBuf(unb64(t).buffer)],{type:type||'image/jpeg'}));
   }
   return {on,pull,push,merge,shrink,newPhoto,photo};
 })();
@@ -964,7 +1118,7 @@ const AV=C.avisos||{};
 const AV_TIPOS=window.AV_TIPOS=[['vale','🎟️ Canjea un vale'],['nota','💌 Te deja una notita en el buzón'],['ruleta','🎡 Gira la ruleta de citas'],['abrela','💌 Abre una carta «Ábrela cuando…»'],
   ['abrazo','🤗 Te manda un abrazo (corazón presionado)'],['rasca','🌠 Raspa el rasca y gana'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Agrega o aprende algo nuevo'],
   ['evento','🗓️ Agrega algo a «Lo que viene»'],['foto','📷 Sube fotos al carrusel'],['recuerdo','📷 Guarda un recuerdo de algo que hicieron'],['sorpresa','🎁 Abre la sorpresa del mes'],
-  ['capsula','⏳ Abre la cápsula del tiempo'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (máx. 1 aviso cada 30 min)']];
+  ['capsula','⏳ Abre la cápsula del tiempo'],['racha','🔥 Desbloquea un premio de su racha'],['animo','🌤️ Dice cómo se siente'],['voz','🎙️ Te manda un mensaje de voz'],['cartames','✉️ Abre la carta del mes'],['comida','🍽️ Gira la rueda de la comida'],['peli','🍿 Agrega, ve o califica una peli o serie'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (máx. 1 aviso cada 30 min)']];
 const AV_OFF_DEF=window.AV_OFF_DEF={entrada:1};
 const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'&&AV.notas===false)return false;return !off[t]};
 const AV_LAST={};
@@ -977,8 +1131,24 @@ function avisar(txt,tipo){
   try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
   const quien=soyYo?C.yo:C.ella;
   if(soyYo){ txt=txt.split(C.ella+' ').join(C.yo+' ').replace(/ te (dejó|mandó)/,' le $1'); }
-  const title=({vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
+  const title=({vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
   fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
+}
+const VIEWER=()=>{if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
+const MXD=t=>new Date(new Date(t==null?Date.now():t).toLocaleString('en-US',{timeZone:'America/Mexico_City'}));
+const DK=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const UID=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+/* lista compartida y cifrada en el gist (se combina por id) */
+function SHARED(file,field,LK,max,onChange){
+  let L=[]; try{L=JSON.parse(localStorage.getItem(LK)||'[]')||[]}catch(e){}
+  const keep=()=>{L=L.sort((a,b)=>(a.a||0)-(b.a||0)).slice(-max);try{localStorage.setItem(LK,JSON.stringify(L))}catch(e){}};
+  let busy=false,again=false;
+  async function sync(){ if(!GG.on)return; if(busy){again=true;return} busy=true;
+    try{const r=await GG.pull(file,true)||{}; L=GG.merge(L,r[field]); keep(); await GG.push(file,{[field]:L}); onChange()}catch(e){setTimeout(sync,15000)}
+    busy=false; if(again){again=false;sync()} }
+  async function refresh(){ if(!GG.on)return; try{const r=await GG.pull(file)||{}; const b=JSON.stringify(L); L=GG.merge(L,r[field]); keep(); if(JSON.stringify(L)!==b)onChange()}catch(e){} }
+  setTimeout(refresh,400); document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
+  return {all:()=>L, add(x){L.push(x);keep();onChange();sync()}, save(){keep();onChange();sync()}};
 }
 const fmtDia=t=>new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short'});
 const fmtHora=t=>new Date(t).toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'});
@@ -1183,7 +1353,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     location.replace(location.pathname);
   };
@@ -1402,7 +1572,12 @@ function makeBoard(B){
     del.onclick=()=>{if(!armed){armed=true;del.textContent='¿Borrar?';del.className='warn';setTimeout(()=>{armed=false;del.textContent='✕';del.className=''},2500);return}
       x.x=1;x.u=nowT();changed()};
     b.append(mv,ed,del); f.append(d,b); el.append(t,f);
-    if(x.c==='d'&&GG.on){
+    if(B.rate&&x.c==='d'){const r=x.r||{}, vw=VIEWER(), box=document.createElement('div'); box.className='kb-rate';
+      [['ella',C.ella],['yo',C.yo]].forEach(([w,nm])=>{const row=document.createElement('div');row.className='kb-rr';const l=document.createElement('span');l.textContent=nm;row.append(l);
+        for(let i=1;i<=5;i++){const sb=document.createElement('button');sb.type='button';sb.className='kb-star'+(i<=(r[w]||0)?' on':'');sb.textContent='★';
+          if(w===vw)sb.onclick=()=>{x.r=Object.assign({},x.r,{[w]:i});x.u=nowT();avisar(`⭐ ${C.ella} calificó «${x.t}» con ${i} de 5 estrellas`,B.avTipo);changed()};else sb.disabled=true;row.append(sb)}
+        box.append(row)}); el.append(box)}
+    if(x.c==='d'&&GG.on&&!B.noMemo){
       if(x.ph||x.n){
         if(x.ph){const im=document.createElement('div');im.className='kb-mem';im.textContent='💗';GG.photo(x.ph).then(u=>{im.style.backgroundImage=`url("${u}")`;im.textContent=''}).catch(()=>{});im.onclick=()=>MEMO.open(x,changed);el.append(im)}
         if(x.n){const n=document.createElement('div');n.className='kb-memn';n.textContent='“'+x.n+'”';n.onclick=()=>MEMO.open(x,changed);el.append(n)}
@@ -1453,6 +1628,7 @@ function makeBoard(B){
     window.addEventListener('online',sync);}
 }
 makeBoard({avTipo:'plan',avNew:'📝 '+C.ella+' agregó un plan:',avDone:'🎉 ¡Lo logramos! '+C.ella+' marcó como hecho:',sec:'planes',p:'kb',file:'planes.bin',cache:'planes-cache',seed:C.lista,emptyP:'¿qué hacemos? escríbelo arriba ✍️',emptyD:'aquí irán nuestros recuerdos 💗',doneTitle:'¡Lo hicimos!'});
+makeBoard({avTipo:'peli',avNew:'🍿 '+C.ella+' quiere que veamos:',avDone:'✅ Ya la vimos: '+C.ella+' marcó',sec:'pelis',p:'pl',file:'pelis.bin',cache:'pelis-cache',seed:[],emptyP:'¿qué vemos? escríbelo arriba 🍿',emptyD:'aquí irá todo lo que ya vimos juntos 🎬',doneTitle:'¡Ya la vimos!',rate:true,noMemo:true});
 makeBoard({avTipo:'aprender',avNew:'📚 '+C.ella+' quiere que aprendamos:',avDone:'🎓 ¡Ya lo aprendimos! '+C.ella+' marcó:',sec:'aprender',p:'ap',file:'aprender.bin',cache:'aprender-cache',seed:[],emptyP:'¿qué aprendemos? escríbelo arriba 📚',emptyD:'aquí irá todo lo que ya aprendimos juntos 🎓',doneTitle:'¡Ya lo aprendimos!'});
 
 /* ====== Sorpresa de cada mes ====== */
@@ -1865,6 +2041,213 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   render(); refresh(); document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
 })();
 
+/* ====== Racha de visitas ====== */
+(function(){
+  const PR=(C.racha||[]).map(o=>({d:parseInt(o.dias)||0,e:o.emoji||'🎁',t:FILL(o.titulo),x:FILL(o.texto)})).filter(o=>o.d>0).sort((a,b)=>a.d-b.d);
+  const soyElla=VIEWER()==='ella';
+  const S=SHARED('racha.bin','d','racha-cache',400,render);
+  const W=['D','L','M','M','J','V','S'];
+  const $=id=>document.getElementById(id);
+  let open=null;
+  function stats(){
+    const set=new Set(S.all().map(x=>x.id)), d=MXD(); if(!set.has(DK(d)))d.setDate(d.getDate()-1);
+    let cur=0; while(set.has(DK(d))){cur++;d.setDate(d.getDate()-1)}
+    let best=0,run=0,prev=null; [...set].sort().forEach(k=>{const t=new Date(k+'T12:00:00');run=prev&&(t-prev)/864e5<1.5?run+1:1;best=Math.max(best,run);prev=t});
+    return {cur,best:Math.max(best,cur),set};
+  }
+  function render(){
+    const {cur,best,set}=stats();
+    $('rchN').textContent=cur; $('rchL').textContent=cur===1?'día seguido':'días seguidos';
+    $('rchFire').classList.toggle('off',!cur);
+    $('rchSub').textContent=soyElla?'entra todos los días y desbloquea premios':`así va ${C.ella} entrando a nuestro lugar`;
+    const wk=$('rchWeek'); wk.innerHTML=''; const d=MXD(); d.setDate(d.getDate()-6);
+    for(let i=0;i<7;i++){const k=DK(d),on=set.has(k),c=document.createElement('div');c.className=(on?'on ':'')+(i===6?'today':'');
+      c.innerHTML=`<i>${on?'🔥':''}</i>${W[d.getDay()]}`;wk.append(c);d.setDate(d.getDate()+1)}
+    const next=PR.find(p=>best<p.d);
+    if(next){const base=[...PR].reverse().find(p=>p.d<=best);const from=0;
+      $('rchBar').style.width=Math.min(100,Math.round(cur/next.d*100))+'%';
+      $('rchNext').textContent=cur?`Faltan ${next.d-cur} ${next.d-cur===1?'día':'días'} para desbloquear: ${next.e} ${next.t}`:(soyElla?'Entra mañana otra vez y empieza tu racha 🔥':`${C.ella} todavía no empieza una racha nueva`);}
+    else{$('rchBar').style.width='100%';$('rchNext').textContent=PR.length?'¡Desbloqueaste todos los premios! 🏆':''}
+    const box=$('rchPrizes'); box.innerHTML='';
+    PR.forEach(p=>{const ok=best>=p.d,b=document.createElement('button');b.className='rch-p '+(ok?'ok':'lock');
+      b.innerHTML=`<span class="e">${ok?esc(p.e):'🔒'}</span><span><b>${ok?esc(p.t):'Premio sorpresa'}</b><small>${p.d} días seguidos${ok?' · ¡desbloqueado!':''}</small>${ok&&open===p.d?'<p>'+esc(p.x)+'</p>':''}</span>`;
+      if(ok)b.onclick=()=>{open=open===p.d?null:p.d;render()}; box.append(b)});
+  }
+  function visit(){
+    if(!soyElla)return; const k=DK(MXD()); const before=stats().best;
+    if(!S.all().some(x=>x.id===k)){S.add({id:k,a:Date.now(),u:Date.now()})}
+    const after=stats().best;
+    PR.filter(p=>before<p.d&&after>=p.d).forEach(p=>{let done=false;try{done=localStorage.getItem('racha-av-'+p.d)===RK;localStorage.setItem('racha-av-'+p.d,RK)}catch(e){}
+      if(!done){avisar(`🔥 ${C.ella} lleva ${p.d} días seguidos entrando y desbloqueó: ${p.e} ${p.t}`,'racha');setTimeout(()=>burst(30),600)}});
+  }
+  render(); window.addEventListener('unlocked',visit); document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!document.body.classList.contains('locked'))visit()});
+})();
+
+/* ====== ¿Cómo te sientes hoy? ====== */
+(function(){
+  const M=(C.animo||[]).filter(o=>o.emoji).map(o=>({e:o.emoji,n:FILL(o.nombre),r:FILL(o.respuesta)}));
+  const $=id=>document.getElementById(id), grid=$('anGrid'), res=$('anRes'), hoy=$('anHoy');
+  const S=SHARED('animo.bin','e','animo-cache',60,render);
+  const yo=()=>VIEWER(), today=()=>DK(MXD());
+  const lastOf=w=>S.all().filter(x=>!x.x&&x.w===w&&DK(MXD(x.a))===today()).sort((a,b)=>b.a-a.a)[0];
+  let shown=false;
+  function render(){
+    const mine=lastOf(yo());
+    $('anSub').textContent=yo()==='yo'?'¿y tú cómo te sientes hoy?':'toca una carita y cuéntame';
+    grid.innerHTML='';
+    M.forEach(m=>{const b=document.createElement('button');b.className='an-b'+(mine&&mine.m===m.e?' sel':'');b.innerHTML=`<span>${esc(m.e)}</span>${esc(m.n)}`;b.onclick=()=>pick(m);grid.append(b)});
+    const L=[['ella',C.ella],['yo',C.yo]].map(([w,nm])=>{const x=lastOf(w);return x?`Hoy ${esc(nm)} se siente ${esc(x.m)} ${esc((x.n||'').toLowerCase())} <span style="opacity:.6">· ${fmtHora(x.a)}</span>`:''}).filter(Boolean);
+    hoy.innerHTML=L.join('<br>');
+    if(mine&&!shown){shown=true;respond(M.find(m=>m.e===mine.m),false)}
+  }
+  function respond(m,fresh){
+    if(!m){res.hidden=true;return}
+    res.hidden=false;
+    if(yo()==='ella')res.innerHTML=`<div class="daily-l">${esc(m.e)} ${esc(m.n)}</div><div class="daily">${esc(m.r)}</div><div class="sg">${esc(SIGN)}</div>`;
+    else res.innerHTML=`<div class="daily-l">${esc(m.e)} ${esc(m.n)}</div><div class="daily">Listo, ${esc(C.ella)} va a ver cómo te sientes hoy 💗</div>`;
+    if(fresh){res.style.animation='none';void res.offsetWidth;res.style.animation=''}
+  }
+  function pick(m){
+    S.add({id:UID(),w:yo(),m:m.e,n:m.n,a:Date.now(),u:Date.now()});
+    respond(m,true); burst(12);
+    avisar(`🌤️ ${C.ella} se siente ${m.e} ${m.n.toLowerCase()} hoy`,'animo');
+  }
+  render();
+})();
+
+/* ====== Carta del mes ====== */
+(function(){
+  const L=(C.cartasMes||[]).map(o=>({m:parseInt(o.mes)||0,t:FILL(o.titulo),x:o.texto||''})).filter(o=>o.m>0&&o.x.trim()).sort((a,b)=>a.m-b.m);
+  const box=document.getElementById('cmBox');
+  const dateOf=m=>{const d=new Date(SY,SM-1+m,SD);return `${d.getDate()} de ${MESN[d.getMonth()]} de ${d.getFullYear()}`};
+  const opened=L.filter(o=>o.m<=MONTHS), next=L.find(o=>o.m>MONTHS);
+  let cur=opened.length?opened[opened.length-1]:null, isOpen=false;
+  const body=t=>FILL(t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('');
+  function render(){
+    box.innerHTML='';
+    if(!cur){box.innerHTML=`<div class="card cm-env"><div class="e">🔒</div><h3>${next?'Muy pronto':'Pronto habrá una carta aquí'}</h3><div class="t">${next?'la primera se abre el '+dateOf(next.m):'💌'}</div></div>`;return}
+    const c=document.createElement('div');c.className='card cm-env';
+    c.innerHTML=`<div class="e">${isOpen?'💌':'✉️'}</div><h3>Carta de los ${cur.m} meses</h3><div class="t">${esc(cur.t)}</div>`;
+    const b=document.createElement('button');b.className='btn small';b.textContent=isOpen?'💌 Guardar carta':'✉️ Abrir carta';
+    b.onclick=()=>{isOpen=!isOpen;render();if(isOpen){burst(16);let done=false;try{done=localStorage.getItem('cm-av-'+cur.m)==='1';localStorage.setItem('cm-av-'+cur.m,'1')}catch(e){}
+      if(!done)avisar(`✉️ ${C.ella} abrió la carta de los ${cur.m} meses`,'cartames');
+      setTimeout(()=>box.querySelector('.paper')?.scrollIntoView({behavior:'smooth',block:'start'}),80)}};
+    c.append(b); box.append(c);
+    if(isOpen){const p=document.createElement('div');p.className='paper';p.innerHTML=body(cur.x)+`<p class="sign">${esc(SIGN)}</p>`;box.append(p)}
+    if(opened.length>1){const ch=document.createElement('div');ch.className='cm-chips';
+      opened.slice().reverse().forEach(o=>{const x=document.createElement('button');x.className=o===cur?'cur':'';x.textContent='📜 '+o.m+' meses';x.onclick=()=>{cur=o;isOpen=true;render()};ch.append(x)});box.append(ch)}
+    if(next){const n=document.createElement('div');n.className='cm-next';n.textContent='🔒 La siguiente carta se abre el '+dateOf(next.m);box.append(n)}
+  }
+  render();
+})();
+
+/* ====== Mensajes de voz ====== */
+(function(){
+  const $=id=>document.getElementById(id), list=$('vzList'), btn=$('vzBtn'), prev=$('vzPrev'), aud=$('vzAud'), st=$('vzSt');
+  const S=SHARED('voz.bin','v','voz-cache',40,render);
+  const fmtT=s=>{s=Math.max(0,Math.round(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+  const player=new Audio(); let playing=null;
+  player.addEventListener('timeupdate',()=>{if(!playing)return;const bar=list.querySelector(`[data-id="${playing}"] .vz-bar i`);if(bar&&player.duration&&isFinite(player.duration))bar.style.width=(player.currentTime/player.duration*100)+'%'});
+  player.addEventListener('ended',()=>{const el=list.querySelector(`[data-id="${playing}"]`);if(el){el.querySelector('.vz-play').textContent='▶';el.querySelector('.vz-bar i').style.width='0'}playing=null});
+  function render(){
+    const live=S.all().filter(x=>!x.x).sort((a,b)=>a.a-b.a), me=VIEWER();
+    list.innerHTML=live.length?'':'<div class="nb-empty">aún no hay mensajes de voz… ¡graba el primero! 🎙️</div>';
+    live.forEach(x=>{
+      const d=document.createElement('div');d.className='vz-m '+(x.w===me?'me':'them');d.dataset.id=x.id;
+      const pl=document.createElement('button');pl.className='vz-play';pl.textContent=playing===x.id?'⏸':'▶';pl.setAttribute('aria-label','Escuchar');
+      const bd=document.createElement('div');bd.className='vz-body';
+      bd.innerHTML=`<div class="vz-bar"><i></i></div><div class="vz-meta"><span>${esc(x.w==='yo'?C.yo:C.ella)} · ${fmtDia(x.a)} ${fmtHora(x.a)}</span><span>${fmtT(x.d)}</span></div>`;
+      pl.onclick=async()=>{
+        if(playing===x.id){player.pause();playing=null;pl.textContent='▶';return}
+        list.querySelectorAll('.vz-play').forEach(b=>b.textContent='▶'); pl.textContent='⏳';
+        try{const u=await GG.photo(x.g,x.mt||'audio/webm');player.src=u;playing=x.id;await player.play();pl.textContent='⏸'}catch(e){pl.textContent='▶';st.textContent='No se pudo reproducir, intenta de nuevo'}
+      };
+      d.append(pl,bd);
+      if(x.w===me){const del=document.createElement('button');del.className='vz-x';del.textContent='✕';let armed=false;
+        del.onclick=()=>{if(!armed){armed=true;del.textContent='¿Borrar?';setTimeout(()=>{armed=false;del.textContent='✕'},2500);return}x.x=1;x.u=Date.now();S.save()};d.append(del)}
+      list.append(d);
+    });
+    list.scrollTop=list.scrollHeight;
+  }
+  render();
+  if(!GG.on){btn.hidden=true;st.textContent='Los mensajes de voz necesitan el guardado compartido activado';return}
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder)){btn.hidden=true;st.textContent='Este celular no deja grabar audio desde aquí';return}
+  let rec=null, chunks=[], t0=0, tick=null, blob=null, secs=0, stream=null;
+  const MT=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'].find(t=>{try{return MediaRecorder.isTypeSupported(t)}catch(e){return false}})||'';
+  function stop(){if(rec&&rec.state!=='inactive')rec.stop()}
+  btn.onclick=async()=>{
+    if(rec&&rec.state==='recording'){stop();return}
+    st.textContent='';
+    try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){st.textContent='Necesito permiso para usar el micrófono 🎙️';return}
+    chunks=[]; rec=new MediaRecorder(stream,MT?{mimeType:MT}:undefined);
+    rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+    rec.onstop=()=>{clearInterval(tick);stream.getTracks().forEach(t=>t.stop());secs=(Date.now()-t0)/1000;
+      blob=new Blob(chunks,{type:(rec.mimeType||MT||'audio/webm').split(';')[0]});
+      btn.classList.remove('rec');btn.textContent='🎙️ Grabar otro';aud.src=URL.createObjectURL(blob);prev.hidden=false};
+    rec.start(); t0=Date.now(); btn.classList.add('rec'); prev.hidden=true;
+    const up=()=>{const s=(Date.now()-t0)/1000;btn.textContent='⏹️ Detener · '+fmtT(s);if(s>=60)stop()};up();tick=setInterval(up,250);
+  };
+  $('vzDel').onclick=()=>{blob=null;prev.hidden=true;aud.removeAttribute('src');btn.textContent='🎙️ Grabar mensaje'};
+  $('vzSend').onclick=async()=>{
+    if(!blob)return; const sb=$('vzSend'); sb.disabled=true; st.textContent='Enviando…';
+    try{const g=await GG.newPhoto(blob);
+      S.add({id:UID(),w:VIEWER(),g,mt:blob.type,d:Math.round(secs),a:Date.now(),u:Date.now()});
+      avisar(`🎙️ ${C.ella} te mandó un mensaje de voz`,'voz');
+      blob=null;prev.hidden=true;btn.textContent='🎙️ Grabar mensaje';st.textContent='💌 Enviado';burst(14)}
+    catch(e){st.textContent='No se pudo enviar, intenta de nuevo'}
+    sb.disabled=false;
+  };
+})();
+
+/* ====== Rueda de la comida ====== */
+(function(){
+  const P=((C.comida||[]).length?C.comida:['🌮 Tacos']).slice(0,12).map(FILL);
+  const WC=['#e9b872','#fbe3d6','#e85d84','#ffd9e3','#b3204f','#f7c6d3','#8e1f45','#ffb3c6'];
+  const cv=document.getElementById('fdWheel'), x=cv.getContext('2d'), n=P.length, a=2*Math.PI/n;
+  const btn=document.getElementById('fdSpin'), res=document.getElementById('fdRes');
+  P.forEach((p,i)=>{
+    x.beginPath();x.moveTo(300,300);x.arc(300,300,295,i*a-Math.PI/2,(i+1)*a-Math.PI/2);x.closePath();x.fillStyle=WC[i%WC.length];x.fill();
+    x.strokeStyle='rgba(255,255,255,.6)';x.lineWidth=3;x.stroke();
+    x.save();x.translate(300,300);x.rotate(i*a+a/2-Math.PI/2);x.textAlign='right';
+    x.fillStyle=[2,4,6].includes(i%8)?'#fff':'#3b0d1c';x.font=`700 ${n>9?21:n>8?23:26}px Nunito, sans-serif`;x.fillText(p,275,9);x.restore();
+  });
+  x.beginPath();x.arc(300,300,34,0,7);x.fillStyle='#fff';x.fill();x.font='34px serif';x.textAlign='center';x.fillText('🍽️',300,312);
+  let rot=0,busy=false;
+  btn.onclick=()=>{
+    if(busy)return; busy=true; btn.disabled=true; res.textContent='';
+    const k=Math.floor(Math.random()*n), target=360-(k*360/n+360/n/2);
+    rot+=360*6+((target-(rot%360))+360)%360; cv.style.transform=`rotate(${rot}deg)`;
+    setTimeout(()=>{busy=false;btn.disabled=false;btn.textContent='🍽️ Girar otra vez';res.textContent='Hoy toca: '+P[k]+' 😋';burst(14);
+      avisar(`🍽️ ${C.ella} giró la rueda de la comida: hoy toca ${P[k]}`,'comida')},4600);
+  };
+})();
+
+/* ====== Nuestro árbol (crece cada mes y florece al año) ====== */
+(function(){
+  const svg=document.getElementById('treeSvg'), btn=document.getElementById('tree');
+  let seed=7; const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+  const g=Math.min(MONTHS,12)/12, sc=.62+.38*g;
+  const leaves=Math.min(48,4+MONTHS*3), flowers=MONTHS>=12?Math.min(30,(MONTHS-11)*5):0;
+  const tips=[[150,62],[96,104],[204,100],[72,150],[228,146],[118,82],[182,80],[110,128],[190,124],[150,100]];
+  let out=`<ellipse cx="150" cy="272" rx="120" ry="14" fill="rgba(0,0,0,.25)"/><path d="M40 270 Q150 255 260 270 L260 276 L40 276Z" fill="#3f8a4e"/>`;
+  out+=`<g class="tr-sway"><g transform="translate(150 268) scale(${sc}) translate(-150 -268)">`;
+  out+=`<path d="M138 270 C142 230 140 190 146 150 C148 130 150 110 150 96 L156 96 C157 120 158 140 160 160 C164 200 162 235 166 270Z" fill="#7a4a2e"/>`;
+  const br=[[150,170,96,104],[154,160,204,100],[148,190,72,150],[158,188,228,146],[150,140,118,82],[154,138,182,80],[150,120,150,62]];
+  br.forEach(([x1,y1,x2,y2])=>out+=`<path d="M${x1} ${y1} Q${(x1+x2)/2} ${(y1+y2)/2-10} ${x2} ${y2}" stroke="#7a4a2e" stroke-width="7" fill="none" stroke-linecap="round"/>`);
+  const LC=['#5fbf72','#4aa862','#7dd38a','#3f9a57','#8fdc8f'];
+  for(let i=0;i<leaves;i++){const t=tips[i%tips.length],r=14+rnd()*30,an=rnd()*6.283,x=t[0]+Math.cos(an)*r,y=t[1]+Math.sin(an)*r*.8,rot=rnd()*360;
+    out+=`<ellipse class="tr-leaf" style="animation-delay:${(i*40)}ms" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="11" ry="6.5" transform="rotate(${rot.toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})" fill="${LC[i%LC.length]}"/>`}
+  for(let i=0;i<flowers;i++){const t=tips[i%tips.length],r=10+rnd()*34,an=rnd()*6.283,x=t[0]+Math.cos(an)*r,y=t[1]+Math.sin(an)*r*.8;
+    out+=`<g class="tr-leaf" style="animation-delay:${leaves*40+i*60}ms">`;for(let k=0;k<5;k++){const pa=k*1.2566;out+=`<circle cx="${(x+Math.cos(pa)*4.5).toFixed(1)}" cy="${(y+Math.sin(pa)*4.5).toFixed(1)}" r="4" fill="#ffc2d4"/>`}out+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="#e9b872"/></g>`}
+  out+=`</g></g>`;
+  svg.innerHTML=out;
+  const anniv=new Date(SY+1,SM-1,SD), falt=12-MONTHS;
+  document.getElementById('arSub').textContent=`${MONTHS} ${MESES} creciendo juntos 🌱`;
+  document.getElementById('arTxt').textContent=MONTHS>=12?'¡Nuestro árbol ya floreció! 🌸 Cada mes le salen flores nuevas':
+    `Cada mes le salen hojitas nuevas · ${falt===1?'falta 1 mes':'faltan '+falt+' meses'} para que florezca, el ${anniv.getDate()} de ${MESN[anniv.getMonth()]} de ${anniv.getFullYear()} 🌸`;
+  btn.onclick=()=>{btn.classList.remove('shake');void btn.offsetWidth;btn.classList.add('shake');burst(10);setTimeout(()=>btn.classList.remove('shake'),750)};
+})();
+
 /* ====== Lo que viene ====== */
 (function(){
   const list=document.getElementById('evList'), st=document.getElementById('evSt'), CK='eventos-cache';
@@ -2035,7 +2418,7 @@ document.getElementById('moreLove').addEventListener('click',()=>{
 /* =====================================================================
    CARGA DEL CONTENIDO (content.json en tu repo de GitHub)
    ===================================================================== */
-const DEFAULTS = {"ella": "", "yo": "", "inicio": "2026-01-01", "pin": "0000", "pistas": [], "saludos": {"manana": "", "tarde": "", "noche": ""}, "mensajesDia": [], "cancion": {"titulo": "", "artista": "", "link": ""}, "carta": "", "abrela": [], "cartaSola": "", "fotos": [], "fotoPolaroid": 1, "polaroidTexto": "", "fotoRompecabezas": 1, "razones": [], "fortunas": [], "rasca": {"emoji": "", "titulo": "", "texto": ""}, "vales": [], "ruleta": [], "lista": [], "horaCielo": "21:00", "sorpresas": [], "sorpresasExtra": [], "capsula": {"fecha": "2030-01-01", "texto": ""}, "secreto": "", "fraseFinal": "", "mensajitos": [], "creditos": [], "whatsapp": {"numero": "", "mensajes": []}, "reinicio": "1", "kanban": {}};
+const DEFAULTS = {"ella": "", "yo": "", "inicio": "2026-01-01", "pin": "0000", "pistas": [], "saludos": {"manana": "", "tarde": "", "noche": ""}, "mensajesDia": [], "cancion": {"titulo": "", "artista": "", "link": ""}, "carta": "", "abrela": [], "cartaSola": "", "fotos": [], "fotoPolaroid": 1, "polaroidTexto": "", "fotoRompecabezas": 1, "razones": [], "fortunas": [], "rasca": {"emoji": "", "titulo": "", "texto": ""}, "vales": [], "ruleta": [], "lista": [], "horaCielo": "21:00", "sorpresas": [], "sorpresasExtra": [], "capsula": {"fecha": "2030-01-01", "texto": ""}, "secreto": "", "fraseFinal": "", "mensajitos": [], "creditos": [], "whatsapp": {"numero": "", "mensajes": []}, "reinicio": "1", "kanban": {}, "racha": [{"dias": "7", "emoji": "🎟️", "titulo": "Cita sorpresa", "texto": "Por una semana seguida: una cita que yo planeo completita, tú solo llegas."}, {"dias": "30", "emoji": "🍰", "titulo": "Tu postre favorito", "texto": "Por un mes seguido: te llevo tu postre favorito a donde estés."}, {"dias": "100", "emoji": "👑", "titulo": "Un día de reina", "texto": "Por 100 días seguidos: un día entero dedicado a ti y tú pones todas las reglas."}], "animo": [{"emoji": "😊", "nombre": "Feliz", "respuesta": "¡Me encanta verte feliz! Que nada te quite esa sonrisa hoy 💗"}, {"emoji": "🥰", "nombre": "Enamorada", "respuesta": "Yo también, mi amor. Cada día más 🥰"}, {"emoji": "😴", "nombre": "Cansada", "respuesta": "Descansa tantito, preciosa. Hoy te mereces una siesta y muchos apapachos 💤"}, {"emoji": "😔", "nombre": "Triste", "respuesta": "Aquí estoy para ti, siempre. Te mando un abrazo enorme 🤗 y si quieres, háblame."}, {"emoji": "😣", "nombre": "Estresada", "respuesta": "Respira hondo… tú puedes con todo. Y si no, aquí estoy para ayudarte 💪💗"}, {"emoji": "😤", "nombre": "Enojada", "respuesta": "Ay, mi amor… cuéntame qué pasó, te escucho. (Y si fui yo, perdóname 🙈)"}], "cartasMes": [{"mes": "8", "titulo": "Ocho meses contigo", "texto": "Mi amor:\n\nHoy cumplimos ocho meses y todavía me sorprende lo bonito que se siente estar contigo. Gracias por cada risa, cada abrazo y por hacer que los días normales se sientan especiales.\n\nNo sé qué nos traiga el siguiente mes, pero sé que lo quiero vivir contigo.\n\nTe amo mucho, {ella}."}, {"mes": "9", "titulo": "Nueve meses de nosotros", "texto": "Mi vida:\n\nNueve meses ya. Cada mes que pasa te conozco un poquito más y te quiero un poquito más también.\n\nGracias por elegirme todos los días. Yo te elijo a ti, hoy y siempre.\n\nCon todo mi amor."}], "comida": ["🌮 Tacos", "🍕 Pizza", "🍣 Sushi", "🍔 Hamburguesas", "🍜 Ramen", "🍝 Pasta", "🥗 Algo sanito", "🌯 Burritos", "🍗 Alitas", "🥘 Comida casera"]};
 const EDIT = /[?&]editar\b/.test(location.search) || location.hash==='#editar';
 const LS={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
 function ghRepo(){
@@ -2117,8 +2500,11 @@ const SCHEMA=[
   {t:'Nombres, fecha y candado',f:[['ella','Su nombre','text'],['yo','Tu nombre (firma)','text'],['inicio','Fecha en que empezó todo','date'],['pin','Código del candado (4 números)','text']]},
   {t:'Saludos según la hora',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
   {t:'Mensaje del día',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2],['mensajesDia','Frases (cambia una cada día)','list']]},
+  {t:'Racha de visitas',f:[['racha','Premios por días seguidos','objlist',[['dias','Días seguidos (número)','text'],['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
+  {t:'¿Cómo te sientes hoy?',f:[['animo','Caritas y lo que le respondes','objlist',[['emoji','Emoji','text'],['nombre','Cómo se siente','text'],['respuesta','Lo que le respondes','textarea',2]]]]},
   {t:'Nuestra canción',f:[['cancion.titulo','Título','text'],['cancion.artista','Artista','text'],['cancion.link','Link (Spotify, YouTube…)','text']]},
   {t:'Carta principal',f:[['carta','Texto · deja una línea vacía entre párrafos','textarea',10]]},
+  {t:'Carta de cada mes',f:[['cartasMes','Cartas (se abre cada una el día 12 de ese mes)','objlist',[['mes','Meses que cumplimos (número)','text'],['titulo','Título','text'],['texto','Carta · deja una línea vacía entre párrafos','textarea',8]]]]},
   {t:'Ábrela cuando…',f:[['abrela','Cartas','objlist',[['emoji','Emoji','text'],['cuando','Ábrela cuando…','text'],['texto','Texto de la carta','textarea']]]]},
   {t:'Carta que se escribe sola',f:[['cartaSola','Texto','textarea',9]]},
   {t:'Fotos',f:[['fotos','Galería (también se usan en el memorama y los créditos)','photos'],['polaroidTexto','Texto al revelar la polaroid (la foto sale al azar)','text'],['fotoRompecabezas','Número de foto para el rompecabezas','number']]},
@@ -2127,6 +2513,7 @@ const SCHEMA=[
   {t:'Rasca y gana',f:[['rascaPremios','Premios (sale uno al azar y solo se puede raspar una vez)','objlist',[['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
   {t:'Vales de amor',f:[['vales','Vales','objlist',[['emoji','Emoji','text'],['titulo','Vale por…','text'],['detalle','Detalle','text']]]]},
   {t:'Ruleta de citas',f:[['ruleta','Opciones (máximo 12)','list']]},
+  {t:'Rueda de la comida',f:[['comida','Opciones (máximo 12)','list']]},
   {t:'Planes, fotos, vales, notitas y eventos de Ale',special:'kanban'},
   {t:'El cielo de esa noche',f:[['horaCielo','Hora del cielo (el día que empezó todo)','time']]},
   {t:'Sorpresas de cada mes',f:[['sorpresas','Sorpresas con fecha','objlist',[['emoji','Emoji','text'],['nombre','Nombre en la tarjeta (ej. 9 meses)','text'],['fecha','Se abre el','date'],['titulo','Título','text'],['texto','Mensaje','textarea']]],['sorpresasExtra','Sorpresas automáticas para los meses siguientes','objlist',[['emoji','Emoji','text'],['texto','Mensaje','textarea']]]]},
