@@ -1118,8 +1118,8 @@ const AV=C.avisos||{};
 const AV_TIPOS=window.AV_TIPOS=[['vale','🎟️ Canjea un vale'],['nota','💌 Te deja una notita en el buzón'],['ruleta','🎡 Gira la ruleta de citas'],['abrela','💌 Abre una carta «Ábrela cuando…»'],
   ['abrazo','🤗 Te manda un abrazo (corazón presionado)'],['rasca','🌠 Raspa el rasca y gana'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Agrega o aprende algo nuevo'],
   ['evento','🗓️ Agrega algo a «Lo que viene»'],['foto','📷 Sube fotos al carrusel'],['recuerdo','📷 Guarda un recuerdo de algo que hicieron'],['sorpresa','🎁 Abre la sorpresa del mes'],
-  ['capsula','⏳ Abre la cápsula del tiempo'],['racha','🔥 Desbloquea un premio de su racha'],['animo','🌤️ Dice cómo se siente'],['voz','🎙️ Te manda un mensaje de voz'],['cartames','✉️ Abre la carta del mes'],['comida','🍽️ Gira la rueda de la comida'],['peli','🍿 Agrega, ve o califica una peli o serie'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (máx. 1 aviso cada 30 min)']];
-const AV_OFF_DEF=window.AV_OFF_DEF={entrada:1};
+  ['capsula','⏳ Abre la cápsula del tiempo'],['racha','🔥 Desbloquea un premio de su racha'],['animo','🌤️ Dice cómo se siente'],['voz','🎙️ Te manda un mensaje de voz'],['cartames','✉️ Abre la carta del mes'],['comida','🍽️ Gira la rueda de la comida'],['peli','🍿 Agrega, ve o califica una peli o serie'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (cada vez que entra)']];
+const AV_OFF_DEF=window.AV_OFF_DEF={};
 const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'&&AV.notas===false)return false;return !off[t]};
 const AV_LAST={};
 function avisar(txt,tipo){
@@ -1127,7 +1127,7 @@ function avisar(txt,tipo){
   let soyYo=EDIT; try{if(localStorage.getItem('yo-soy')==='yo')soyYo=true}catch(e){}
   if(soyYo&&AV.yo===false)return;
   if(!avOn(tipo))return;
-  const gap=tipo==='entrada'?30*60*1000:({abrazo:1,secreto:1}[tipo]?60*1000:0);
+  const gap=({abrazo:1,secreto:1}[tipo]?60*1000:0);
   try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
   const quien=soyYo?C.yo:C.ella;
   if(soyYo){ txt=txt.split(C.ella+' ').join(C.yo+' ').replace(/ te (dejó|mandó)/,' le $1'); }
@@ -1419,11 +1419,11 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   const ov=document.getElementById('hoyOv');
   document.getElementById('hoyDate').textContent=now.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
   document.getElementById('hoyMsg').textContent=D[doy%D.length];
-  document.getElementById('hoyFix').textContent=FILL(C.mensajeFijo||'Te amo mucho, {ella}, y siempre voy a estar para ti.');
+  document.getElementById('hoyFix').textContent=FILL(C.mensajeFijo||'Te amo mucho {ella}, y siempre estaré para ti en todo momento.');
   document.getElementById('hoySign').textContent=SIGN;
   let shown=false;
   const close=()=>{if(!ov.classList.contains('open'))return;ov.classList.add('out');setTimeout(()=>{ov.classList.remove('open','out');window.dispatchEvent(new Event('hoyClosed'))},480)};
-  window.addEventListener('unlocked',()=>{avisar(`👀 ${C.ella} está viendo nuestra app`,'entrada');if(shown)return;shown=true;setTimeout(()=>{ov.classList.add('open');burst(35)},500)});
+  window.addEventListener('unlocked',()=>{if(VIEWER()!=='yo')avisar(`👀 ${C.ella} entró a nuestra app`,'entrada');if(shown)return;shown=true;setTimeout(()=>{ov.classList.add('open');burst(35)},500)});
   document.getElementById('hoyBtn').onclick=close;
   ov.addEventListener('click',e=>{if(e.target===ov)close()});
 })();
