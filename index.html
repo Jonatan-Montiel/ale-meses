@@ -477,7 +477,7 @@
   <div class="hoy-sep">♥</div>
   <div class="hoy-fix" id="hoyFix"></div>
   <div class="hoy-sign" id="hoySign"></div>
-  <button class="btn" id="hoyBtn">Gracias, mi amor ♥</button>
+  <button class="btn" id="hoyBtn">Continuar ♥</button>
 </div></div>
 <div class="celebrate" id="celebrate"><div class="cel-t">¡Feliz</div><div class="cel-n" id="celN">8</div><div class="cel-t" id="celT">meses, mi amor!</div><button class="btn" id="celBtn" style="margin-top:26px">Gracias ♥</button></div>
 <div class="credits" id="credits"><button class="cr-x" id="crX" aria-label="Cerrar">×</button><div id="crBgs"></div><div class="cr-roll" id="crRoll"></div></div>
@@ -935,7 +935,6 @@ galRender();
 /* ====== Candado ====== */
 (function(){
   const CODE=String(C.pin||'').padStart(4,'0'), pad=document.getElementById('pad'), dots=document.querySelectorAll('#pinDots i');
-  const hints=(C.pistas&&C.pistas.length?C.pistas:['Casi…']).map(FILL);
   let v='', tries=0;
   ['1','2','3','4','5','6','7','8','9','♥','0','⌫'].forEach(k=>{
     const b=document.createElement('button'); b.textContent=k; if(k==='♥'||k==='⌫')b.className='ghost';
@@ -944,7 +943,7 @@ galRender();
   function paint(){dots.forEach((d,i)=>d.classList.toggle('f',i<v.length))}
   function press(k){
     if(k==='⌫'){v=v.slice(0,-1);paint();return}
-    if(k==='♥'){document.getElementById('pinMsg').textContent=hints[Math.min(tries,hints.length-1)];return}
+    if(k==='♥'){burst(8);return}
     if(v.length>=4)return; v+=k; paint();
     if(v.length===4)setTimeout(test,200);
   }
@@ -956,7 +955,7 @@ galRender();
       setTimeout(()=>document.getElementById('lock').remove(),1500);
     }else{
       const d=document.getElementById('pinDots'); d.classList.remove('err'); void d.offsetWidth; d.classList.add('err');
-      document.getElementById('pinMsg').textContent=hints[Math.min(tries,hints.length-1)]; tries++; v=''; setTimeout(paint,300);
+      document.getElementById('pinMsg').textContent='Código incorrecto'; tries++; v=''; setTimeout(paint,300); setTimeout(()=>{if(!v)document.getElementById('pinMsg').textContent=''},2200);
     }
   }
 })();
@@ -1693,7 +1692,7 @@ let CUR=null;
    EDITOR
    ===================================================================== */
 const SCHEMA=[
-  {t:'Nombres, fecha y candado',f:[['ella','Su nombre','text'],['yo','Tu nombre (firma)','text'],['inicio','Fecha en que empezó todo','date'],['pin','Código del candado (4 números)','text'],['pistas','Pistas del candado (una por intento fallido)','list']]},
+  {t:'Nombres, fecha y candado',f:[['ella','Su nombre','text'],['yo','Tu nombre (firma)','text'],['inicio','Fecha en que empezó todo','date'],['pin','Código del candado (4 números)','text']]},
   {t:'Saludos según la hora',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
   {t:'Mensaje del día',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2],['mensajesDia','Frases (cambia una cada día)','list']]},
   {t:'Nuestra canción',f:[['cancion.titulo','Título','text'],['cancion.artista','Artista','text'],['cancion.link','Link (Spotify, YouTube…)','text']]},
