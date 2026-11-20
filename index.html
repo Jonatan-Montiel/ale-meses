@@ -156,6 +156,7 @@
   .wheel-wrap{position:relative;width:300px;max-width:100%;margin:0 auto}
   .wheel-wrap::before{content:"";position:absolute;top:-6px;left:50%;transform:translateX(-50%);z-index:2;border:14px solid transparent;border-top:26px solid var(--gold);filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
   #wheel{width:100%;display:block;border-radius:50%;box-shadow:0 14px 36px rgba(0,0,0,.45),0 0 0 6px rgba(233,184,114,.6);transition:transform 4.5s cubic-bezier(.12,.8,.15,1)}
+  #spin:disabled{opacity:.6;cursor:default;filter:grayscale(.3)}
   .wheel-res{margin-top:16px;font-family:'Caveat',cursive;font-size:28px;color:var(--blush);min-height:40px}
   /* Lista */
   .todo{display:grid;gap:10px;text-align:left}
@@ -696,7 +697,7 @@
   <!-- RASCA -->
   <section id="rasca">
     <h2>Rasca y gana</h2>
-    <div class="sub">raspa con tu dedito</div>
+    <div class="sub" id="rascaSub">raspa con tu dedito</div>
     <div class="scratch">
       <div class="prize"><div class="prize-emoji" id="prizeE"></div><div class="prize-title" id="prizeT"></div><div class="prize-text" id="prizeX"></div></div>
       <canvas id="scratchCv"></canvas>
@@ -929,6 +930,19 @@ const GG=(()=>{
   }
   return {on,pull,push,merge,shrink,newPhoto,photo};
 })();
+/* ---- Juegos de una sola vez (rasca y gana, ruleta): se guardan y se sincronizan ---- */
+const JUEGOS=(()=>{
+  const LK='juegos-cache'; let st={}; try{st=JSON.parse(localStorage.getItem(LK)||'{}')||{}}catch(e){}
+  const keyOf=n=>RK+'.'+String(n==='rasca'?(C.rr||0):(C.rq||0));
+  const save=()=>{try{localStorage.setItem(LK,JSON.stringify(st))}catch(e){}};
+  const get=n=>{const x=st[n];return x&&x.k===keyOf(n)?x:null};
+  const subs=[];
+  async function push(){ if(!GG.on)return; try{const r=await GG.pull('juegos.bin',true)||{}; ['rasca','ruleta'].forEach(n=>{const a=st[n],b=r[n];if(b&&(!a||(b.u||0)>(a.u||0)))st[n]=b}); save(); await GG.push('juegos.bin',st)}catch(e){setTimeout(push,15000)} }
+  async function refresh(){ if(!GG.on)return; try{const r=await GG.pull('juegos.bin')||{}; let ch=false; ['rasca','ruleta'].forEach(n=>{const a=st[n],b=r[n];if(b&&(!a||(b.u||0)>(a.u||0))){st[n]=b;ch=true}}); if(ch){save();subs.forEach(f=>f())}}catch(e){} }
+  function set(n,v){st[n]=Object.assign({k:keyOf(n),u:Date.now(),at:Date.now()},v);save();push()}
+  setTimeout(refresh,300); document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
+  return {get,set,on:f=>subs.push(f)};
+})();
 /* ---- Avisos a Jon (notificación con ntfy) ---- */
 const AV=C.avisos||{};
 const AV_TIPOS=window.AV_TIPOS=[['vale','🎟️ Canjea un vale'],['nota','💌 Te deja una notita en el buzón'],['ruleta','🎡 Gira la ruleta de citas'],['abrela','💌 Abre una carta «Ábrela cuando…»'],
@@ -1149,7 +1163,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|eventos-cache|yo-soy|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     location.replace(location.pathname);
   };
@@ -1270,13 +1284,21 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   });
   x.beginPath();x.arc(300,300,34,0,7);x.fillStyle='#fff';x.fill();x.font='34px serif';x.textAlign='center';x.fillText('💗',300,312);
   let rot=0, busy=false;
-  document.getElementById('spin').onclick=()=>{
-    if(busy)return; busy=true; document.getElementById('wheelRes').textContent='';
+  const btn=document.getElementById('spin'), res=document.getElementById('wheelRes');
+  const angleFor=k=>360-(k*360/n+360/n/2);
+  function applyClaimed(){
+    const g=JUEGOS.get('ruleta'); if(!g)return false;
+    const k=P.indexOf(g.opt); if(k>=0&&!busy){cv.style.transition='none';rot=angleFor(k);cv.style.transform=`rotate(${rot}deg)`;void cv.offsetWidth;cv.style.transition=''}
+    btn.disabled=true; btn.textContent='🎡 Ya giraste la ruleta';
+    res.textContent='Próxima cita: '+g.opt+' ♥'; return true;
+  }
+  applyClaimed(); JUEGOS.on(()=>{if(!busy)applyClaimed()});
+  btn.onclick=()=>{
+    if(busy||JUEGOS.get('ruleta'))return; busy=true; res.textContent='';
     const k=Math.floor(Math.random()*n);
-    const target=360-(k*360/n+360/n/2);
-    rot+= 360*6 + ((target-(rot%360))+360)%360;
+    rot+= 360*6 + ((angleFor(k)-(rot%360))+360)%360;
     cv.style.transform=`rotate(${rot}deg)`;
-    setTimeout(()=>{document.getElementById('wheelRes').textContent='Próxima cita: '+P[k]+' ♥';avisar(`🎡 ${C.ella} giró la ruleta de citas: ${P[k]}`,'ruleta');burst(20);busy=false},4600);
+    setTimeout(()=>{JUEGOS.set('ruleta',{opt:P[k]});busy=false;applyClaimed();avisar(`🎡 ${C.ella} giró la ruleta de citas: ${P[k]}`,'ruleta');burst(20)},4600);
   };
 })();
 
@@ -1686,10 +1708,27 @@ document.getElementById('jar').addEventListener('click',()=>{
     ctx.beginPath();ctx.arc(e.clientX-r.left,e.clientY-r.top,22,0,Math.PI*2);ctx.fill();
     if(++moves%12===0)check();
   }
+  const R0=C.rasca||{};
+  const PREM=(Array.isArray(C.rascaPremios)&&C.rascaPremios.length?C.rascaPremios:[
+    {emoji:R0.emoji||'🌠✨',titulo:R0.titulo||'¡Ganaste un deseo!',texto:R0.texto||'Pide lo que quieras y yo te lo cumplo, mi amor.'},
+    {emoji:'🍕',titulo:'¡Ganaste una cena!',texto:'Tú eliges el lugar y yo invito.'},
+    {emoji:'💆‍♀️',titulo:'¡Ganaste un masaje!',texto:'20 minutos de puro consentirte.'},
+    {emoji:'🎬',titulo:'¡Ganaste noche de películas!',texto:'Con palomitas, cobijita y tú eliges todas.'},
+    {emoji:'🍦',titulo:'¡Ganaste un antojo!',texto:'El que quieras, a la hora que quieras.'},
+    {emoji:'💐',titulo:'¡Ganaste flores!',texto:'Un ramito sorpresa solo para ti.'}]).filter(p=>p&&(p.titulo||p.texto));
+  const sub=document.getElementById('rascaSub');
+  function showPrize(p){document.getElementById('prizeE').textContent=p.emoji||'🎁';document.getElementById('prizeT').textContent=FILL(p.titulo);document.getElementById('prizeX').textContent=FILL(p.texto)}
+  let pick=PREM[Math.floor(Math.random()*PREM.length)]||{emoji:'💗',titulo:'¡Ganaste!',texto:'Un abrazo gigante'};
+  function applyClaimed(){const g=JUEGOS.get('rasca'); if(!g)return false; done=true; showPrize(g.p); cv.style.display='none';
+    sub.textContent='ya raspaste tu premio el '+fmtDia(g.at)+' ✨'; return true}
+  if(!applyClaimed()) showPrize(pick);
+  JUEGOS.on(()=>{if(!done)applyClaimed()});
   function check(){
     const d=ctx.getImageData(0,0,cv.width,cv.height).data;let clear=0;
     for(let i=3;i<d.length;i+=64)if(d[i]===0)clear++;
-    if(clear/(d.length/64)>.5){done=true;avisar(`🌠 ${C.ella} raspó el rasca y gana: ${FILL(C.rasca.titulo)}`,'rasca');cv.style.opacity=0;setTimeout(()=>cv.style.display='none',800);burst(30)}
+    if(clear/(d.length/64)>.5){done=true;JUEGOS.set('rasca',{p:{emoji:pick.emoji,titulo:FILL(pick.titulo),texto:FILL(pick.texto)}});
+      avisar(`🌠 ${C.ella} raspó el rasca y gana: ${pick.emoji||''} ${FILL(pick.titulo)} — ${FILL(pick.texto)}`,'rasca');
+      cv.style.opacity=0;setTimeout(()=>cv.style.display='none',800);burst(30);sub.textContent='¡ganaste! este premio es tuyo 💗'}
   }
   let down=false;
   cv.addEventListener('pointerdown',e=>{down=true;scratch(e)});
@@ -1703,7 +1742,7 @@ document.getElementById('jar').addEventListener('click',()=>{
 /* ====== Vales (sincronizados y con aviso) ====== */
 const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
 (function(){
-  const LK='vales-ale-'+RK, key=c=>c[0]+'|'+c[1];
+  const VK=RK+'.'+(C.reinicioVales||0), LK='vales-ale-'+VK, key=c=>c[0]+'|'+c[1];
   let st={}; try{st=JSON.parse(localStorage.getItem(LK)||'{}')||{}}catch(e){}
   if(Object.keys(st).some(k=>/^\d+$/.test(k))){const n={};Object.keys(st).forEach(k=>{if(/^\d+$/.test(k)&&st[k]&&COUPONS[k])n[key(COUPONS[k])]={on:1,t:Date.now(),u:Date.now()}});st=n}
   const save=()=>{try{localStorage.setItem(LK,JSON.stringify(st))}catch(e){}};
@@ -1712,8 +1751,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     el.classList.toggle('used',on); el.querySelector('.c-btn').textContent=on?'Usado':'Canjear';
     el.querySelector('.c-when').textContent=on&&x.t?('Canjeado el '+fmtDia(x.t)):''})}
   const mergeSt=(a,b)=>{const m=Object.assign({},a);Object.keys(b||{}).forEach(k=>{if(!m[k]||(b[k].u||0)>(m[k].u||0))m[k]=b[k]});return m};
-  async function sync(){ if(!GG.on)return; try{const r=await GG.pull('vales.bin',true); st=mergeSt(st,(r&&r.rk===RK)?r.v:{}); save(); paint(); await GG.push('vales.bin',{rk:RK,v:st})}catch(e){setTimeout(sync,15000)} }
-  async function refresh(){ if(!GG.on)return; try{const r=await GG.pull('vales.bin'); if(r&&r.rk===RK){st=mergeSt(st,r.v);save();paint()}}catch(e){} }
+  async function sync(){ if(!GG.on)return; try{const r=await GG.pull('vales.bin',true); st=mergeSt(st,(r&&r.rk===VK)?r.v:{}); save(); paint(); await GG.push('vales.bin',{rk:VK,v:st})}catch(e){setTimeout(sync,15000)} }
+  async function refresh(){ if(!GG.on)return; try{const r=await GG.pull('vales.bin'); if(r&&r.rk===VK){st=mergeSt(st,r.v);save();paint()}}catch(e){} }
   COUPONS.forEach(c=>{
     const k=key(c), el=document.createElement('div'); el.className='coupon'; els[k]=el;
     el.innerHTML=`<div class="c-emoji">${esc(c[0])}</div><div class="c-body"><div class="c-title">Vale por: ${esc(c[1])}</div><div class="c-sub">${esc(c[2])}</div><div class="c-when"></div></div><button class="c-btn">Canjear</button><div class="stamp">CANJEADO ♥</div>`;
@@ -2028,7 +2067,7 @@ const SCHEMA=[
   {t:'Fotos',f:[['fotos','Galería (también se usan en el memorama y los créditos)','photos'],['polaroidTexto','Texto al revelar la polaroid (la foto sale al azar)','text'],['fotoRompecabezas','Número de foto para el rompecabezas','number']]},
   {t:'Razones por las que te quiero',f:[['razones','Razones','list']]},
   {t:'Galleta de la fortuna',f:[['fortunas','Mensajes de la galleta','list']]},
-  {t:'Rasca y gana',f:[['rasca.emoji','Emoji','text'],['rasca.titulo','Título del premio','text'],['rasca.texto','Texto del premio','textarea',3]]},
+  {t:'Rasca y gana',f:[['rascaPremios','Premios (sale uno al azar y solo se puede raspar una vez)','objlist',[['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
   {t:'Vales de amor',f:[['vales','Vales','objlist',[['emoji','Emoji','text'],['titulo','Vale por…','text'],['detalle','Detalle','text']]]]},
   {t:'Ruleta de citas',f:[['ruleta','Opciones (máximo 12)','list']]},
   {t:'Planes, fotos, vales, notitas y eventos de Ale',special:'kanban'},
@@ -2040,7 +2079,7 @@ const SCHEMA=[
   {t:'Créditos de película',f:[['creditos','Créditos','objlist',[['rol','Rol','text'],['quien','Quién / qué','text']]]]},
   {t:'WhatsApp',f:[['whatsapp.numero','Tu número (con lada, ej. 5255…)','text'],['whatsapp.mensajes','Botones','objlist',[['emoji','Emoji','text'],['boton','Texto del botón','text'],['mensaje','Mensaje que se envía','textarea',2]]]]},
   {t:'Avisos a tu celular',special:'avisos'},
-  {t:'Reiniciar para Ale',special:'reset'},
+  {t:'Reiniciar',special:'reset'},
 ];
 const getP=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
 const setP=(o,p,v)=>{const ks=p.split('.');let a=o;ks.slice(0,-1).forEach(k=>{if(a[k]==null||typeof a[k]!=='object')a[k]={};a=a[k]});a[ks[ks.length-1]]=v};
@@ -2051,6 +2090,13 @@ function autosize(t){t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px
 
 function initEditor(){
   let D=JSON.parse(JSON.stringify(CUR)), dirty=false;
+  if(!Array.isArray(D.rascaPremios)||!D.rascaPremios.length){const r=D.rasca||{};D.rascaPremios=[
+    {emoji:r.emoji||'🌠✨',titulo:r.titulo||'¡Ganaste un deseo!',texto:r.texto||'Pide lo que quieras y yo te lo cumplo, mi amor.'},
+    {emoji:'🍕',titulo:'¡Ganaste una cena!',texto:'Tú eliges el lugar y yo invito.'},
+    {emoji:'💆‍♀️',titulo:'¡Ganaste un masaje!',texto:'20 minutos de puro consentirte.'},
+    {emoji:'🎬',titulo:'¡Ganaste noche de películas!',texto:'Con palomitas, cobijita y tú eliges todas.'},
+    {emoji:'🍦',titulo:'¡Ganaste un antojo!',texto:'El que quieras, a la hora que quieras.'},
+    {emoji:'💐',titulo:'¡Ganaste flores!',texto:'Un ramito sorpresa solo para ti.'}]}
   const markDirty=()=>{dirty=true;saveBtn.textContent='Guardar cambios •'};
   document.body.classList.add('editing');
   document.body.append(h('div',{class:'ed-bar'},'✏️ Modo edición · tus cambios van directo a la página publicada'));
@@ -2194,9 +2240,13 @@ function initEditor(){
     }
     if(sec.special==='reset'){
       const msg=h('div',{class:'ed-note'});
+      const bt=(label,fn,note)=>h('button',{class:'ed-btn',style:'display:block;margin:6px 0',onclick:()=>{fn();markDirty();msg.textContent='Listo: '+note+' Se aplicará cuando toques «Guardar cambios».';msg.className='ed-note ok'}},label);
       body.append(section('🔄 '+sec.t,[
-        h('div',{class:'ed-note'},'Vuelve a dejar sin usar los vales y sin abrir las cartas «Ábrela cuando…» en el celular de Ale. (Los planes del kanban no se borran.)'),
-        h('button',{class:'ed-btn',onclick:()=>{D.reinicio=String(Date.now());markDirty();msg.textContent='Listo: se aplicará cuando toques «Guardar cambios».';msg.className='ed-note ok'}},'Reiniciar vales y cartas'),msg]));
+        h('div',{class:'ed-note'},'Vuelve a dejar todo como nuevo en el celular de Ale (y en el tuyo). Los planes, notitas, eventos y fotos no se borran.'),
+        bt('Reiniciar todo',()=>{D.reinicio=String(Date.now())},'vales sin usar, cartas sin abrir, rasca y gana y ruleta listos para usarse otra vez.'),
+        bt('Reiniciar solo el rasca y gana',()=>{D.rr=Date.now()},'el rasca y gana se podrá raspar otra vez.'),
+        bt('Reiniciar solo la ruleta',()=>{D.rq=Date.now()},'la ruleta se podrá girar otra vez.'),
+        bt('Reiniciar solo los vales',()=>{D.reinicioVales=Date.now()},'todos los vales vuelven a estar sin usar.'),msg]));
       return;
     }
     body.append(section(sec.t, sec.f.map(fd=>field(fd))));
