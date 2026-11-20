@@ -775,7 +775,7 @@ const photoURL=p=>/^(https?:|data:|blob:)/.test(p)?p:p;
 /* ====== Galería (carrusel) ====== */
 const PHOTOS = (C.fotos||[]).map(photoURL);
 const tilts = [-3,2,-1.5,3,-2,1,2.5,-2.5,1.5,-1,3,-3,2];
-const GAL={items:PHOTOS.map(src=>({src,own:false}))};
+const GAL={items:PHOTOS.map((src,i)=>({src,own:false,id:'r:'+((C.fotoPaths||[])[i]||i)}))}; GAL.repo=GAL.items.slice();
 const car=document.getElementById('car');
 /* Visor / película */
 const lb=document.createElement('div'); lb.className='lb';
@@ -791,7 +791,7 @@ function galRender(keep){
   GAL.items.forEach((it,i)=>{
     const s=document.createElement('figure'); s.className='slide'+(i===carIdx?' on':''); s.style.setProperty('--r',tilts[i%tilts.length]+'deg'); if(it.id)s.dataset.id=it.id;
     s.innerHTML=`<div class="ph">${it.src?`<img src="${esc(it.src)}" alt="" loading="lazy">`:'<div class="ph-load">💗</div>'}</div><figcaption>${it.own?('📷 '+esc(fmtShort(it.a))):'&nbsp;'}</figcaption>`;
-    if(it.own&&GAL.canEdit){const d=document.createElement('button');d.className='del';d.textContent='✕';let armed=false;
+    if(GAL.canEdit){const d=document.createElement('button');d.className='del';d.textContent='✕';let armed=false;
       d.onclick=e=>{e.stopPropagation();if(!armed){armed=true;d.textContent='¿Quitar?';d.classList.add('warn');setTimeout(()=>{armed=false;d.textContent='✕';d.classList.remove('warn')},2500);return}GAL.remove(it.id)};s.append(d)}
     s.addEventListener('click',()=>{const k=galShown().indexOf(it);if(k>=0)openLB(k,false)});
     car.appendChild(s);
@@ -859,9 +859,11 @@ galRender();
   }
   const cacheKey='fotos-ale-cache';
   function apply(){
-    const own=idx.filter(x=>!x.x).sort((a,b)=>b.a-a.a);
+    const own=idx.filter(x=>!x.x&&!String(x.id).startsWith('r:')).sort((a,b)=>b.a-a.a);
+    const hid=new Set(idx.filter(x=>x.x&&String(x.id).startsWith('r:')).map(x=>x.id));
     const old={}; GAL.items.filter(x=>x.own).forEach(x=>old[x.id]=x.src);
-    GAL.items=[...own.map(x=>({own:true,id:x.id,a:x.a,src:old[x.id]||''})),...GAL.items.filter(x=>!x.own)];
+    GAL.items=[...own.map(x=>({own:true,id:x.id,a:x.a,src:old[x.id]||''})),...GAL.repo.filter(x=>!hid.has(x.id))];
+    carIdx=Math.min(carIdx,Math.max(0,GAL.items.length-1));
     galRender(true); own.forEach(x=>{if(!old[x.id])load(x.id)});
   }
   let q=Promise.resolve();
@@ -871,8 +873,10 @@ galRender();
       const it=GAL.items.find(x=>x.id===id); if(it){it.src=url;galRender(true)}
     }catch(e){}})}
   GAL.remove=async id=>{
-    const x=idx.find(y=>y.id===id); if(!x)return; x.x=1;x.u=Date.now(); apply();
-    try{await pushIdx();st.textContent='Foto quitada';fetch(`https://api.github.com/gists/${id}`,{method:'DELETE',headers:H()}).catch(()=>{})}catch(e){st.textContent='No se pudo quitar ahorita, intenta de nuevo'}
+    const isRepo=String(id).startsWith('r:');
+    let x=idx.find(y=>y.id===id); if(!x){if(!isRepo)return; x={id,a:Date.now()}; idx.push(x)}
+    x.x=1;x.u=Date.now(); apply();
+    try{await pushIdx();st.textContent='Foto quitada';if(!isRepo)fetch(`https://api.github.com/gists/${id}`,{method:'DELETE',headers:H()}).catch(()=>{})}catch(e){st.textContent='No se pudo quitar ahorita, intenta de nuevo'}
   };
   async function shrinkImg(f){
     let bmp; try{bmp=await createImageBitmap(f,{imageOrientation:'from-image'})}catch(e){
@@ -1634,8 +1638,8 @@ let CUR=null;
   let remote;
   try{remote=await loadContent()}catch(e){noKeyScreen(e.message==='nodata'?'No pude cargar el contenido. Revisa tu conexión e intenta de nuevo.':'El link no es correcto. Ábrela desde el link especial que te mandaron 💗');return}
   CUR=mergeC(DEFAULTS,remote);
-  const urls=await Promise.all((CUR.fotos||[]).map(p=>photoBlobURL(p).catch(()=>'')));
-  const VIEW=Object.assign({},CUR,{fotos:urls.filter(Boolean)});
+  const pairs=(await Promise.all((CUR.fotos||[]).map(async p=>[p,await photoBlobURL(p).catch(()=>'')]))).filter(x=>x[1]);
+  const VIEW=Object.assign({},CUR,{fotos:pairs.map(x=>x[1]),fotoPaths:pairs.map(x=>x[0])});
   boot(VIEW);
   if(EDIT){
     const l=document.getElementById('lock'); if(l) l.remove(); document.body.classList.remove('locked');
@@ -1740,6 +1744,24 @@ function initEditor(){
       D.kanban=D.kanban||{};
       const tk=h('input',{class:'ed-in',type:'password',placeholder:'github_pat_… (solo con permiso de Gists)',value:D.kanban.token||'',autocomplete:'off'});
       const msg=h('div',{class:'ed-note'},D.kanban.gist?('✅ Activado. Los planes y fotos que agregue Ale se guardan cifrados y tú también los ves.'):'Sin activar: lo que escriba Ale solo se queda en su celular.');
+      const restMsg=h('div',{class:'ed-note'});
+      async function restore(){
+        restMsg.textContent='Revisando…';restMsg.className='ed-note';
+        try{
+          const K=D.kanban, H={Authorization:'Bearer '+K.token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'};
+          const g=await (await fetch('https://api.github.com/gists/'+K.gist+'?t='+Date.now(),{headers:H,cache:'no-store'})).json();
+          const f=(g.files||{})['fotos.bin']; if(!f){restMsg.textContent='No hay fotos ocultas.';return}
+          const u=Uint8Array.from(atob(f.content.trim()),c=>c.charCodeAt(0));
+          const list=JSON.parse(new TextDecoder().decode(await decBuf(u.buffer))).fotos||[];
+          const hidden=list.filter(x=>x.x&&String(x.id).startsWith('r:'));
+          if(!hidden.length){restMsg.textContent='No hay fotos tuyas ocultas.';restMsg.className='ed-note ok';return}
+          hidden.forEach(x=>{x.x=0;x.u=Date.now()});
+          const enc=await encBuf(new TextEncoder().encode(JSON.stringify({fotos:list})));
+          const r=await fetch('https://api.github.com/gists/'+K.gist,{method:'PATCH',headers:H,body:JSON.stringify({files:{'fotos.bin':{content:b64buf(enc.buffer)}}})});
+          if(!r.ok)throw new Error('GitHub respondió '+r.status);
+          restMsg.textContent='✅ Se volvieron a mostrar '+hidden.length+' foto(s). Recarga la página para verlas.';restMsg.className='ed-note ok';
+        }catch(e){restMsg.textContent='No se pudo: '+e.message;restMsg.className='ed-note bad'}
+      }
       async function activate(){
         const t=tk.value.trim(); if(!t){msg.textContent='Pega primero el token de Gists.';msg.className='ed-note bad';return}
         msg.textContent='Activando…';msg.className='ed-note';
@@ -1763,6 +1785,7 @@ function initEditor(){
         h('div',{class:'ed-note',html:'Ale puede agregar planes (y moverlos a «¡Lo logramos!») y <b>subir fotos al carrusel</b> desde su celular, sin entrar al editor. Para que se guarden en línea (y tú también los veas) se usa un <b>gist privado y cifrado</b> de GitHub con un token que <b>solo</b> puede tocar gists, nunca tu repo.'}),
         h('label',{class:'ed-lab'},h('span',null,'Token solo de Gists'),tk),
         h('button',{class:'ed-btn',onclick:activate},D.kanban.gist?'Actualizar token':'Activar planes compartidos'),msg,
+        D.kanban.gist?h('button',{class:'ed-btn',style:'background:#7a6168',onclick:restore},'Mostrar de nuevo las fotos ocultas'):null,restMsg,
         h('details',{class:'ed-how'},h('summary',null,'¿Cómo saco ese token?'),h('ol',{html:
           '<li>Abre <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li>'+
           '<li>Nombre: «Planes Ale». En <b>Repository access</b> deja <b>Public repositories</b> (solo lectura).</li>'+
