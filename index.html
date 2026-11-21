@@ -594,6 +594,67 @@
   nav a{color:var(--cream);text-decoration:none;font-size:13px;font-weight:700;padding:9px 13px;border-radius:999px;opacity:.8}
   nav a:active{background:rgba(232,93,132,.3)}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.moment{opacity:1;transform:none}}
+  /* ===== Diseño pulido + temas (sin efectos pesados) ===== */
+  main section{padding:62px 0 26px}
+  main section>h2{font-size:31px;letter-spacing:-.2px;line-height:1.15}
+  main section>h2::before{display:grid;place-items:center;width:46px;height:46px;margin:0 auto 12px;border-radius:50%;font-size:22px;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.22);box-shadow:0 6px 16px -6px rgba(0,0,0,.45)}
+  #contador>h2::before{content:'💞'} #racha>h2::before{content:'🔥'} #animo>h2::before{content:'🌤️'} #pregunta>h2::before{content:'💭'}
+  #cancion>h2::before{content:'🎵'} #carta>h2::before{content:'💌'} #cartames>h2::before{content:'✉️'} #abrela>h2::before{content:'📬'}
+  #buzon>h2::before{content:'📮'} #voz>h2::before{content:'🎙️'} #escribir>h2::before{content:'✍️'} #momentos>h2::before{content:'📸'}
+  #polaroid>h2::before{content:'🖼️'} #razones>h2::before{content:'🫙'} #galleta>h2::before{content:'🥠'} #medidor>h2::before{content:'💗'}
+  #abrazo>h2::before{content:'🤗'} #rasca>h2::before{content:'🌠'} #vales>h2::before{content:'🎟️'} #memorama>h2::before{content:'🃏'}
+  #rompecabezas>h2::before{content:'🧩'} #ruleta>h2::before{content:'🎡'} #comida>h2::before{content:'🍽️'} #planes>h2::before{content:'📝'}
+  #aprender>h2::before{content:'📚'} #pelis>h2::before{content:'🍿'} #viene>h2::before{content:'🗓️'} #cielo>h2::before{content:'🌌'}
+  #arbol>h2::before{content:'🌳'} #sorpresas>h2::before{content:'🎁'} #constelacion>h2::before{content:'✨'} #capsula>h2::before{content:'⏳'}
+  main section>.sub{font-size:21px;margin-bottom:22px}
+  .card,.tile,.song,.capsule,.ev,.kb-col,.rch-p,.an-b{border-radius:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 28px -14px rgba(0,0,0,.6)}
+  .tile,.rch-p,.an-b,.ev{border-radius:18px}
+  /* Botón y selector de tema */
+  .th-btn{position:absolute;top:14px;right:0;z-index:3;width:42px;height:42px;border-radius:50%;border:1px solid rgba(247,198,211,.3);background:rgba(255,255,255,.1);font-size:19px;cursor:pointer}
+  body.editing .th-btn{top:40px}
+  .th-sheet{position:fixed;inset:0;z-index:40;background:rgba(10,2,6,.6);display:none;align-items:flex-end;justify-content:center}
+  .th-sheet.open{display:flex;animation:fadeIn .25s}
+  .th-box{width:100%;max-width:520px;background:#fff7f3;color:#3d1f2a;border-radius:26px 26px 0 0;padding:20px 18px 28px;text-align:center}
+  .th-box h3{font-family:'Fraunces',serif;font-size:22px;margin-bottom:4px}
+  .th-box p{font-size:13.5px;opacity:.7;margin-bottom:14px}
+  .th-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .th-op{border:2px solid transparent;border-radius:16px;padding:8px 6px 10px;background:#fff;box-shadow:0 4px 12px -6px rgba(0,0,0,.25);font:700 12.5px 'Nunito';color:#3d1f2a;cursor:pointer}
+  .th-op.sel{border-color:#e85d84}
+  .th-op i{display:block;height:54px;border-radius:11px;margin-bottom:6px;position:relative;overflow:hidden}
+  .th-op i::after{content:'';position:absolute;left:10%;right:10%;bottom:9px;height:14px;border-radius:6px;background:var(--c,rgba(255,255,255,.18))}
+  /* --- Noche estrellada --- */
+  body[data-t=noche]{--wine:#141a3a;--rose:#e879a6;--gold:#f3cf74;--blush:#cfc8ff;background:radial-gradient(1.5px 1.5px at 20% 30%,#fff,transparent),radial-gradient(1px 1px at 70% 12%,#fff,transparent),radial-gradient(1.5px 1.5px at 85% 60%,#fff,transparent),radial-gradient(1px 1px at 35% 80%,#fff,transparent),radial-gradient(1px 1px at 55% 45%,#fff,transparent),radial-gradient(120% 80% at 50% 0%,#2b2f6b 0%,#141a3a 55%,#070a1c 100%)!important;background-attachment:fixed!important}
+  /* --- Atardecer --- */
+  body[data-t=atardecer]{--rose:#f0567f;--gold:#ffe08a;--blush:#ffe3d8;background:linear-gradient(180deg,#ff9f7a 0%,#e8577f 42%,#6e2a6e 80%,#2b0f33 100%) fixed!important}
+  /* --- Temas claros: base --- */
+  body.light{color:#3d1f2a}
+  body[data-t=pastel]{--rose:#e2577f;--gold:#b9853c;--blush:#cf5c82;background:linear-gradient(180deg,#fff6f0 0%,#fde3ea 60%,#f8d3df 100%) fixed!important}
+  body[data-t=minimal]{--rose:#d93f72;--gold:#9a7b5f;--blush:#b04a6e;background:#faf8f7!important}
+  body[data-t=minimal] main section>h2{font-size:34px;letter-spacing:-.6px}
+  body.light main section>h2::before{background:#fff;border-color:rgba(120,40,70,.12);box-shadow:0 6px 14px -8px rgba(120,40,70,.35)}
+  body.light .card,body.light .tile,body.light .song,body.light .capsule,body.light .ev,body.light .kb-col,body.light .rch-p:not(.ok),body.light .an-b:not(.sel),
+  body.light .vz-m:not(.me),body.light .pq-a:not(.me),body.light .nb-m:not(.me),body.light .month{background:#fff!important;border:1px solid rgba(120,40,70,.1)!important;color:#3d1f2a;box-shadow:0 10px 24px -14px rgba(120,40,70,.4)}
+  body.light .tile b,body.light .rch-n b,body.light .couple,body.light .cel-t{color:#3d1f2a}
+  body.light .couple{text-shadow:none}
+  body.light .kb-add input,body.light .ev-add input,body.light .pq-in{background:#fff;color:#3d1f2a;border-color:rgba(120,40,70,.2);color-scheme:light}
+  body.light .kb-add input::placeholder,body.light .ev-add input::placeholder,body.light .pq-in::placeholder{color:rgba(61,31,42,.45)}
+  body.light .btn.alt,body.light .car-nav button,body.light .wu,body.light .cm-chips button:not(.cur),body.light .nb-who button,body.light .rch-week i{background:#fff;color:#3d1f2a;border-color:rgba(120,40,70,.18)}
+  body.light .car-count,body.light .vz-x,body.light .ev-x,body.light .logout,body.light #loveMsg,body.light .hold-msg,body.light .pz-info{color:#3d1f2a}
+  body.light .rch-bar,body.light .vz-bar{background:rgba(120,40,70,.1)}
+  body.light .dots i{background:rgba(61,31,42,.25)}
+  body.light .kb-h b{background:rgba(120,40,70,.1);color:#3d1f2a}
+  body.light .hold svg path:first-of-type{fill:rgba(226,87,127,.1)}
+  body.light .hold-pct{color:#3d1f2a}
+  body.light nav{background:rgba(255,255,255,.94)!important;border:1px solid rgba(120,40,70,.12)!important;box-shadow:0 10px 26px -10px rgba(120,40,70,.35)!important}
+  body.light nav a{color:#3d1f2a}
+  body.light .th-btn{background:#fff;border-color:rgba(120,40,70,.15)}
+  body.light .fh{opacity:.5}
+  body[data-t=pastel] .coupon::before,body[data-t=pastel] .coupon::after{background:#fbe6ec}
+  body[data-t=minimal] .coupon::before,body[data-t=minimal] .coupon::after{background:#faf8f7}
+  body[data-t=noche] .coupon::before,body[data-t=noche] .coupon::after{background:#141a3a}
+  body[data-t=atardecer] .coupon::before,body[data-t=atardecer] .coupon::after{background:#c94a7c}
+  body.light input[type=range].love{background:linear-gradient(90deg,var(--rose) var(--p,0%),rgba(120,40,70,.12) var(--p,0%))}
+  body.light input[type=range].love::-webkit-slider-thumb{box-shadow:0 2px 8px rgba(120,40,70,.35)}
 </style>
 </head>
 <body class="locked">
@@ -1037,6 +1098,19 @@
 </nav>
 
 <script>
+/* ====== Temas ====== */
+const TEMAS=[['vino','Vino','#5a1430','radial-gradient(circle at 50% 0,#7a1d40,#2a0a18)','rgba(255,255,255,.18)'],
+  ['noche','Noche estrellada','#141a3a','radial-gradient(circle at 50% 0,#2b2f6b,#070a1c)','rgba(207,200,255,.3)'],
+  ['atardecer','Atardecer','#e8577f','linear-gradient(180deg,#ff9f7a,#e8577f,#6e2a6e)','rgba(255,255,255,.35)'],
+  ['pastel','Rosa pastel','#fde3ea','linear-gradient(180deg,#fff6f0,#f8d3df)','#fff'],
+  ['minimal','Minimalista','#faf8f7','#faf8f7','#fff']];
+function applyTema(t){
+  if(!TEMAS.some(x=>x[0]===t))t='vino';
+  if(t==='vino')delete document.body.dataset.t; else document.body.dataset.t=t;
+  document.body.classList.toggle('light',t==='pastel'||t==='minimal');
+  const m=document.querySelector('meta[name=theme-color]'); if(m)m.content=TEMAS.find(x=>x[0]===t)[2];
+}
+try{applyTema(localStorage.getItem('tema')||'vino')}catch(e){}
 function boot(C){
 /* ====== Datos base ====== */
 const START=new Date(C.inicio+'T00:00:00-06:00');
@@ -2179,6 +2253,21 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   hb.onclick=()=>{showH=!showH;render()};
   render();
   let last=DK(MXD()); setInterval(()=>{const k=DK(MXD());if(k!==last){last=k;editing=false;render()}},60000);
+})();
+
+/* ====== Selector de tema ====== */
+(function(){
+  const hero=document.getElementById('inicio'); if(!hero)return;
+  const b=document.createElement('button'); b.className='th-btn'; b.textContent='🎨'; b.setAttribute('aria-label','Cambiar tema'); hero.append(b);
+  const sh=document.createElement('div'); sh.className='th-sheet';
+  sh.innerHTML='<div class="th-box"><h3>Elige un tema 🎨</h3><p>se queda guardado en este celular</p><div class="th-grid"></div><button class="btn small" style="margin-top:16px">Listo ♥</button></div>';
+  document.body.append(sh);
+  const grid=sh.querySelector('.th-grid'), cur=()=>{try{return localStorage.getItem('tema')||'vino'}catch(e){return 'vino'}};
+  function paint(){grid.innerHTML='';TEMAS.forEach(([k,n,,bg,c])=>{const o=document.createElement('button');o.className='th-op'+(cur()===k?' sel':'');
+    o.innerHTML=`<i style="background:${bg};--c:${c};border:1px solid rgba(0,0,0,.06)"></i>${n}`;
+    o.onclick=()=>{try{localStorage.setItem('tema',k)}catch(e){}applyTema(k);paint()};grid.append(o)})}
+  b.onclick=()=>{paint();sh.classList.add('open')};
+  sh.addEventListener('click',e=>{if(e.target===sh||e.target.classList.contains('btn'))sh.classList.remove('open')});
 })();
 
 /* ====== Carta del mes ====== */
