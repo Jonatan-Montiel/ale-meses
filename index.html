@@ -432,6 +432,49 @@
   .pq-ed{background:none;border:0;color:var(--blush);font:700 13px 'Nunito';margin-top:12px;cursor:pointer;text-decoration:underline}
   .pq.old{margin-top:12px}
   .pq-q{font-family:'Fraunces',serif;font-style:italic;font-size:17px}
+  /* Deseos */
+  .ds-add{display:grid;gap:8px;margin-bottom:14px}
+  .ds-add input{min-width:0;border:1px solid rgba(247,198,211,.35);background:rgba(255,255,255,.08);color:#fff;border-radius:14px;padding:12px;font:15px 'Nunito',sans-serif;outline:none;-webkit-user-select:text;user-select:text}
+  .ds-add .ev-row{display:flex;gap:8px}.ds-add .ev-row input{flex:1}
+  .ds-add button{flex:none;width:48px;border:0;border-radius:14px;background:var(--rose);color:#fff;font-size:22px;cursor:pointer}
+  .ds{display:grid;gap:12px}
+  .ds-col{background:rgba(255,247,240,.06);border:1px solid rgba(247,198,211,.16);border-radius:18px;padding:10px;display:grid;gap:8px}
+  .ds-i{background:var(--cream);color:var(--ink);border-radius:12px;padding:10px 12px;box-shadow:0 6px 14px rgba(0,0,0,.25)}
+  .ds-i.got{box-shadow:0 0 0 2px #2e9d5b,0 6px 14px rgba(0,0,0,.25)}
+  .ds-t{font-size:15px;line-height:1.35}
+  .ds-f{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:12px;color:#9a7f86}
+  .ds-f a{color:#b3204f;font-weight:700}
+  .ds-b{border:0;background:#f3e3df;color:#7a6168;border-radius:999px;padding:5px 10px;font:700 12px 'Nunito';cursor:pointer;white-space:nowrap}
+  .ds-b.buy{background:#e85d84;color:#fff}.ds-i.got .ds-b.buy{background:#2e9d5b}
+  /* Diario */
+  .di-add{display:grid;gap:10px;text-align:left}
+  .di-row{display:flex;gap:8px;align-items:center}
+  .di-row input{flex:1;min-width:0;border:1px solid rgba(247,198,211,.35);background:rgba(255,255,255,.08);color:#fff;border-radius:12px;padding:10px;font:14px 'Nunito';color-scheme:dark}
+  .di-row .btn{margin:0}
+  .di-add>.btn{margin:2px auto 0}
+  .di-ph{border-radius:12px;aspect-ratio:4/3;background:#f0dcd6 center/cover;display:grid;place-items:center;font-size:22px}
+  .di-ph[hidden],.di-add [hidden],.rt-acts [hidden]{display:none!important}
+  .di-list{margin-top:18px;display:grid;gap:12px}
+  .di-m{font-family:'Fraunces',serif;font-size:18px;color:var(--gold);margin-top:6px}
+  .di-e{display:flex;gap:12px;align-items:flex-start}
+  .di-d{flex:none;width:46px;text-align:center;background:var(--rose);color:#fff;border-radius:12px;padding:6px 0}
+  .di-d b{display:block;font-size:20px;line-height:1}.di-d span{font-size:11px;text-transform:uppercase;letter-spacing:1px}
+  .di-c{flex:1;position:relative;background:var(--cream);color:var(--ink);border-radius:14px;padding:10px 12px;box-shadow:0 6px 14px rgba(0,0,0,.25)}
+  .di-c .di-ph{margin-bottom:8px}
+  .di-t{font-size:15px;line-height:1.4;padding-right:28px}
+  .di-w{font-size:11.5px;color:#9a7f86;margin-top:6px;text-transform:uppercase;letter-spacing:1px}
+  .di-x{position:absolute;top:8px;right:8px}
+  /* Reto */
+  .rt .daily{margin-bottom:10px}
+  .rt-left{font-size:13.5px;opacity:.8;margin-bottom:10px}
+  .rt-acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.rt-acts .btn{margin-top:10px}
+  .rt-ok{font-weight:800;color:#7be0a2;margin-top:4px}
+  .rt-ph{margin-top:12px}
+  .rt-n{font-family:'Caveat',cursive;font-size:22px;color:var(--blush);margin-top:8px}
+  .rt-h{width:100%;font-size:13px;font-weight:800;opacity:.85;margin-bottom:4px}
+  body.light .ds-col{background:#fff!important;border:1px solid rgba(120,40,70,.1)!important}
+  body.light .ds-add input,body.light .di-row input{background:#fff;color:#3d1f2a;border-color:rgba(120,40,70,.2);color-scheme:light}
+  body.light .rt-ok{color:#2e9d5b}
   /* Carta del mes */
   .cm-env{text-align:center}
   .cm-env .e{font-size:46px}
@@ -605,7 +648,7 @@
   #abrazo>h2::before{content:'🤗'} #rasca>h2::before{content:'🌠'} #vales>h2::before{content:'🎟️'} #memorama>h2::before{content:'🃏'}
   #rompecabezas>h2::before{content:'🧩'} #ruleta>h2::before{content:'🎡'} #comida>h2::before{content:'🍽️'} #planes>h2::before{content:'📝'}
   #aprender>h2::before{content:'📚'} #pelis>h2::before{content:'🍿'} #viene>h2::before{content:'🗓️'} #cielo>h2::before{content:'🌌'}
-  #arbol>h2::before{content:'🌳'} #sorpresas>h2::before{content:'🎁'} #constelacion>h2::before{content:'✨'} #capsula>h2::before{content:'⏳'}
+  #arbol>h2::before{content:'🌳'} #sorpresas>h2::before{content:'🎁'} #constelacion>h2::before{content:'✨'} #capsula>h2::before{content:'⏳'} #reto>h2::before{content:'🎯'} #deseos>h2::before{content:'🎁'} #diario>h2::before{content:'📔'}
   main section>.sub{font-size:21px;margin-bottom:22px}
   .card,.tile,.song,.capsule,.ev,.kb-col,.rch-p,.an-b{border-radius:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 28px -14px rgba(0,0,0,.6)}
   .tile,.rch-p,.an-b,.ev{border-radius:18px}
@@ -809,6 +852,21 @@
     <div class="kb-st" id="nbSt"></div>
   </section>
 
+  <!-- DIARIO -->
+  <section id="diario">
+    <h2>Nuestro diario</h2>
+    <div class="sub">los momentos que no queremos olvidar 📔</div>
+    <form class="di-add card" id="diForm" autocomplete="off">
+      <textarea id="diIn" class="pq-in" maxlength="600" rows="3" placeholder="¿Qué pasó hoy que quieras guardar?"></textarea>
+      <div class="di-row"><input type="date" id="diF" aria-label="Fecha"><button class="btn small alt" type="button" id="diPick">📷 Agregar foto</button></div>
+      <div class="di-ph" id="diPrev" hidden></div>
+      <button class="btn small" id="diSave">💗 Guardar momento</button>
+      <input type="file" id="diFile" accept="image/*" hidden>
+      <div class="kb-st" id="diSt"></div>
+    </form>
+    <div class="di-list" id="diList"></div>
+  </section>
+
   <!-- MENSAJES DE VOZ -->
   <section id="voz">
     <h2>Mensajes de voz</h2>
@@ -996,6 +1054,27 @@
     <div class="kb-st" id="plSt"></div>
   </section>
 
+  <!-- RETO DE LA SEMANA -->
+  <section id="reto">
+    <h2>Reto de la semana</h2>
+    <div class="sub">cada lunes, un reto nuevo para los dos</div>
+    <div id="rtBox"></div>
+    <input type="file" id="rtFile" accept="image/*" hidden>
+    <div class="wheel-used" id="rtHist" style="margin-top:14px"></div>
+  </section>
+
+  <!-- LISTA DE DESEOS -->
+  <section id="deseos">
+    <h2>Lista de deseos</h2>
+    <div class="sub">cosas que nos gustan o queremos 🎁</div>
+    <form class="ds-add" id="dsForm" autocomplete="off">
+      <input id="dsIn" maxlength="160" placeholder="Ej. Unos audífonos rosas 🎧">
+      <div class="ev-row"><input id="dsLink" maxlength="400" placeholder="Link (opcional)" inputmode="url"><button type="submit" aria-label="Agregar">＋</button></div>
+    </form>
+    <div class="ds" id="dsList"></div>
+    <div class="kb-st" id="dsSt"></div>
+  </section>
+
   <!-- LO QUE VIENE -->
   <section id="viene">
     <h2>Lo que viene</h2>
@@ -1074,6 +1153,7 @@
   <a href="#cartames">Carta del mes</a>
   <a href="#abrela">Ábrela</a>
   <a href="#buzon">Buzón</a>
+  <a href="#diario">Diario</a>
   <a href="#voz">Voz</a>
   <a href="#escribir">Carta 2</a>
   <a href="#momentos">Fotos</a>
@@ -1089,6 +1169,8 @@
   <a href="#planes">Planes</a>
   <a href="#aprender">Aprender</a>
   <a href="#pelis">Pelis</a>
+  <a href="#reto">Reto</a>
+  <a href="#deseos">Deseos</a>
   <a href="#viene">Lo que viene</a>
   <a href="#cielo">Cielo</a>
   <a href="#sorpresas">Sorpresas</a>
@@ -1214,7 +1296,7 @@ const AV=C.avisos||{};
 const AV_TIPOS=window.AV_TIPOS=[['vale','🎟️ Canjea un vale'],['nota','💌 Te deja una notita en el buzón'],['ruleta','🎡 Gira la ruleta de citas'],['abrela','💌 Abre una carta «Ábrela cuando…»'],
   ['abrazo','🤗 Te manda un abrazo (corazón presionado)'],['rasca','🌠 Raspa el rasca y gana'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Agrega o aprende algo nuevo'],
   ['evento','🗓️ Agrega algo a «Lo que viene»'],['foto','📷 Sube fotos al carrusel'],['recuerdo','📷 Guarda un recuerdo de algo que hicieron'],['sorpresa','🎁 Abre la sorpresa del mes'],
-  ['capsula','⏳ Abre la cápsula del tiempo'],['racha','🔥 Desbloquea un premio de su racha'],['animo','🌤️ Dice cómo se siente'],['voz','🎙️ Te manda un mensaje de voz'],['cartames','✉️ Abre la carta del mes'],['comida','🍽️ Gira la rueda de la comida'],['pregunta','💭 Responde la pregunta del día'],['peli','🍿 Agrega, ve o califica una peli o serie'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (cada vez que entra)']];
+  ['capsula','⏳ Abre la cápsula del tiempo'],['racha','🔥 Desbloquea un premio de su racha'],['animo','🌤️ Dice cómo se siente'],['voz','🎙️ Te manda un mensaje de voz'],['cartames','✉️ Abre la carta del mes'],['comida','🍽️ Gira la rueda de la comida'],['pregunta','💭 Responde la pregunta del día'],['deseo','🎁 Agrega algo a su lista de deseos'],['diario','📔 Guarda un momento en el diario'],['reto','🎯 Cumplen el reto de la semana'],['peli','🍿 Agrega, ve o califica una peli o serie'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (cada vez que entra)']];
 const AV_OFF_DEF=window.AV_OFF_DEF={};
 const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'&&AV.notas===false)return false;return !off[t]};
 const AV_LAST={};
@@ -1222,7 +1304,7 @@ function avisarElla(txt,tipo){
   if(!AV.ntfyElla||tipo==='entrada')return;
   let m=txt.split(C.ella+' ').join(C.yo+' ');
   if(tipo==='pregunta')m='💭 '+C.yo+' ya contestó la pregunta del día · contesta para ver su respuesta';
-  const title=({nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo}[tipo])||'💗 '+C.yo;
+  const title=({nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo,deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana'}[tipo])||'💗 '+C.yo;
   fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfyElla.trim(),title,message:m,tags:['love_letter'],priority:4})}).catch(()=>{});
 }
 function avisar(txt,tipo){
@@ -1235,7 +1317,7 @@ function avisar(txt,tipo){
   try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
   const quien=soyYo?C.yo:C.ella;
   if(soyYo){ txt=txt.split(C.ella+' ').join(C.yo+' ').replace(/ te (dejó|mandó)/,' le $1'); }
-  const title=({vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',pregunta:'💭 Pregunta del día',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
+  const title=({vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
   fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
 }
 const VIEWER=()=>{if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
@@ -1457,7 +1539,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     try{if(window.AndroidApp){window.AndroidApp.relink();return}}catch(e){}
     location.replace(location.pathname);
@@ -2282,6 +2364,117 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
 /* ====== App de Android: recibe su nombre secreto de avisos ====== */
 try{if(window.AndroidApp&&VIEWER()==='ella')window.AndroidApp.setTopic(AV.ntfyElla||'')}catch(e){}
 
+/* ====== Lista de deseos ====== */
+(function(){
+  const $=id=>document.getElementById(id), box=$('dsList'), form=$('dsForm'), st=$('dsSt');
+  const S=SHARED('deseos.bin','d','deseos-cache',200,render);
+  const me=()=>VIEWER(), nm=w=>w==='yo'?C.yo:C.ella;
+  const okURL=u=>/^https?:\/\/[^\s"<>]+$/i.test(u||'');
+  function card(x){
+    const own=x.w===me(), el=document.createElement('div'); el.className='ds-i'+(!own&&x.b?' got':'');
+    el.innerHTML=`<div class="ds-t">${esc(x.t)}</div><div class="ds-f"><span>${fmtDia(x.a)}${okURL(x.l)?` · <a href="${esc(x.l)}" target="_blank" rel="noopener noreferrer">🔗 ver</a>`:''}</span></div>`;
+    const f=el.querySelector('.ds-f');
+    if(own){const d=document.createElement('button');d.className='ds-b';d.textContent='✕';let armed=false;
+      d.onclick=()=>{if(!armed){armed=true;d.textContent='¿Borrar?';setTimeout(()=>{armed=false;d.textContent='✕'},2500);return}x.x=1;x.u=Date.now();S.save()};f.append(d)}
+    else{const g=document.createElement('button');g.className='ds-b buy';g.textContent=x.b?'✅ Ya lo tienes (solo tú lo ves)':'🛍️ Ya lo compré';
+      g.onclick=()=>{x.b=x.b?0:1;x.u=Date.now();S.save();if(x.b)burst(10)};f.append(g)}
+    return el;
+  }
+  function render(){
+    const live=S.all().filter(x=>!x.x&&NEWER(x,'rds')).sort((a,b)=>b.a-a.a);
+    box.innerHTML='';
+    [me(),me()==='yo'?'ella':'yo'].forEach(w=>{
+      const L=live.filter(x=>x.w===w), col=document.createElement('div');col.className='ds-col';
+      col.innerHTML=`<div class="kb-h"><span>💝 ${w===me()?'Mis deseos':'Lo que quiere '+esc(nm(w))}</span><b>${L.length}</b></div>`;
+      if(!L.length){const e=document.createElement('div');e.className='kb-empty';e.textContent=w===me()?'escribe arriba algo que te guste 💭':'todavía no anota nada 💭';col.append(e)}
+      L.forEach(x=>col.append(card(x))); box.append(col);
+    });
+  }
+  form.addEventListener('submit',e=>{e.preventDefault();const t=$('dsIn').value.trim().slice(0,160), l=$('dsLink').value.trim().slice(0,400); if(!t)return;
+    S.add({id:UID(),w:me(),t,l:okURL(l)?l:'',a:Date.now(),u:Date.now()}); $('dsIn').value='';$('dsLink').value=''; burst(8);
+    avisar(`🎁 ${C.ella} agregó a su lista de deseos: ${t}`,'deseo'); st.textContent=GG.on?'☁️ Guardado':'Guardado en este celular'});
+  render();
+})();
+
+/* ====== Nuestro diario ====== */
+(function(){
+  const $=id=>document.getElementById(id), list=$('diList'), st=$('diSt'), file=$('diFile'), pick=$('diPick'), prev=$('diPrev');
+  const S=SHARED('diario.bin','e','diario-cache',400,render);
+  const me=()=>VIEWER(), nm=w=>w==='yo'?C.yo:C.ella;
+  let blob=null, showAll=false;
+  $('diF').value=DK(MXD()); $('diF').max=DK(MXD());
+  file.onchange=async()=>{const f=file.files[0];file.value='';if(!f)return;st.textContent='Preparando foto…';
+    try{blob=await GG.shrink(f);prev.style.backgroundImage=`url("${URL.createObjectURL(blob)}")`;prev.hidden=false;pick.textContent='📷 Cambiar foto';st.textContent=''}catch(e){st.textContent='No pude leer esa foto, prueba con otra'}};
+  pick.onclick=()=>file.click();
+  function render(){
+    const live=S.all().filter(x=>!x.x&&NEWER(x,'rdi')).sort((a,b)=>(b.d||'').localeCompare(a.d||'')||b.a-a.a);
+    list.innerHTML=live.length?'':'<div class="nb-empty">aquí irá nuestra historia… guarda el primer momento 📔</div>';
+    let mon='';
+    (showAll?live:live.slice(0,8)).forEach(x=>{
+      const [y,m,d]=(x.d||DK(MXD(x.a))).split('-').map(Number), key=y+'-'+m;
+      if(key!==mon){mon=key;const hd=document.createElement('div');hd.className='di-m';hd.textContent=MESN[m-1].charAt(0).toUpperCase()+MESN[m-1].slice(1)+' '+y;list.append(hd)}
+      const el=document.createElement('div');el.className='di-e';
+      el.innerHTML=`<div class="di-d"><b>${d}</b><span>${MESN[m-1].slice(0,3)}</span></div><div class="di-c">${x.ph?'<div class="di-ph">💗</div>':''}<div class="di-t">${esc(x.t).replace(/\n/g,'<br>')}</div><div class="di-w">${esc(nm(x.w))}</div></div>`;
+      if(x.ph){const ph=el.querySelector('.di-ph');GG.photo(x.ph).then(u=>{ph.style.backgroundImage=`url("${u}")`;ph.textContent=''}).catch(()=>{})}
+      if(x.w===me()){const del=document.createElement('button');del.className='ds-b di-x';del.textContent='✕';let armed=false;
+        del.onclick=()=>{if(!armed){armed=true;del.textContent='¿Borrar?';setTimeout(()=>{armed=false;del.textContent='✕'},2500);return}x.x=1;x.u=Date.now();S.save()};el.querySelector('.di-c').append(del)}
+      list.append(el);
+    });
+    if(live.length>8){const b=document.createElement('button');b.className='pq-ed';b.textContent=showAll?'Ver menos':`Ver todo (${live.length})`;b.onclick=()=>{showAll=!showAll;render()};list.append(b)}
+  }
+  $('diForm').addEventListener('submit',async e=>{
+    e.preventDefault(); const t=$('diIn').value.trim().slice(0,600), d=$('diF').value||DK(MXD()); if(!t&&!blob){$('diIn').focus();return}
+    const btn=$('diSave'); btn.disabled=true; st.textContent='Guardando…';
+    try{let ph='';if(blob&&GG.on)ph=await GG.newPhoto(blob);
+      S.add({id:UID(),w:me(),t,d,ph,a:Date.now(),u:Date.now()});
+      avisar(`📔 ${C.ella} guardó un momento en nuestro diario${t?': '+t.slice(0,90):''}`,'diario');
+      $('diIn').value='';blob=null;prev.hidden=true;pick.textContent='📷 Agregar foto';$('diF').value=DK(MXD());st.textContent='💗 Guardado';burst(14)}
+    catch(err){st.textContent='No se pudo guardar, intenta de nuevo'}
+    btn.disabled=false;
+  });
+  if(!GG.on)pick.hidden=true;
+  render();
+})();
+
+/* ====== Reto de la semana ====== */
+(function(){
+  const R=(C.retos||[]).map(FILL).filter(x=>x.trim()); if(!R.length)return;
+  const $=id=>document.getElementById(id), box=$('rtBox'), hist=$('rtHist');
+  const S=SHARED('retos.bin','r','retos-cache',200,render);
+  const mon=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+  const w0=mon(new Date(SY,SM-1,SD));
+  const idx=k=>{const [y,m,d]=k.split('-').map(Number);return ((Math.round((new Date(y,m-1,d)-w0)/(7*864e5))%R.length)+R.length)%R.length};
+  let blob=null;
+  function render(){
+    const now=MXD(), wk=DK(mon(now)), r=R[idx(wk)], done=S.all().find(x=>!x.x&&NEWER(x,'rre')&&x.id===wk);
+    const left=7-((now.getDay()+6)%7);
+    let h=`<div class="card rt"><div class="daily-l">Reto de esta semana</div><div class="daily">${esc(r)}</div>`;
+    if(done){h+=`<div class="rt-ok">✅ ¡Lo cumplimos! · ${fmtDia(done.a)}</div>${done.ph?'<div class="di-ph rt-ph">💗</div>':''}${done.n?`<div class="rt-n">“${esc(done.n)}”</div>`:''}<button class="pq-ed" id="rtUndo">↩ Deshacer</button>`}
+    else h+=`<div class="rt-left">${left===1?'Hoy es el último día':'Quedan '+left+' días'} para cumplirlo ⏳</div>
+      <input id="rtNote" class="pq-in" maxlength="200" placeholder="¿Cómo nos fue? (opcional)">
+      <div class="rt-acts">${GG.on?'<button class="btn small alt" id="rtPick" type="button">📷 Foto (opcional)</button>':''}<button class="btn small" id="rtDone">✅ ¡Lo cumplimos!</button></div>
+      <div class="di-ph rt-ph" id="rtPrev" ${blob?'':'hidden'}></div><div class="kb-st" id="rtSt"></div>`;
+    const keepN=$('rtNote')?$('rtNote').value:null;
+    box.innerHTML=h+'</div>';
+    if(keepN&&$('rtNote'))$('rtNote').value=keepN;
+    if(done&&done.ph){const ph=box.querySelector('.rt-ph');GG.photo(done.ph).then(u=>{ph.style.backgroundImage=`url("${u}")`;ph.textContent=''}).catch(()=>{})}
+    if(!done&&blob)$('rtPrev').style.backgroundImage=`url("${URL.createObjectURL(blob)}")`;
+    const pk=$('rtPick'); if(pk)pk.onclick=()=>$('rtFile').click();
+    const dn=$('rtDone'); if(dn)dn.onclick=async()=>{dn.disabled=true;$('rtSt').textContent='Guardando…';
+      const n=$('rtNote').value.trim().slice(0,200);
+      try{let ph='';if(blob)ph=await GG.newPhoto(blob);
+        const ex=S.all().find(x=>x.id===wk); if(ex){Object.assign(ex,{x:0,ph,n,r,a:Date.now(),u:Date.now()});S.save()}else S.add({id:wk,r,ph,n,a:Date.now(),u:Date.now()});
+        blob=null;burst(30);if(window.confetti)confetti(70);avisar(`🎯 ¡Reto cumplido! ${r}`,'reto')}
+      catch(e){$('rtSt').textContent='No se pudo guardar, intenta de nuevo';dn.disabled=false}};
+    const un=$('rtUndo'); if(un)un.onclick=()=>{done.x=1;done.u=Date.now();S.save()};
+    const past=S.all().filter(x=>!x.x&&NEWER(x,'rre')&&x.id!==wk).sort((a,b)=>b.id.localeCompare(a.id));
+    hist.innerHTML=past.length?`<div class="rt-h">🏆 Retos cumplidos: ${past.length+(done?1:0)}</div>`+past.slice(0,12).map(x=>`<span class="wu" style="text-decoration:none">✅ ${esc(x.r||'')}</span>`).join(''):'';
+  }
+  $('rtFile').onchange=async()=>{const f=$('rtFile').files[0];$('rtFile').value='';if(!f)return;try{blob=await GG.shrink(f);render()}catch(e){}};
+  render();
+  let last=DK(MXD()); setInterval(()=>{const k=DK(MXD());if(k!==last){last=k;render()}},60000);
+})();
+
 /* ====== Carta del mes ====== */
 (function(){
   const L=(C.cartasMes||[]).map(o=>({m:parseInt(o.mes)||0,t:FILL(o.titulo),x:o.texto||''})).filter(o=>o.m>0&&o.x.trim()).sort((a,b)=>a.m-b.m);
@@ -2585,7 +2778,7 @@ document.getElementById('moreLove').addEventListener('click',()=>{
 /* =====================================================================
    CARGA DEL CONTENIDO (content.json en tu repo de GitHub)
    ===================================================================== */
-const DEFAULTS = {"ella": "", "yo": "", "inicio": "2026-01-01", "pin": "0000", "pistas": [], "saludos": {"manana": "", "tarde": "", "noche": ""}, "mensajesDia": [], "cancion": {"titulo": "", "artista": "", "link": ""}, "carta": "", "abrela": [], "cartaSola": "", "fotos": [], "fotoPolaroid": 1, "polaroidTexto": "", "fotoRompecabezas": 1, "razones": [], "fortunas": [], "rasca": {"emoji": "", "titulo": "", "texto": ""}, "vales": [], "ruleta": [], "lista": [], "horaCielo": "21:00", "sorpresas": [], "sorpresasExtra": [], "capsula": {"fecha": "2030-01-01", "texto": ""}, "secreto": "", "fraseFinal": "", "mensajitos": [], "creditos": [], "whatsapp": {"numero": "", "mensajes": []}, "reinicio": "1", "kanban": {}, "racha": [{"dias": "15", "emoji": "🎟️", "titulo": "Cita sorpresa", "texto": "Por 15 días seguidos: una cita que yo planeo completita, tú solo llegas."}, {"dias": "45", "emoji": "🍰", "titulo": "Tu postre favorito", "texto": "Por 45 días seguidos: te llevo tu postre favorito a donde estés."}, {"dias": "100", "emoji": "👑", "titulo": "Un día de reina", "texto": "Por 100 días seguidos: un día entero dedicado a ti y tú pones todas las reglas."}], "animo": [{"emoji": "😊", "nombre": "Feliz", "respuesta": "¡Me encanta verte feliz! Que nada te quite esa sonrisa hoy 💗"}, {"emoji": "🥰", "nombre": "Enamorada", "respuesta": "Yo también, mi amor. Cada día más 🥰"}, {"emoji": "😴", "nombre": "Cansada", "respuesta": "Descansa tantito, preciosa. Hoy te mereces una siesta y muchos apapachos 💤"}, {"emoji": "😔", "nombre": "Triste", "respuesta": "Aquí estoy para ti, siempre. Te mando un abrazo enorme 🤗 y si quieres, háblame."}, {"emoji": "😣", "nombre": "Estresada", "respuesta": "Respira hondo… tú puedes con todo. Y si no, aquí estoy para ayudarte 💪💗"}, {"emoji": "😤", "nombre": "Enojada", "respuesta": "Ay, mi amor… cuéntame qué pasó, te escucho. (Y si fui yo, perdóname 🙈)"}], "cartasMes": [{"mes": "8", "titulo": "Ocho meses contigo", "texto": "Mi amor:\n\nHoy cumplimos ocho meses y todavía me sorprende lo bonito que se siente estar contigo. Gracias por cada risa, cada abrazo y por hacer que los días normales se sientan especiales.\n\nNo sé qué nos traiga el siguiente mes, pero sé que lo quiero vivir contigo.\n\nTe amo mucho, {ella}."}, {"mes": "9", "titulo": "Nueve meses de nosotros", "texto": "Mi vida:\n\nNueve meses ya. Cada mes que pasa te conozco un poquito más y te quiero un poquito más también.\n\nGracias por elegirme todos los días. Yo te elijo a ti, hoy y siempre.\n\nCon todo mi amor."}], "comida": ["🌮 Tacos", "🍕 Pizza", "🍣 Sushi", "🍔 Hamburguesas", "🍜 Ramen", "🍝 Pasta", "🥗 Algo sanito", "🌯 Burritos", "🍗 Alitas", "🥘 Comida casera"], "preguntas": ["¿Qué fue lo primero que pensaste de mí cuando me conociste?", "¿Cuál ha sido tu momento favorito conmigo hasta ahora?", "Si pudiéramos irnos de viaje mañana, ¿a dónde iríamos?", "¿Qué canción te recuerda a mí?", "¿Qué es lo que más te gusta de nosotros?", "¿Cuál sería nuestra cita perfecta?", "¿Qué es algo que nunca me has contado?", "¿Qué comida te gustaría que cocináramos juntos?", "¿En qué momento supiste que te gustaba?", "¿Qué sueño te gustaría que cumpliéramos juntos?", "¿Qué es lo más bonito que he hecho por ti?", "Si fuéramos una película, ¿cómo se llamaría?", "¿Qué te hace sentir más querida?", "¿Cómo te imaginas que estaremos en un año?", "¿Qué es algo pequeño que hago y que te encanta?", "¿Cuál es tu recuerdo favorito de nuestra primera cita?", "Si pudieras revivir un día conmigo, ¿cuál sería?", "¿Qué apodo te gustaría que te dijera?", "¿Qué es algo nuevo que quieras que aprendamos juntos?", "¿Qué te da más risa de mí?", "¿Qué es lo que más extrañas de mí cuando no estamos juntos?", "¿Qué lugar te gustaría que conociéramos en la ciudad?", "¿Qué tres palabras nos describen como pareja?", "¿Cuál es tu plan ideal para un domingo conmigo?", "¿Qué te gustaría que hiciéramos en nuestro aniversario?", "¿Qué es algo que admiras de mí?", "¿Qué te gustaría que hiciera más seguido?", "¿Cuál es la foto nuestra que más te gusta y por qué?", "Si tuviéramos una mascota, ¿cómo se llamaría?", "¿Qué quieres decirme hoy que no me hayas dicho?"]};
+const DEFAULTS = {"ella": "", "yo": "", "inicio": "2026-01-01", "pin": "0000", "pistas": [], "saludos": {"manana": "", "tarde": "", "noche": ""}, "mensajesDia": [], "cancion": {"titulo": "", "artista": "", "link": ""}, "carta": "", "abrela": [], "cartaSola": "", "fotos": [], "fotoPolaroid": 1, "polaroidTexto": "", "fotoRompecabezas": 1, "razones": [], "fortunas": [], "rasca": {"emoji": "", "titulo": "", "texto": ""}, "vales": [], "ruleta": [], "lista": [], "horaCielo": "21:00", "sorpresas": [], "sorpresasExtra": [], "capsula": {"fecha": "2030-01-01", "texto": ""}, "secreto": "", "fraseFinal": "", "mensajitos": [], "creditos": [], "whatsapp": {"numero": "", "mensajes": []}, "reinicio": "1", "kanban": {}, "racha": [{"dias": "15", "emoji": "🎟️", "titulo": "Cita sorpresa", "texto": "Por 15 días seguidos: una cita que yo planeo completita, tú solo llegas."}, {"dias": "45", "emoji": "🍰", "titulo": "Tu postre favorito", "texto": "Por 45 días seguidos: te llevo tu postre favorito a donde estés."}, {"dias": "100", "emoji": "👑", "titulo": "Un día de reina", "texto": "Por 100 días seguidos: un día entero dedicado a ti y tú pones todas las reglas."}], "animo": [{"emoji": "😊", "nombre": "Feliz", "respuesta": "¡Me encanta verte feliz! Que nada te quite esa sonrisa hoy 💗"}, {"emoji": "🥰", "nombre": "Enamorada", "respuesta": "Yo también, mi amor. Cada día más 🥰"}, {"emoji": "😴", "nombre": "Cansada", "respuesta": "Descansa tantito, preciosa. Hoy te mereces una siesta y muchos apapachos 💤"}, {"emoji": "😔", "nombre": "Triste", "respuesta": "Aquí estoy para ti, siempre. Te mando un abrazo enorme 🤗 y si quieres, háblame."}, {"emoji": "😣", "nombre": "Estresada", "respuesta": "Respira hondo… tú puedes con todo. Y si no, aquí estoy para ayudarte 💪💗"}, {"emoji": "😤", "nombre": "Enojada", "respuesta": "Ay, mi amor… cuéntame qué pasó, te escucho. (Y si fui yo, perdóname 🙈)"}], "cartasMes": [{"mes": "8", "titulo": "Ocho meses contigo", "texto": "Mi amor:\n\nHoy cumplimos ocho meses y todavía me sorprende lo bonito que se siente estar contigo. Gracias por cada risa, cada abrazo y por hacer que los días normales se sientan especiales.\n\nNo sé qué nos traiga el siguiente mes, pero sé que lo quiero vivir contigo.\n\nTe amo mucho, {ella}."}, {"mes": "9", "titulo": "Nueve meses de nosotros", "texto": "Mi vida:\n\nNueve meses ya. Cada mes que pasa te conozco un poquito más y te quiero un poquito más también.\n\nGracias por elegirme todos los días. Yo te elijo a ti, hoy y siempre.\n\nCon todo mi amor."}], "comida": ["🌮 Tacos", "🍕 Pizza", "🍣 Sushi", "🍔 Hamburguesas", "🍜 Ramen", "🍝 Pasta", "🥗 Algo sanito", "🌯 Burritos", "🍗 Alitas", "🥘 Comida casera"], "preguntas": ["¿Qué fue lo primero que pensaste de mí cuando me conociste?", "¿Cuál ha sido tu momento favorito conmigo hasta ahora?", "Si pudiéramos irnos de viaje mañana, ¿a dónde iríamos?", "¿Qué canción te recuerda a mí?", "¿Qué es lo que más te gusta de nosotros?", "¿Cuál sería nuestra cita perfecta?", "¿Qué es algo que nunca me has contado?", "¿Qué comida te gustaría que cocináramos juntos?", "¿En qué momento supiste que te gustaba?", "¿Qué sueño te gustaría que cumpliéramos juntos?", "¿Qué es lo más bonito que he hecho por ti?", "Si fuéramos una película, ¿cómo se llamaría?", "¿Qué te hace sentir más querida?", "¿Cómo te imaginas que estaremos en un año?", "¿Qué es algo pequeño que hago y que te encanta?", "¿Cuál es tu recuerdo favorito de nuestra primera cita?", "Si pudieras revivir un día conmigo, ¿cuál sería?", "¿Qué apodo te gustaría que te dijera?", "¿Qué es algo nuevo que quieras que aprendamos juntos?", "¿Qué te da más risa de mí?", "¿Qué es lo que más extrañas de mí cuando no estamos juntos?", "¿Qué lugar te gustaría que conociéramos en la ciudad?", "¿Qué tres palabras nos describen como pareja?", "¿Cuál es tu plan ideal para un domingo conmigo?", "¿Qué te gustaría que hiciéramos en nuestro aniversario?", "¿Qué es algo que admiras de mí?", "¿Qué te gustaría que hiciera más seguido?", "¿Cuál es la foto nuestra que más te gusta y por qué?", "Si tuviéramos una mascota, ¿cómo se llamaría?", "¿Qué quieres decirme hoy que no me hayas dicho?"], "retos": ["Cocinar juntos una receta que nunca hayamos hecho 🍳", "Tomarnos una foto juntos en un lugar nuevo 📸", "Tener una cita sin celulares 📵", "Escribirnos una carta a mano y dárnosla en persona ✉️", "Ver el atardecer juntos 🌅", "Probar un postre que nunca hayamos probado 🍰", "Hacer una noche de juegos de mesa 🎲", "Caminar por un lugar de la ciudad que no conozcamos 🚶", "Bailar juntos una canción en casa 💃", "Hacer un picnic 🧺", "Ver una película que elija el otro, sin quejarnos 🎬", "Darnos un masaje 💆", "Ir a desayunar a un lugar nuevo 🥞", "Decirnos 3 cosas que admiramos del otro 💗", "Hacer una manualidad juntos ✂️", "Visitar un museo 🏛️", "Prepararle el desayuno sorpresa al otro ☕", "Planear juntos nuestro próximo viaje ✈️", "Recrear nuestra primera cita 💕", "Hacer juntos algo que nos dé un poquito de miedo 🎢"]};
 const EDIT = /[?&]editar\b/.test(location.search) || location.hash==='#editar';
 const LS={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
 function ghRepo(){
@@ -2699,6 +2892,7 @@ const SCHEMA=[
   {t:'Rasca y gana',f:[['rascaPremios','Premios (sale uno al azar y solo se puede raspar una vez)','objlist',[['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
   {t:'Vales de amor',f:[['vales','Vales','objlist',[['emoji','Emoji','text'],['titulo','Vale por…','text'],['detalle','Detalle','text']]]]},
   {t:'Ruleta de citas',f:[['ruleta','Opciones (máximo 12)','list']]},
+  {t:'Reto de la semana',f:[['retos','Retos (sale uno distinto cada lunes, en orden)','list']]},
   {t:'Rueda de la comida',f:[['comida','Opciones (máximo 12)','list']]},
   {t:'Planes, fotos, vales, notitas y eventos de Ale',special:'kanban'},
   {t:'El cielo de esa noche',f:[['horaCielo','Hora del cielo (el día que empezó todo)','time']]},
@@ -2927,6 +3121,9 @@ function initEditor(){
         btD('Vaciar «Nuestros planes»',()=>{D.rpl=Date.now()},'el tablero de planes queda vacío.'),
         btD('Vaciar «Cosas que aprender juntos»',()=>{D.rap=Date.now()},'el tablero de aprender queda vacío.'),
         btD('Vaciar «Pelis y series»',()=>{D.rpe=Date.now()},'la lista de pelis y series queda vacía.'),
+        btD('Vaciar «Lista de deseos»',()=>{D.rds=Date.now()},'la lista de deseos queda vacía.'),
+        btD('Vaciar «Nuestro diario»',()=>{D.rdi=Date.now()},'el diario queda vacío.'),
+        bt('Reiniciar «Reto de la semana»',()=>{D.rre=Date.now()},'los retos cumplidos se borran y el de esta semana queda pendiente.'),
         btD('Vaciar «Lo que viene»',()=>{D.rev=Date.now()},'la cuenta regresiva queda vacía.'),
         msg]));
       return;
