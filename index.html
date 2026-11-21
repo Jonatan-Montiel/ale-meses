@@ -2511,8 +2511,8 @@ const PHOTO_CACHE={};
 async function photoBlobURL(p){
   if(PHOTO_CACHE[p])return PHOTO_CACHE[p];
   if(!/\.bin$/.test(p))return p; // fotos antiguas sin cifrar
-  const R=ghRepo(); let r=await fetch(p,{cache:'force-cache'}).catch(()=>null);
-  if((!r||!r.ok)&&R)r=await fetch(rawURL(R,p)).catch(()=>null);
+  const R=ghRepo(); let r=await fetchT(p,{cache:'force-cache'},10000).catch(()=>null);
+  if((!r||!r.ok)&&R)r=await fetchT(rawURL(R,p),{},8000).catch(()=>null);
   if(!r||!r.ok)return '';
   const plain=await decBuf(await r.arrayBuffer());
   return PHOTO_CACHE[p]=URL.createObjectURL(new Blob([plain],{type:'image/jpeg'}));
@@ -2539,16 +2539,23 @@ function mergeC(a,b){
   }
   return o;
 }
+function fetchT(u,o,ms){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms||10000);return fetch(u,Object.assign({},o||{},{signal:c.signal})).finally(()=>clearTimeout(t))}
+function slowScreen(msg){
+  const l=document.getElementById('lock'), pad=document.getElementById('pad'); if(!l||!pad||pad.children.length)return;
+  let m=document.getElementById('slowMsg'); if(!m){m=document.createElement('div');m.id='slowMsg';m.style.cssText='margin-top:18px;max-width:300px;font-size:14px;opacity:.85;text-align:center';l.append(m)}
+  m.innerHTML=msg+'<div><button class="btn small" onclick="location.reload()">Reintentar ♥</button></div>';
+}
+setTimeout(()=>slowScreen('Está tardando más de lo normal en cargar…'),20000);
 async function loadContent(){
   const R=ghRepo(); let buf=null;
   if(R){
     try{
-      const r=await fetch(`https://api.github.com/repos/${R.owner}/${R.repo}/contents/data.bin?ref=${encodeURIComponent(R.branch||'main')}&t=${Date.now()}`,
-        {headers:Object.assign(ghH(EDIT?ghToken():''),{Accept:'application/vnd.github.raw+json'}),cache:'no-store'});
+      const r=await fetchT(`https://api.github.com/repos/${R.owner}/${R.repo}/contents/data.bin?ref=${encodeURIComponent(R.branch||'main')}&t=${Date.now()}`,
+        {headers:Object.assign(ghH(EDIT?ghToken():''),{Accept:'application/vnd.github.raw+json'}),cache:'no-store'},7000);
       if(r.ok) buf=await r.arrayBuffer();
     }catch(e){}
   }
-  if(!buf){try{const r=await fetch('data.bin?t='+Date.now(),{cache:'no-store'}); if(r.ok) buf=await r.arrayBuffer()}catch(e){}}
+  if(!buf){try{const r=await fetchT('data.bin?t='+Date.now(),{cache:'no-store'},15000); if(r.ok) buf=await r.arrayBuffer()}catch(e){}}
   if(!buf) throw new Error('nodata');
   return JSON.parse(new TextDecoder().decode(await decBuf(buf)));
 }
@@ -2561,7 +2568,7 @@ let CUR=null;
   const pairs=(await Promise.all((CUR.fotos||[]).map(async p=>[p,await photoBlobURL(p).catch(()=>'')]))).filter(x=>x[1]);
   const VIEW=Object.assign({},CUR,{fotos:pairs.map(x=>x[1]),fotoPaths:pairs.map(x=>x[0])});
   if(CUR.inactiva&&!EDIT){inactiveScreen(CUR);return}
-  boot(VIEW);
+  try{boot(VIEW)}catch(e){console.error(e);slowScreen('Algo falló al abrir la página ('+String(e&&e.message||e).slice(0,80)+').');throw e}
   if(EDIT){
     const l=document.getElementById('lock'); if(l) l.remove(); document.body.classList.remove('locked');
     initEditor();
