@@ -1032,6 +1032,7 @@ const RICH=x=>esc(FILL(x)).replace(/\*([^*]+)\*/g,'<em>$1</em>').replace(/\n/g,'
 const INI=(C.ella[0]||'A').toUpperCase()+' ♥ '+(C.yo[0]||'J').toUpperCase();
 const SIGN='— '+C.yo+' ♥';
 const RK=String(C.reinicio||'');
+const CUTOF=k=>+C[k]||0, NEWER=(x,k)=>((x.a||x.u||0)>CUTOF(k));
 const MESN=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const fdate=d=>{const [y,m,dd]=d.split('-').map(Number);return `${dd} de ${MESN[m-1]} de ${y}`};
 document.title=C.ella+' & '+C.yo+' ♥';
@@ -1367,7 +1368,7 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   document.body.appendChild(m);
   const close=()=>m.classList.remove('open');
   m.querySelector('.x').onclick=close; m.addEventListener('click',e=>{if(e.target===m)close()});
-  let read={}; try{read=JSON.parse(localStorage.getItem('abrela-ale-'+RK)||'{}')}catch(e){}
+  let read={}; try{read=JSON.parse(localStorage.getItem('abrela-ale-'+RK+(C.rab?'.'+C.rab:''))||'{}')}catch(e){}
   WHENS.forEach((w,i)=>{
     const b=document.createElement('button'); b.className='when'+(read[i]?' read':'');
     b.innerHTML=`<span class="we">${esc(w[0])}</span><small>Ábrela cuando…</small>${esc(w[1])}`;
@@ -1375,7 +1376,7 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
       m.querySelector('.when-t').textContent=`Ábrela cuando ${w[1]} ${w[0]}`;
       m.querySelector('.wtxt').textContent=w[2];
       m.classList.add('open'); b.classList.add('read'); read[i]=1; burst(10); avisar(`💌 ${C.ella} abrió la carta «Ábrela cuando ${w[1]}» ${w[0]}`,'abrela');
-      try{localStorage.setItem('abrela-ale-'+RK,JSON.stringify(read))}catch(e){}
+      try{localStorage.setItem('abrela-ale-'+RK+(C.rab?'.'+C.rab:''),JSON.stringify(read))}catch(e){}
     };
     wrap.appendChild(b);
   });
@@ -1546,7 +1547,7 @@ function makeBoard(B){
   const keep=()=>{try{localStorage.setItem(CACHE,JSON.stringify(cards))}catch(e){}};
   function merge(a,b){const m={};[...a,...b].forEach(x=>{if(!m[x.id]||(x.u||0)>(m[x.id].u||0))m[x.id]=x});return Object.values(m)}
   function render(){
-    const live=cards.filter(x=>!x.x);
+    const live=cards.filter(x=>!x.x&&NEWER(x,B.cut));
     const pend=live.filter(x=>x.c==='p').sort((a,b)=>a.a-b.a), done=live.filter(x=>x.c==='d').sort((a,b)=>(b.d||0)-(a.d||0));
     $('Np').textContent=pend.length; $('Nd').textContent=done.length;
     P.innerHTML=''; Dn.innerHTML='';
@@ -1626,9 +1627,9 @@ function makeBoard(B){
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
     window.addEventListener('online',sync);}
 }
-makeBoard({avTipo:'plan',avNew:'📝 '+C.ella+' agregó un plan:',avDone:'🎉 ¡Lo logramos! '+C.ella+' marcó como hecho:',sec:'planes',p:'kb',file:'planes.bin',cache:'planes-cache',seed:C.lista,emptyP:'¿qué hacemos? escríbelo arriba ✍️',emptyD:'aquí irán nuestros recuerdos 💗',doneTitle:'¡Lo hicimos!'});
-makeBoard({avTipo:'peli',avNew:'🍿 '+C.ella+' quiere que veamos:',avDone:'✅ Ya la vimos: '+C.ella+' marcó',sec:'pelis',p:'pl',file:'pelis.bin',cache:'pelis-cache',seed:[],emptyP:'¿qué vemos? escríbelo arriba 🍿',emptyD:'aquí irá todo lo que ya vimos juntos 🎬',doneTitle:'¡Ya la vimos!',rate:true,noMemo:true});
-makeBoard({avTipo:'aprender',avNew:'📚 '+C.ella+' quiere que aprendamos:',avDone:'🎓 ¡Ya lo aprendimos! '+C.ella+' marcó:',sec:'aprender',p:'ap',file:'aprender.bin',cache:'aprender-cache',seed:[],emptyP:'¿qué aprendemos? escríbelo arriba 📚',emptyD:'aquí irá todo lo que ya aprendimos juntos 🎓',doneTitle:'¡Ya lo aprendimos!'});
+makeBoard({avTipo:'plan',avNew:'📝 '+C.ella+' agregó un plan:',avDone:'🎉 ¡Lo logramos! '+C.ella+' marcó como hecho:',sec:'planes',p:'kb',cut:'rpl',file:'planes.bin',cache:'planes-cache',seed:C.lista,emptyP:'¿qué hacemos? escríbelo arriba ✍️',emptyD:'aquí irán nuestros recuerdos 💗',doneTitle:'¡Lo hicimos!'});
+makeBoard({avTipo:'peli',avNew:'🍿 '+C.ella+' quiere que veamos:',avDone:'✅ Ya la vimos: '+C.ella+' marcó',sec:'pelis',p:'pl',cut:'rpe',file:'pelis.bin',cache:'pelis-cache',seed:[],emptyP:'¿qué vemos? escríbelo arriba 🍿',emptyD:'aquí irá todo lo que ya vimos juntos 🎬',doneTitle:'¡Ya la vimos!',rate:true,noMemo:true});
+makeBoard({avTipo:'aprender',avNew:'📚 '+C.ella+' quiere que aprendamos:',avDone:'🎓 ¡Ya lo aprendimos! '+C.ella+' marcó:',sec:'aprender',p:'ap',cut:'rap',file:'aprender.bin',cache:'aprender-cache',seed:[],emptyP:'¿qué aprendemos? escríbelo arriba 📚',emptyD:'aquí irá todo lo que ya aprendimos juntos 🎓',doneTitle:'¡Ya lo aprendimos!'});
 
 /* ====== Sorpresa de cada mes ====== */
 (function(){
@@ -1984,7 +1985,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const keep=()=>{try{localStorage.setItem(CK,JSON.stringify(notes))}catch(e){}};
   const name=w=>w==='yo'?C.yo:C.ella;
   let render=function(){
-    const live=notes.filter(x=>!x.x).sort((a,b)=>a.a-b.a).slice(-60), m=me();
+    const live=notes.filter(x=>!x.x&&NEWER(x,'rnb')).sort((a,b)=>a.a-b.a).slice(-60), m=me();
     list.innerHTML=live.length?'':'<div class="nb-empty">aún no hay notitas… ¡escribe la primera! 💌</div>';
     live.forEach(x=>{
       const d=document.createElement('div'); d.className='nb-m '+(x.w===m?'me':'them');
@@ -2019,7 +2020,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const pill=document.getElementById('nbPill'), hoyNew=document.getElementById('hoyNew');
   const SK='notas-visto'; let seen=+(localStorage.getItem(SK)||0)||0;
   const mine=()=>me()||(EDIT?'yo':'ella');
-  const unread=()=>notes.filter(x=>!x.x&&x.w!==mine()&&x.a>seen);
+  const unread=()=>notes.filter(x=>!x.x&&NEWER(x,'rnb')&&x.w!==mine()&&x.a>seen);
   const markSeen=()=>{if(!unread().length)return;seen=Date.now();try{localStorage.setItem(SK,String(seen))}catch(_){}badge()};
   const goBuzon=()=>{document.getElementById('buzon').scrollIntoView({behavior:'smooth'});pill.hidden=true;setTimeout(markSeen,1800)};
   pill.onclick=goBuzon;
@@ -2049,7 +2050,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const $=id=>document.getElementById(id);
   let open=null;
   function stats(){
-    const set=new Set(S.all().map(x=>x.id)), d=MXD(); if(!set.has(DK(d)))d.setDate(d.getDate()-1);
+    const set=new Set(S.all().filter(x=>NEWER(x,'rrc')).map(x=>x.id)), d=MXD(); if(!set.has(DK(d)))d.setDate(d.getDate()-1);
     let cur=0; while(set.has(DK(d))){cur++;d.setDate(d.getDate()-1)}
     let best=0,run=0,prev=null; [...set].sort().forEach(k=>{const t=new Date(k+'T12:00:00');run=prev&&(t-prev)/864e5<1.5?run+1:1;best=Math.max(best,run);prev=t});
     return {cur,best:Math.max(best,cur),set};
@@ -2074,9 +2075,10 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   }
   function visit(){
     if(!soyElla)return; const k=DK(MXD()); const before=stats().best;
-    if(!S.all().some(x=>x.id===k)){S.add({id:k,a:Date.now(),u:Date.now()})}
+    const ex=S.all().find(x=>x.id===k);
+    if(!ex){S.add({id:k,a:Date.now(),u:Date.now()})}else if(!NEWER(ex,'rrc')){ex.a=ex.u=Date.now();S.save()}
     const after=stats().best;
-    PR.filter(p=>before<p.d&&after>=p.d).forEach(p=>{let done=false;try{done=localStorage.getItem('racha-av-'+p.d)===RK;localStorage.setItem('racha-av-'+p.d,RK)}catch(e){}
+    PR.filter(p=>before<p.d&&after>=p.d).forEach(p=>{let done=false;try{done=localStorage.getItem('racha-av-'+p.d)===RK+'.'+CUTOF('rrc');localStorage.setItem('racha-av-'+p.d,RK+'.'+CUTOF('rrc'))}catch(e){}
       if(!done){avisar(`🔥 ${C.ella} lleva ${p.d} días seguidos entrando y desbloqueó: ${p.e} ${p.t}`,'racha');setTimeout(()=>burst(30),600)}});
   }
   render(); window.addEventListener('unlocked',visit); document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!document.body.classList.contains('locked'))visit()});
@@ -2150,7 +2152,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   player.addEventListener('timeupdate',()=>{if(!playing)return;const bar=list.querySelector(`[data-id="${playing}"] .vz-bar i`);if(bar&&player.duration&&isFinite(player.duration))bar.style.width=(player.currentTime/player.duration*100)+'%'});
   player.addEventListener('ended',()=>{const el=list.querySelector(`[data-id="${playing}"]`);if(el){el.querySelector('.vz-play').textContent='▶';el.querySelector('.vz-bar i').style.width='0'}playing=null});
   function render(){
-    const live=S.all().filter(x=>!x.x).sort((a,b)=>a.a-b.a), me=VIEWER();
+    const live=S.all().filter(x=>!x.x&&NEWER(x,'rvz')).sort((a,b)=>a.a-b.a), me=VIEWER();
     list.innerHTML=live.length?'':'<div class="nb-empty">aún no hay mensajes de voz… ¡graba el primero! 🎙️</div>';
     live.forEach(x=>{
       const d=document.createElement('div');d.className='vz-m '+(x.w===me?'me':'them');d.dataset.id=x.id;
@@ -2257,7 +2259,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const dayStart=d=>{const t=new Date(d.toLocaleString('en-US',{timeZone:'America/Mexico_City'}));t.setHours(0,0,0,0);return t};
   function render(){
     const now=new Date(), today=dayStart(now);
-    const live=evs.filter(x=>!x.x).sort((a,b)=>when(a)-when(b));
+    const live=evs.filter(x=>!x.x&&NEWER(x,'rev')).sort((a,b)=>when(a)-when(b));
     const up=live.filter(x=>dayStart(new Date(x.f+'T12:00:00-06:00'))>=today), past=live.length-up.length;
     list.innerHTML=up.length?'':'<div class="nb-empty">agrega la próxima cita, un viaje o un cumpleaños 🗓️</div>';
     up.forEach(x=>{
@@ -2687,13 +2689,28 @@ function initEditor(){
     if(sec.special==='reset'){
       const msg=h('div',{class:'ed-note'});
       const bt=(label,fn,note)=>h('button',{class:'ed-btn',style:'display:block;margin:6px 0',onclick:()=>{fn();markDirty();msg.textContent='Listo: '+note+' Se aplicará cuando toques «Guardar cambios».';msg.className='ed-note ok'}},label);
+      const btD=(label,fn,note)=>{let armed=false;const b=h('button',{class:'ed-btn',style:'display:block;margin:6px 0;background:#9b2c3c',onclick:()=>{
+          if(!armed){armed=true;b.textContent='¿Seguro? Toca otra vez para borrar';setTimeout(()=>{armed=false;b.textContent=label},3000);return}
+          armed=false;b.textContent=label;fn();markDirty();msg.textContent='Listo: '+note+' Se aplicará cuando toques «Guardar cambios».';msg.className='ed-note ok'}},label);return b};
       body.append(section('🔄 '+sec.t,[
-        h('div',{class:'ed-note'},'Vuelve a dejar todo como nuevo en el celular de Ale (y en el tuyo). Los planes, notitas, eventos y fotos no se borran.'),
-        bt('Reiniciar todo',()=>{D.reinicio=String(Date.now())},'vales sin usar, cartas sin abrir, rasca y gana, ruleta y «¿Cómo te sientes hoy?» listos para usarse otra vez.'),
+        h('div',{class:'ed-note'},'Vuelve a dejar todo como nuevo en el celular de Ale (y en el tuyo).'),
+        h('div',{class:'ed-flab',style:'margin-top:10px'},'🎮 Juegos y sorpresas'),
+        bt('Reiniciar todo',()=>{D.reinicio=String(Date.now())},'vales sin usar, cartas sin abrir, rasca y gana, ruleta y «¿Cómo te sientes hoy?» listos para usarse otra vez (planes, notitas, eventos y fotos no se borran).'),
         bt('Reiniciar solo el rasca y gana',()=>{D.rr=Date.now()},'el rasca y gana se podrá raspar otra vez.'),
-        bt('Reiniciar solo la ruleta',()=>{D.rq=Date.now()},'todas las opciones de la ruleta vuelven a estar disponibles.'),
+        bt('Reiniciar solo la ruleta de citas',()=>{D.rq=Date.now()},'todas las opciones de la ruleta vuelven a estar disponibles.'),
         bt('Reiniciar solo los vales',()=>{D.reinicioVales=Date.now()},'todos los vales vuelven a estar sin usar.'),
-        bt('Reiniciar solo «¿Cómo te sientes hoy?»',()=>{D.ra=Date.now()},'las caritas vuelven a estar sin elegir para los dos.'),msg]));
+        bt('Reiniciar solo «Ábrela cuando…»',()=>{D.rab=Date.now()},'todas las cartas vuelven a estar sin abrir.'),
+        bt('Reiniciar solo «¿Cómo te sientes hoy?»',()=>{D.ra=Date.now()},'las caritas vuelven a estar sin elegir para los dos.'),
+        bt('Reiniciar la racha de visitas',()=>{D.rrc=Date.now()},'la racha vuelve a empezar desde hoy y los premios se vuelven a bloquear.'),
+        h('div',{class:'ed-flab',style:'margin-top:14px'},'🗑️ Borrar todo de una sección'),
+        h('div',{class:'ed-note'},'Estos borran todo lo que hay en esa sección para los dos. Toca dos veces para confirmar.'),
+        btD('Borrar todas las notitas del buzón',()=>{D.rnb=Date.now()},'el buzón queda vacío.'),
+        btD('Borrar todos los mensajes de voz',()=>{D.rvz=Date.now()},'los mensajes de voz quedan vacíos.'),
+        btD('Vaciar «Nuestros planes»',()=>{D.rpl=Date.now()},'el tablero de planes queda vacío.'),
+        btD('Vaciar «Cosas que aprender juntos»',()=>{D.rap=Date.now()},'el tablero de aprender queda vacío.'),
+        btD('Vaciar «Pelis y series»',()=>{D.rpe=Date.now()},'la lista de pelis y series queda vacía.'),
+        btD('Vaciar «Lo que viene»',()=>{D.rev=Date.now()},'la cuenta regresiva queda vacía.'),
+        msg]));
       return;
     }
     body.append(section(sec.t, sec.f.map(fd=>field(fd))));
