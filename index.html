@@ -386,6 +386,8 @@
   .hoy-new{margin:18px auto 0;display:block;background:rgba(255,255,255,.12);border:1px solid var(--gold);color:#fff;border-radius:999px;padding:11px 18px;font:800 15px 'Nunito';cursor:pointer;animation:beat 1.6s ease-in-out infinite}
   .nb-pill{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:45;background:linear-gradient(135deg,var(--rose),#b3204f);color:#fff;border:0;border-radius:999px;padding:10px 16px;font:800 14px 'Nunito';box-shadow:0 10px 24px rgba(0,0,0,.4);cursor:pointer;animation:pop .5s cubic-bezier(.2,.9,.3,1.3);white-space:nowrap}
   body.editing .nb-pill{top:44px}
+  body.ed-inactiva .ed-bar{background:#9b2c3c!important}
+  body.ed-inactiva .ed-bar::after{content:' · 💤 PÁGINA INACTIVA PARA ELLA'}
   .nb-m.new{box-shadow:0 0 0 3px var(--gold)}
 
   /* Racha */
@@ -2457,6 +2459,14 @@ function noKeyScreen(msg){
   const l=document.getElementById('lock'); if(!l)return;
   l.innerHTML='<div class="lock-ico">💌</div><div class="lock-q">Esta app es privada</div><div class="lock-h" style="max-width:300px;margin:10px auto 0">'+msg+'</div>';
 }
+function inactiveScreen(c){
+  const l=document.getElementById('lock'); if(!l)return;
+  const e=t=>String(t||'').replace(/[&<>"]/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[x])).replace(/\{ella\}/g,c.ella).replace(/\{yo\}/g,c.yo).replace(/\n/g,'<br>');
+  l.innerHTML='<div class="lock-ico">💤</div><div class="lock-q">'+e(c.inactivaTitulo||'Página inactiva')+'</div><div class="lock-h" style="max-width:310px;margin:12px auto 0;line-height:1.3">'+e(c.inactivaTexto||'Esta página se desactivó por no entrar a verla.')+'</div>';
+  const A=c.avisos||{};
+  if(A.ntfy){let yo=false;try{yo=localStorage.getItem('yo-soy')==='yo'}catch(_){}
+    if(!yo)fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:A.ntfy.trim(),title:'💤 Página inactiva · '+c.ella,message:'👀 '+c.ella+' intentó entrar, pero la página está inactiva',tags:['zzz'],priority:4})}).catch(()=>{})}
+}
 const ghH=tok=>Object.assign({Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},tok?{Authorization:'Bearer '+tok}:{});
 function mergeC(a,b){
   const o=JSON.parse(JSON.stringify(a));
@@ -2488,6 +2498,7 @@ let CUR=null;
   CUR=mergeC(DEFAULTS,remote);
   const pairs=(await Promise.all((CUR.fotos||[]).map(async p=>[p,await photoBlobURL(p).catch(()=>'')]))).filter(x=>x[1]);
   const VIEW=Object.assign({},CUR,{fotos:pairs.map(x=>x[1]),fotoPaths:pairs.map(x=>x[0])});
+  if(CUR.inactiva&&!EDIT){inactiveScreen(CUR);return}
   boot(VIEW);
   if(EDIT){
     const l=document.getElementById('lock'); if(l) l.remove(); document.body.classList.remove('locked');
@@ -2499,6 +2510,7 @@ let CUR=null;
    EDITOR
    ===================================================================== */
 const SCHEMA=[
+  {t:'Página inactiva',special:'inactiva'},
   {t:'Nombres, fecha y candado',f:[['ella','Su nombre','text'],['yo','Tu nombre (firma)','text'],['inicio','Fecha en que empezó todo','date'],['pin','Código del candado (4 números)','text']]},
   {t:'Saludos según la hora',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
   {t:'Mensaje del día',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2],['mensajesDia','Frases (cambia una cada día)','list']]},
@@ -2600,6 +2612,20 @@ function initEditor(){
 
   // Secciones de contenido
   SCHEMA.forEach(sec=>{
+    if(sec.special==='inactiva'){
+      const st=h('div',{class:'ed-note'});
+      const tg=h('button',{class:'ed-btn',style:'display:block;margin:6px 0'});
+      const paint=()=>{tg.textContent=D.inactiva?'▶️ Volver a activar la página':'💤 Poner la página inactiva';tg.style.background=D.inactiva?'#2e7d4f':'#9b2c3c';
+        st.textContent=D.inactiva?'Ahora: INACTIVA. '+(D.ella||'Ale')+' solo verá el aviso que escribes abajo.':'Ahora: activa. '+(D.ella||'Ale')+' ve toda la página normal.';st.className='ed-note '+(D.inactiva?'bad':'ok');
+        document.body.classList.toggle('ed-inactiva',!!D.inactiva)};
+      tg.onclick=()=>{D.inactiva=!D.inactiva;markDirty();paint();st.textContent+=' Se aplica cuando toques «Guardar cambios».'};
+      const t1=h('input',{class:'ed-in',value:D.inactivaTitulo||'Página inactiva'});t1.addEventListener('input',()=>{D.inactivaTitulo=t1.value;markDirty()});
+      const t2=h('textarea',{class:'ed-in',rows:3});t2.value=D.inactivaTexto||'Esta página se desactivó por no entrar a verla.';t2.addEventListener('input',()=>{D.inactivaTexto=t2.value;markDirty()});
+      paint();
+      body.append(section('💤 '+sec.t,[h('div',{class:'ed-note'},'Con un botón, '+(D.ella||'Ale')+' deja de ver la página y solo le aparece un aviso de que está inactiva. Nada se borra: al reactivarla todo vuelve a estar igual. Tú sigues viendo todo aquí en el editor.'),
+        tg,st,h('label',{class:'ed-lab'},h('span',null,'Título que verá'),t1),h('label',{class:'ed-lab'},h('span',null,'Mensaje que verá'),t2)]));
+      return;
+    }
     if(sec.special==='avisos'){
       D.avisos=D.avisos||{}; const A=D.avisos;
       const inp=(k,ph,type)=>{const i=h('input',{class:'ed-in',type:type||'text',placeholder:ph||'',value:A[k]||'',autocomplete:'off'});i.addEventListener('input',()=>{A[k]=i.value.trim();markDirty()});return i};
