@@ -2088,7 +2088,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const $=id=>document.getElementById(id), grid=$('anGrid'), res=$('anRes'), hoy=$('anHoy');
   const S=SHARED('animo.bin','e','animo-cache',60,render);
   const yo=()=>VIEWER(), today=()=>DK(MXD());
-  const lastOf=w=>S.all().filter(x=>!x.x&&x.w===w&&DK(MXD(x.a))===today()).sort((a,b)=>b.a-a.a)[0];
+  const CUT=Math.max(+C.ra||0,+RK>1e11?+RK:0);
+  const lastOf=w=>S.all().filter(x=>!x.x&&x.a>CUT&&x.w===w&&DK(MXD(x.a))===today()).sort((a,b)=>b.a-a.a)[0];
   let shown=false;
   function render(){
     const mine=lastOf(yo());
@@ -2688,10 +2689,11 @@ function initEditor(){
       const bt=(label,fn,note)=>h('button',{class:'ed-btn',style:'display:block;margin:6px 0',onclick:()=>{fn();markDirty();msg.textContent='Listo: '+note+' Se aplicará cuando toques «Guardar cambios».';msg.className='ed-note ok'}},label);
       body.append(section('🔄 '+sec.t,[
         h('div',{class:'ed-note'},'Vuelve a dejar todo como nuevo en el celular de Ale (y en el tuyo). Los planes, notitas, eventos y fotos no se borran.'),
-        bt('Reiniciar todo',()=>{D.reinicio=String(Date.now())},'vales sin usar, cartas sin abrir, rasca y gana y ruleta listos para usarse otra vez.'),
+        bt('Reiniciar todo',()=>{D.reinicio=String(Date.now())},'vales sin usar, cartas sin abrir, rasca y gana, ruleta y «¿Cómo te sientes hoy?» listos para usarse otra vez.'),
         bt('Reiniciar solo el rasca y gana',()=>{D.rr=Date.now()},'el rasca y gana se podrá raspar otra vez.'),
         bt('Reiniciar solo la ruleta',()=>{D.rq=Date.now()},'todas las opciones de la ruleta vuelven a estar disponibles.'),
-        bt('Reiniciar solo los vales',()=>{D.reinicioVales=Date.now()},'todos los vales vuelven a estar sin usar.'),msg]));
+        bt('Reiniciar solo los vales',()=>{D.reinicioVales=Date.now()},'todos los vales vuelven a estar sin usar.'),
+        bt('Reiniciar solo «¿Cómo te sientes hoy?»',()=>{D.ra=Date.now()},'las caritas vuelven a estar sin elegir para los dos.'),msg]));
       return;
     }
     body.append(section(sec.t, sec.f.map(fd=>field(fd))));
