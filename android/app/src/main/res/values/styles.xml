@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="Tema" parent="@android:style/Theme.Material.NoActionBar">
+    <item name="android:windowBackground">@color/vino</item>
+    <item name="android:statusBarColor">@color/vino</item>
+    <item name="android:navigationBarColor">@color/vino</item>
+    <item name="android:colorAccent">#e85d84</item>
+  </style>
+  <color name="vino">#3b0d1c</color>
+</resources>

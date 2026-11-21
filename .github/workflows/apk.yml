@@ -1,0 +1,44 @@
+name: APK
+on:
+  push:
+    branches: [main]
+    paths: ['android/**', '.github/workflows/apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: apk
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Construir APK
+        working-directory: android
+        env:
+          VC: ${{ github.run_number }}
+        run: gradle assembleRelease --no-daemon --stacktrace 2>&1 | tee build.log
+      - name: Preparar archivo
+        run: cp android/app/build/outputs/apk/release/app-release.apk nuestro-lugar.apk
+      - name: Publicar descarga
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk
+          name: Nuestro lugar (Android)
+          body: App de Android de nuestro lugar 💗
+          files: nuestro-lugar.apk
+          make_latest: true
+      - name: Guardar registro si falla
+        if: failure()
+        run: |
+          mkdir -p /tmp/l && cp android/build.log /tmp/l/ 2>/dev/null || echo "sin log" > /tmp/l/build.log
+          cd /tmp/l && git init -q -b apk-log && git add . && git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm log
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" apk-log

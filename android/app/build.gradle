@@ -1,0 +1,18 @@
+plugins { id 'com.android.application' }
+android {
+  namespace 'com.jon.nuestrolugar'
+  compileSdk 34
+  defaultConfig {
+    applicationId 'com.jon.nuestrolugar'
+    minSdk 24
+    targetSdk 34
+    versionCode Integer.parseInt(System.getenv('VC') ?: '1')
+    versionName '1.' + (System.getenv('VC') ?: '1')
+  }
+  signingConfigs {
+    rel { storeFile file('../keystore.jks'); storePassword 'nuestrolugar'; keyAlias 'nl'; keyPassword 'nuestrolugar' }
+  }
+  buildTypes { release { minifyEnabled false; signingConfig signingConfigs.rel } }
+  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+  lint { abortOnError false; checkReleaseBuilds false }
+}

@@ -1218,9 +1218,17 @@ const AV_TIPOS=window.AV_TIPOS=[['vale','🎟️ Canjea un vale'],['nota','💌 
 const AV_OFF_DEF=window.AV_OFF_DEF={};
 const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'&&AV.notas===false)return false;return !off[t]};
 const AV_LAST={};
+function avisarElla(txt,tipo){
+  if(!AV.ntfyElla||tipo==='entrada')return;
+  let m=txt.split(C.ella+' ').join(C.yo+' ');
+  if(tipo==='pregunta')m='💭 '+C.yo+' ya contestó la pregunta del día · contesta para ver su respuesta';
+  const title=({nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo}[tipo])||'💗 '+C.yo;
+  fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfyElla.trim(),title,message:m,tags:['love_letter'],priority:4})}).catch(()=>{});
+}
 function avisar(txt,tipo){
-  if(!AV.ntfy)return;
   let soyYo=EDIT; try{if(localStorage.getItem('yo-soy')==='yo')soyYo=true}catch(e){}
+  if(soyYo)avisarElla(txt,tipo);
+  if(!AV.ntfy)return;
   if(soyYo&&AV.yo===false)return;
   if(!avOn(tipo))return;
   const gap=({abrazo:1,secreto:1}[tipo]?60*1000:0);
@@ -1451,6 +1459,7 @@ galRender();
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
     try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
+    try{if(window.AndroidApp){window.AndroidApp.relink();return}}catch(e){}
     location.replace(location.pathname);
   };
 })();
@@ -2270,6 +2279,9 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   sh.addEventListener('click',e=>{if(e.target===sh||e.target.classList.contains('btn'))sh.classList.remove('open')});
 })();
 
+/* ====== App de Android: recibe su nombre secreto de avisos ====== */
+try{if(window.AndroidApp&&VIEWER()==='ella')window.AndroidApp.setTopic(AV.ntfyElla||'')}catch(e){}
+
 /* ====== Carta del mes ====== */
 (function(){
   const L=(C.cartasMes||[]).map(o=>({m:parseInt(o.mes)||0,t:FILL(o.titulo),x:o.texto||''})).filter(o=>o.m>0&&o.x.trim()).sort((a,b)=>a.m-b.m);
@@ -2607,6 +2619,7 @@ async function photoBlobURL(p){
   return PHOTO_CACHE[p]=URL.createObjectURL(new Blob([plain],{type:'image/jpeg'}));
 }
 function noKeyScreen(msg){
+  try{if(window.AndroidApp&&!KEY_B64){window.AndroidApp.relink();return}}catch(e){}
   const l=document.getElementById('lock'); if(!l)return;
   l.innerHTML='<div class="lock-ico">💌</div><div class="lock-q">Esta app es privada</div><div class="lock-h" style="max-width:300px;margin:10px auto 0">'+msg+'</div>';
 }
@@ -2813,7 +2826,26 @@ function initEditor(){
         h('button',{class:'ed-btn',onclick:test},'Enviar prueba'),msg,
         (()=>{const cb=h('input',{type:'checkbox'}); cb.checked=A.yo!==false; cb.addEventListener('change',()=>{A.yo=cb.checked;markDirty()});
           return h('label',{class:'ed-lab',style:'display:flex;gap:10px;align-items:center;margin-top:8px'},cb,h('span',{style:'margin:0;font-size:14px;color:#2a0a14;font-weight:700'},'Avisarme también de lo que haga yo (sale con mi nombre)'))})(),
-        h('div',{class:'ed-note',html:'Nota: el texto del aviso (ej. «Ale canjeó un vale: Un masaje») pasa por el servidor de ntfy; el resto de la app sigue cifrado.'})
+        h('div',{class:'ed-note',html:'Nota: el texto del aviso (ej. «Ale canjeó un vale: Un masaje») pasa por el servidor de ntfy; el resto de la app sigue cifrado.'}),
+        (()=>{const t=inp('ntfyElla','toca «Generar» abajo'); const m2=h('div',{class:'ed-note'});
+          const ok=(x,good)=>{m2.textContent=x;m2.className='ed-note '+(good?'ok':'bad')};
+          const gen=h('button',{class:'ed-btn',style:'background:#7a6168',onclick:()=>{const r=[...crypto.getRandomValues(new Uint8Array(15))].map(x=>'abcdefghijkmnpqrstuvwxyz23456789'[x%32]).join('');t.value='al-'+r;A.ntfyElla=t.value;markDirty();ok('Listo. Toca «Guardar cambios»: su app lo toma sola la próxima vez que la abra.',true)}},'Generar');
+          const send=async(title,message)=>{if(!A.ntfyElla){ok('Primero toca «Generar» y guarda.',false);return}
+            try{const r=await fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:A.ntfyElla,title,message,tags:['love_letter'],priority:4})});ok(r.ok?'✅ Enviado. Le llega en unos minutos (la app revisa cada ~15 min).':'No se pudo enviar.',r.ok)}catch(e){ok('No se pudo enviar.',false)}};
+          const cm=h('input',{class:'ed-in',placeholder:'Ej. Te dejé algo en nuestro lugar 💌',maxlength:200});
+          return h('div',{style:'margin-top:18px;padding-top:14px;border-top:1px solid #f0e2dc'},
+            h('div',{class:'ed-flab'},'📱 Notificaciones para '+(D.ella||'Ale')+' (app de Android)'),
+            h('div',{class:'ed-note',html:'Cuando <b>tú</b> le dejas una notita, un mensaje de voz, contestas la pregunta del día, etc., le llega una notificación a su celular a través de la app de Android.'}),
+            h('label',{class:'ed-lab'},h('span',null,'Nombre secreto de sus avisos'),t),gen,
+            h('label',{class:'ed-lab'},h('span',null,'Mandarle un aviso ahora'),cm),
+            h('button',{class:'ed-btn',onclick:()=>{const v=cm.value.trim();if(!v){cm.focus();return}send('💗 '+(D.yo||'Jon'),v).then(()=>{cm.value=''})}},'Enviar aviso'),
+            h('button',{class:'ed-btn',style:'margin-left:6px;background:#7a6168',onclick:()=>send('💌 Prueba','Así te van a llegar los avisos de '+(D.yo||'Jon')+' 💗')},'Enviar prueba'),m2,
+            h('details',{class:'ed-how'},h('summary',null,'¿Cómo instala la app?'),h('ol',{html:
+              '<li>Toca <b>Generar</b> y <b>Guardar cambios</b> (solo la primera vez).</li>'+
+              '<li>Mándale por WhatsApp este link de descarga: <b>github.com/Jonatan-Montiel/ale-meses/releases/latest/download/nuestro-lugar.apk</b></li>'+
+              '<li>Ella lo abre, toca <b>Instalar</b> (Android le pedirá permitir instalar apps de esa fuente).</li>'+
+              '<li>Mándale también su link especial; al abrir la app por primera vez lo pega y listo.</li>'+
+              '<li>Que acepte el permiso de notificaciones.</li>'})))})()
       ]));
       return;
     }
