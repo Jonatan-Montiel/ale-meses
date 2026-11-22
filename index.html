@@ -3238,21 +3238,20 @@ function initEditor(){
           const ok=(x,good)=>{m2.textContent=x;m2.className='ed-note '+(good?'ok':'bad')};
           const gen=h('button',{class:'ed-btn',style:'background:#7a6168',onclick:()=>{const r=[...crypto.getRandomValues(new Uint8Array(15))].map(x=>'abcdefghijkmnpqrstuvwxyz23456789'[x%32]).join('');t.value='al-'+r;A.ntfyElla=t.value;markDirty();ok('Listo. Toca «Guardar cambios»: su app lo toma sola la próxima vez que la abra.',true)}},'Generar');
           const send=async(title,message)=>{if(!A.ntfyElla){ok('Primero toca «Generar» y guarda.',false);return}
-            try{const r=await fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:A.ntfyElla,title,message,tags:['love_letter'],priority:4})});ok(r.ok?'✅ Enviado. Le llega en unos minutos (la app revisa cada ~15 min).':'No se pudo enviar.',r.ok)}catch(e){ok('No se pudo enviar.',false)}};
+            try{const r=await fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:A.ntfyElla,title,message,tags:['love_letter'],priority:4})});ok(r.ok?'✅ Enviado a su celular.':'No se pudo enviar.',r.ok)}catch(e){ok('No se pudo enviar.',false)}};
           const cm=h('input',{class:'ed-in',placeholder:'Ej. Te dejé algo en nuestro lugar 💌',maxlength:200});
           return h('div',{style:'margin-top:18px;padding-top:14px;border-top:1px solid #f0e2dc'},
-            h('div',{class:'ed-flab'},'📱 Notificaciones para '+(D.ella||'Ale')+' (app de Android)'),
-            h('div',{class:'ed-note',html:'Cuando <b>tú</b> le dejas una notita, un mensaje de voz, contestas la pregunta del día, etc., le llega una notificación a su celular a través de la app de Android.'}),
+            h('div',{class:'ed-flab'},'📱 Notificaciones para '+(D.ella||'Ale')+' (app ntfy)'),
+            h('div',{class:'ed-note',html:'Cuando <b>tú</b> le dejas una notita, un mensaje de voz, contestas la pregunta del día, etc., le llega una notificación a su celular por la app <b>ntfy</b> (igual que a ti).'}),
             h('label',{class:'ed-lab'},h('span',null,'Nombre secreto de sus avisos'),t),gen,
             h('label',{class:'ed-lab'},h('span',null,'Mandarle un aviso ahora'),cm),
             h('button',{class:'ed-btn',onclick:()=>{const v=cm.value.trim();if(!v){cm.focus();return}send('💗 '+(D.yo||'Jon'),v).then(()=>{cm.value=''})}},'Enviar aviso'),
             h('button',{class:'ed-btn',style:'margin-left:6px;background:#7a6168',onclick:()=>send('💌 Prueba','Así te van a llegar los avisos de '+(D.yo||'Jon')+' 💗')},'Enviar prueba'),m2,
-            h('details',{class:'ed-how'},h('summary',null,'¿Cómo instala la app?'),h('ol',{html:
-              '<li>Toca <b>Generar</b> y <b>Guardar cambios</b> (solo la primera vez).</li>'+
-              '<li>Mándale por WhatsApp este link de descarga: <b>github.com/Jonatan-Montiel/ale-meses/releases/latest/download/nuestro-lugar.apk</b></li>'+
-              '<li>Ella lo abre, toca <b>Instalar</b> (Android le pedirá permitir instalar apps de esa fuente).</li>'+
-              '<li>Mándale también su link especial; al abrir la app por primera vez lo pega y listo.</li>'+
-              '<li>Que acepte el permiso de notificaciones.</li>'})))})()
+            h('details',{class:'ed-how'},h('summary',null,'¿Qué tiene que hacer '+(D.ella||'Ale')+'?'),h('ol',{html:
+              '<li>Instala la app <b>ntfy</b> (Play Store o App Store, gratis y sin cuenta).</li>'+
+              '<li>Toca <b>＋</b> y escribe <b>exactamente</b> su nombre secreto de arriba. Deja el servidor como viene (ntfy.sh).</li>'+
+              '<li>Acepta el permiso de notificaciones.</li>'+
+              '<li>Tú toca <b>Enviar prueba</b> aquí para confirmar que le llega.</li>'})))})()
       ]));
       return;
     }
