@@ -2658,7 +2658,7 @@ try{if(window.AndroidApp&&VIEWER()==='ella')window.AndroidApp.setTopic(AV.ntfyEl
 (function(){
   const $=id=>document.getElementById(id), cv=$('agCv'), x=cv.getContext('2d'), sec=$('adivina');
   const P=(C.fotos||[]); if(!P.length){sec.hidden=true;return}
-  const LV=[5,8,12,18,28,44,70]; let lv=0, idx=-1, img=null, done=false;
+  const LV=[14,20,28,40,56,80]; let lv=0, idx=-1, img=null, done=false;
   const tmp=document.createElement('canvas');
   function draw(){
     if(!img)return; const W=cv.width,H=cv.height, s=Math.min(img.width,img.height), sx=(img.width-s)/2, sy=(img.height-s)/2;
