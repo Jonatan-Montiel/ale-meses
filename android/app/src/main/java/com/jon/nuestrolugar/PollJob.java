@@ -28,7 +28,7 @@ public class PollJob extends JobService {
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
                 .build();
-        js.schedule(ji);
+        try { js.schedule(ji); } catch (Exception ignored) { }
     }
 
     @Override
