@@ -36,9 +36,21 @@ jobs:
           body: App de Android de nuestro lugar 💗
           files: nuestro-lugar.apk
           make_latest: true
-      - name: Guardar registro si falla
-        if: failure()
+      - name: Activar KVM para el emulador
         run: |
-          mkdir -p /tmp/l && cp android/build.log /tmp/l/ 2>/dev/null || echo "sin log" > /tmp/l/build.log
-          cd /tmp/l && git init -q -b apk-log && git add . && git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm log
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - name: Probar en emulador
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          script: bash android/test-emulador.sh
+      - name: Guardar resultado de la prueba
+        if: always()
+        run: |
+          mkdir -p /tmp/out && cp android/build.log /tmp/out/ 2>/dev/null || true
+          cd /tmp/out && git init -q -b apk-log && git add . && git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "prueba ${{ github.run_number }}"
           git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" apk-log
