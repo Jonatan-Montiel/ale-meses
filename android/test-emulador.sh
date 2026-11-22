@@ -17,9 +17,12 @@ tap_res 'class="android.widget.EditText"'
 sleep 1
 adb shell input text "https://jonatan-montiel.github.io/ale-meses/#k=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 sleep 1
-tap_res 'text="Entrar'
+adb shell input keyevent 66
 sleep 15
 adb exec-out screencap -p > $OUT/2-pagina.png
+# teclear el código del candado de prueba no aplica (clave falsa): solo vemos que cargue la página
+adb shell input keyevent 4
+sleep 2
 adb shell pidof com.jon.nuestrolugar > $OUT/pid.txt 2>&1 || echo "NO CORRE" > $OUT/pid.txt
 adb shell dumpsys jobscheduler com.jon.nuestrolugar | head -40 > $OUT/jobs.txt 2>&1
 adb logcat -d > $OUT/logcat-todo.txt

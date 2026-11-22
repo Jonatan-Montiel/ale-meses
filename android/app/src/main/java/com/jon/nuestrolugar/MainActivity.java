@@ -26,6 +26,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ScrollView;
+import android.view.inputmethod.EditorInfo;
 
 public class MainActivity extends Activity {
     static final String BASE = "https://jonatan-montiel.github.io/ale-meses/";
@@ -93,6 +95,8 @@ public class MainActivity extends Activity {
         } catch (Exception ignored) { }
         Button btn = new Button(this);
         btn.setText("Entrar ♥");
+        e.setImeOptions(EditorInfo.IME_ACTION_GO);
+        e.setOnEditorActionListener((tv, a, ev) -> { btn.performClick(); return true; });
         final TextView err = new TextView(this);
         err.setTextColor(Color.parseColor("#f7c6d3"));
         err.setGravity(Gravity.CENTER);
@@ -109,7 +113,11 @@ public class MainActivity extends Activity {
         l.addView(e, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         l.addView(btn);
         l.addView(err);
-        setContentView(l);
+        ScrollView sv = new ScrollView(this);
+        sv.setFillViewport(true);
+        sv.setBackgroundColor(Color.parseColor("#3b0d1c"));
+        sv.addView(l, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setContentView(sv);
     }
 
     void showWeb(String url) {
