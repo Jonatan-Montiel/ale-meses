@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
     ValueCallback<Uri[]> fileCb;
     PermissionRequest pendingPerm;
     SharedPreferences sp;
+    boolean badLink = false;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -113,6 +114,7 @@ public class MainActivity extends Activity {
         l.addView(e, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         l.addView(btn);
         l.addView(err);
+        if (badLink) err.setText("Ese link no funcionó. Pídele a Jon el link especial y pégalo otra vez 💗");
         ScrollView sv = new ScrollView(this);
         sv.setFillViewport(true);
         sv.setBackgroundColor(Color.parseColor("#3b0d1c"));
@@ -137,6 +139,21 @@ public class MainActivity extends Activity {
                 if (u.toString().startsWith(BASE)) return false;
                 try { startActivity(new Intent(Intent.ACTION_VIEW, u)); } catch (Exception ignored) { }
                 return true;
+            }
+
+            @Override
+            public void onPageFinished(final WebView v, String url) {
+                // Si el link pegado no era el correcto, regresa a la pantalla para pegarlo otra vez.
+                v.postDelayed(() -> {
+                    if (wv != v) return;
+                    v.evaluateJavascript("(document.getElementById('lock')||{}).innerText||''", r -> {
+                        if (r != null && r.contains("link no es correcto")) {
+                            sp.edit().putBoolean("linked", false).apply();
+                            showLinkScreen();
+                            badLink = true;
+                        }
+                    });
+                }, 6000);
             }
         });
         wv.setWebChromeClient(new WebChromeClient() {
