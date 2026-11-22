@@ -43,6 +43,7 @@ public class MainActivity extends Activity {
         }
         Notif.channel(this);
         PollJob.schedule(this);
+        StreamService.start(this);
         if (!sp.getBoolean("linked", false)) showLinkScreen();
         else showWeb(null);
     }
@@ -50,8 +51,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Lo que llegue mientras la app está abierta ya lo ve en la página: no se repite como notificación.
-        sp.edit().putString("since", String.valueOf(System.currentTimeMillis() / 1000)).apply();
+        Notif.appVisible = true; // lo que llegue mientras la ve, ya lo ve en la página
+    }
+
+    @Override
+    protected void onPause() {
+        Notif.appVisible = false;
+        super.onPause();
     }
 
     void showLinkScreen() {
@@ -185,13 +191,18 @@ public class MainActivity extends Activity {
     class Bridge {
         @JavascriptInterface
         public void setTopic(String t) {
-            sp.edit().putString("topic", t == null ? "" : t.trim()).apply();
+            String nt = t == null ? "" : t.trim();
+            boolean changed = !nt.equals(sp.getString("topic", ""));
+            sp.edit().putString("topic", nt).apply();
             PollJob.schedule(MainActivity.this);
+            if (changed) stopService(new Intent(MainActivity.this, StreamService.class));
+            StreamService.start(MainActivity.this);
         }
 
         @JavascriptInterface
         public void relink() {
             sp.edit().clear().apply();
+            stopService(new Intent(MainActivity.this, StreamService.class));
             runOnUiThread(MainActivity.this::showLinkScreen);
         }
 

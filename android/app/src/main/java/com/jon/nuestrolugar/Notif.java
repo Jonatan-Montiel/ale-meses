@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
+import android.content.SharedPreferences;
+import org.json.JSONObject;
 
 class Notif {
     static final String CH = "avisos";
@@ -21,6 +23,23 @@ class Notif {
             NotificationManager nm = c.getSystemService(NotificationManager.class);
             if (nm != null) nm.createNotificationChannel(ch);
         }
+    }
+
+    static volatile boolean appVisible = false;
+
+    /** Muestra un aviso de ntfy una sola vez (aunque llegue por la conexión y por la revisión periódica). */
+    static synchronized void fromNtfy(Context c, JSONObject o) {
+        SharedPreferences sp = c.getSharedPreferences("nl", Context.MODE_PRIVATE);
+        String id = o.optString("id", "");
+        String seen = sp.getString("seen", "");
+        if (!id.isEmpty() && ("," + seen + ",").contains("," + id + ",")) return;
+        String nseen = (id + "," + seen);
+        if (nseen.length() > 600) nseen = nseen.substring(0, 600);
+        sp.edit().putString("seen", nseen).putString("since", id.isEmpty() ? String.valueOf(System.currentTimeMillis() / 1000) : id).apply();
+        if (appVisible) return; // ya lo está viendo en la página
+        String title = o.optString("title", "");
+        if (title.isEmpty()) title = "💗 Nuestro lugar";
+        show(c, id.hashCode(), title, o.optString("message", ""));
     }
 
     static void show(Context c, int id, String title, String msg) {

@@ -56,22 +56,17 @@ public class PollJob extends JobService {
         HttpURLConnection h = (HttpURLConnection) u.openConnection();
         h.setConnectTimeout(15000);
         h.setReadTimeout(25000);
-        String last = null;
-        int n = 0;
         try (BufferedReader r = new BufferedReader(new InputStreamReader(h.getInputStream(), "UTF-8"))) {
             String line;
             while ((line = r.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 JSONObject o = new JSONObject(line);
                 if (!"message".equals(o.optString("event"))) continue;
-                last = o.optString("id", null);
-                String title = o.optString("title", "");
-                if (title.isEmpty()) title = "💗 Nuestro lugar";
-                Notif.show(c, (int) (o.optLong("time") % 100000) * 10 + (n++ % 10), title, o.optString("message", ""));
+                Notif.fromNtfy(c, o);
             }
         } finally {
             h.disconnect();
         }
-        if (last != null) sp.edit().putString("since", last).apply();
+        StreamService.start(c);
     }
 }
