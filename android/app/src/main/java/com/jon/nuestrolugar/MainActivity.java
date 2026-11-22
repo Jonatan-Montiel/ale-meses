@@ -149,8 +149,8 @@ public class MainActivity extends Activity {
                     v.evaluateJavascript("(document.getElementById('lock')||{}).innerText||''", r -> {
                         if (r != null && r.contains("link no es correcto")) {
                             sp.edit().putBoolean("linked", false).apply();
-                            showLinkScreen();
                             badLink = true;
+                            showLinkScreen();
                         }
                     });
                 }, 6000);
