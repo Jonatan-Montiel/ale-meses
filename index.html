@@ -384,6 +384,7 @@
   .nb-who{text-align:center;margin:-2px 0 10px;font-size:14px}
   .nb-who button{margin:6px 4px 0;border:1px solid rgba(247,198,211,.4);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:9px 16px;font:700 14px 'Nunito';cursor:pointer}
   .hoy-new[hidden],.nb-pill[hidden]{display:none!important}
+  .pend-pill{position:fixed;right:14px;bottom:86px;z-index:45;border:0;border-radius:999px;padding:10px 15px;font:800 14px 'Nunito';color:#fff;background:linear-gradient(135deg,var(--gold),var(--rose));box-shadow:0 10px 22px -6px rgba(0,0,0,.5);cursor:pointer;animation:pop .5s cubic-bezier(.2,.9,.3,1.3)}
   .hoy-pend{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:10px}
   .hoy-pend button{background:rgba(255,255,255,.12);border:1px solid rgba(247,198,211,.4);color:#fff;border-radius:999px;padding:9px 16px;font:800 14px 'Nunito';cursor:pointer}
   .hoy-new{margin:18px auto 0;display:block;background:rgba(255,255,255,.12);border:1px solid var(--gold);color:#fff;border-radius:999px;padding:11px 18px;font:800 15px 'Nunito';cursor:pointer;animation:beat 1.6s ease-in-out infinite}
@@ -1744,7 +1745,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|hoy-visto|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     try{if(window.AndroidApp){window.AndroidApp.relink();return}}catch(e){}
     location.replace(location.pathname);
@@ -1815,7 +1816,14 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   document.getElementById('hoySign').textContent=SIGN;
   let shown=false;
   const close=()=>{if(!ov.classList.contains('open'))return;ov.classList.add('out');setTimeout(()=>{ov.classList.remove('open','out');window.dispatchEvent(new Event('hoyClosed'))},480)};
-  window.addEventListener('unlocked',()=>{if(VIEWER()!=='yo')avisar(`👀 ${C.ella} entró a nuestra app`,'entrada');if(shown)return;shown=true;setTimeout(()=>{ov.classList.add('open');burst(35)},500)});
+  window.addEventListener('unlocked',()=>{if(VIEWER()!=='yo')avisar(`👀 ${C.ella} entró a nuestra app`,'entrada');if(shown)return;shown=true;
+    // la pantalla del mensaje sale solo la primera vez de cada día
+    const k=DK(MXD()); let seen=''; try{seen=localStorage.getItem('hoy-visto')||''}catch(e){}
+    if(seen===k){setTimeout(()=>{const n=(window.PEND?PEND.all().length:0)+(document.getElementById('hoyNew').hidden?0:1);if(!n)return;
+      const p=document.createElement('button');p.className='pend-pill';p.textContent='🔔 '+(n===1?'Tienes 1 pendiente':'Tienes '+n+' pendientes');
+      p.onclick=()=>{p.remove();ov.classList.add('open')};document.body.append(p)},900);return}
+    try{localStorage.setItem('hoy-visto',k)}catch(e){}
+    setTimeout(()=>{ov.classList.add('open');burst(35)},500)});
   document.getElementById('hoyBtn').onclick=close;
   ov.addEventListener('click',e=>{if(e.target===ov)close()});
 })();
