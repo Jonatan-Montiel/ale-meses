@@ -305,6 +305,38 @@
   .ed-foot{padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #f0e2dc;background:#fffaf7}
   .ed-status{font-size:13px;min-height:18px;margin-bottom:8px;color:#7a6168}
   .ed-status.ok{color:#0f8a5f}.ed-status.bad{color:#c0263f}
+  /* Editor con el estilo de la página */
+  .ed-panel{background:radial-gradient(120% 60% at 50% 0%,#5a1430 0%,#2a0a18 60%,#1a050e 100%)!important;color:var(--cream)!important;border-left:1px solid rgba(247,198,211,.18)}
+  .ed-head{border-bottom:1px solid rgba(247,198,211,.15)!important}
+  .ed-title{font:600 24px 'Fraunces',serif!important;color:#fff}.ed-subt{color:var(--blush)!important;opacity:.85}
+  .ed-x{color:var(--blush)!important}
+  .ed-help{background:rgba(255,255,255,.06)!important;border:1px solid rgba(247,198,211,.2)!important;color:var(--cream)}
+  .ed-jump{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}.ed-jump::-webkit-scrollbar{display:none}
+  .ed-jump button{flex:none;border:1px solid rgba(247,198,211,.3);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:7px 12px;font:700 12.5px 'Nunito';cursor:pointer;white-space:nowrap}
+  .ed-group{font:600 20px 'Fraunces',serif;color:#fff;margin:22px 0 6px;padding:10px 12px;border-radius:14px;background:linear-gradient(135deg,rgba(232,93,132,.28),rgba(179,32,79,.18));border:1px solid rgba(247,198,211,.2)}
+  .ed-sec{border:1px solid rgba(247,198,211,.14)!important;border-radius:16px;margin:8px 0;padding:0 12px;background:rgba(255,255,255,.04)}
+  .ed-sec-h{color:var(--cream)!important;font:700 15px 'Nunito'!important}
+  .ed-sec-h i{color:var(--gold)!important}
+  .ed-lab>span,.ed-flab{color:var(--blush)!important}
+  .ed-panel .ed-in{background:rgba(255,255,255,.07)!important;border:1.5px solid rgba(247,198,211,.25)!important;color:#fff!important;color-scheme:dark}
+  .ed-panel .ed-in::placeholder{color:rgba(255,255,255,.4)}
+  .ed-panel .ed-in:focus{border-color:var(--rose)!important;box-shadow:0 0 0 3px rgba(232,93,132,.25)!important}
+  .ed-tool{background:rgba(255,255,255,.08)!important;border:1px solid rgba(247,198,211,.25)!important;color:var(--cream)!important}
+  .ed-tool:last-child{color:#ff8fab!important}
+  .ed-card{background:rgba(255,255,255,.05)!important;border:1.5px solid rgba(247,198,211,.18)!important}
+  .ed-card-tools{color:rgba(247,198,211,.7)!important}
+  .ed-add{background:rgba(232,93,132,.1)!important;border-color:var(--rose)!important;color:#ffb3c6!important}
+  .ed-btn{background:linear-gradient(135deg,var(--rose),#b3204f)!important;color:#fff!important;border-radius:999px!important}
+  .ed-note{color:rgba(255,247,240,.75)!important}.ed-note.ok{color:#7be0a2!important}.ed-note.bad{color:#ff8fab!important}
+  .ed-how{color:rgba(255,247,240,.8)!important}.ed-how summary,.ed-how a{color:var(--blush)!important}
+  .ed-ph{background:rgba(255,255,255,.06)!important}.ed-ph.add{background:rgba(255,255,255,.04)!important;border-color:rgba(247,198,211,.35)!important;color:var(--blush)!important}
+  .ed-foot{background:#1a050e!important;border-top:1px solid rgba(247,198,211,.15)!important}
+  .ed-status{color:var(--blush)!important}.ed-status.ok{color:#7be0a2!important}.ed-status.bad{color:#ff8fab!important}
+  .ed-save{background:linear-gradient(135deg,var(--rose),#b3204f)!important;box-shadow:0 8px 20px rgba(179,32,79,.45)!important}
+  .ed-panel span[style*="#2a0a14"]{color:var(--cream)!important}
+  .ed-panel [style*="border-top:1px solid #f0e2dc"]{border-top-color:rgba(247,198,211,.15)!important}
+  .ed-panel input[type=checkbox]{accent-color:var(--rose);width:18px;height:18px}
+  .ed-fab{background:linear-gradient(135deg,var(--rose),#b3204f)!important;color:#fff!important}
   .ed-save{width:100%;background:#c9304e;color:#fff;border:0;border-radius:999px;padding:15px;font:800 16px 'Nunito',sans-serif;cursor:pointer;box-shadow:0 8px 20px rgba(201,48,78,.3)}
   .ed-save:disabled{opacity:.6}
   /* Kanban */
@@ -387,7 +419,21 @@
   .bell{position:fixed;top:12px;left:12px;z-index:44;width:44px;height:44px;border-radius:50%;border:1px solid rgba(247,198,211,.3);background:rgba(30,6,16,.65);font-size:20px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35)}
   .bell b{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:999px;background:var(--rose);color:#fff;font:800 11.5px/20px 'Nunito';padding:0 5px;display:none}
   .bell.has b{display:block}.bell.has{animation:beat 2.4s ease-in-out infinite}
-  body.locked .bell,body:has(#hoyOv.open) .bell,body:has(.an-ov) .bell{display:none}
+  body.locked .bell,body:has(#hoyOv.open) .bell,body:has(.an-ov) .bell,body:has(.pend-ov.open) .bell{display:none}
+  .pend-ov{position:fixed;inset:0;z-index:62;background:rgba(10,2,6,.7);display:none;align-items:flex-start;justify-content:center;padding:14px}
+  .pend-ov.open{display:flex;animation:fadeIn .25s}
+  .pend-box{width:100%;max-width:520px;max-height:calc(100vh - 28px);overflow:auto;background:radial-gradient(120% 60% at 50% 0%,#6b1838,#2a0a18 70%);border:1px solid rgba(247,198,211,.2);border-radius:24px;padding:18px 16px 20px;box-shadow:0 20px 50px rgba(0,0,0,.6);animation:pop .45s cubic-bezier(.2,.9,.3,1.3)}
+  .pend-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+  .pend-h h3{font:600 26px 'Fraunces',serif;color:#fff}.pend-h p{font-family:'Caveat',cursive;font-size:21px;color:var(--blush)}
+  .pend-x{background:none;border:0;color:var(--blush);font-size:30px;line-height:1;cursor:pointer}
+  .pend-l{display:grid;gap:10px}
+  .pend-i{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.2);border-radius:16px;padding:12px 14px;color:var(--cream);font:700 14.5px 'Nunito';cursor:pointer}
+  .pend-i:active{transform:scale(.98)}
+  .pend-e{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:21px;background:rgba(232,93,132,.25)}
+  .pend-t{flex:1;line-height:1.35}
+  .pend-go{flex:none;font-size:12.5px;color:var(--gold);font-weight:800}
+  .pend-empty{text-align:center;padding:26px 10px;font-size:15px;opacity:.85;line-height:1.5}.pend-empty div{font-size:46px;margin-bottom:6px}
+  body.light .pend-box{background:#fff7f3;color:#3d1f2a}body.light .pend-h h3{color:#3d1f2a}body.light .pend-i{background:#fff;color:#3d1f2a;border-color:rgba(120,40,70,.12)}
   body.light .bell{background:#fff;border-color:rgba(120,40,70,.15)}
   .hoy-pend{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:10px}
   .hoy-pend button{background:rgba(255,255,255,.12);border:1px solid rgba(247,198,211,.4);color:#fff;border-radius:999px;padding:9px 16px;font:800 14px 'Nunito';cursor:pointer}
@@ -1540,7 +1586,7 @@ function SHARED(file,field,LK,max,onChange){
   setTimeout(refresh,400); document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
   return {all:()=>L, add(x){L.push(x);keep();onChange();sync()}, save(){keep();onChange();sync()}};
 }
-const PEND=window.PEND=(()=>{const m={},subs=[];return {set(k,v){if(v&&v.n)m[k]=v;else delete m[k];subs.forEach(f=>{try{f()}catch(e){}})},all:()=>Object.values(m),on:f=>subs.push(f)}})();
+const PEND=window.PEND=(()=>{const m={},subs=[];return {set(k,v){if(v&&v.n)m[k]=Object.assign({k},v);else delete m[k];subs.forEach(f=>{try{f()}catch(e){}})},all:()=>Object.values(m),on:f=>subs.push(f)}})();
 const ELLA_PREF=(()=>{let off={};const subs=[];
   const S=SHARED('prefs.bin','p','prefs-cache',20,()=>{const x=S.all().find(y=>y.id==='ella');off=(x&&x.off)||{};subs.forEach(f=>{try{f()}catch(e){}})});
   {const x=S.all().find(y=>y.id==='ella');off=(x&&x.off)||{}}
@@ -2442,6 +2488,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const locked=document.body.classList.contains('locked')||document.getElementById('hoyOv').classList.contains('open');
     pill.textContent=txt; pill.hidden=!n||locked||buzonVis;
     hoyNew.textContent=txt?txt+' → leer':''; hoyNew.hidden=!n;
+    PEND.set('notas',{n,t:txt,go:goBuzon});
     list.querySelectorAll('.nb-m.them').forEach(e=>e.classList.remove('new'));
   }
   hoyNew.onclick=()=>{document.getElementById('hoyBtn').click();setTimeout(goBuzon,520)};
@@ -2987,13 +3034,25 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
 (function(){
   const P=document.getElementById('hoyPend'), ov=document.getElementById('hoyOv');
   const bell=document.createElement('button'); bell.className='bell'; bell.setAttribute('aria-label','Pendientes'); bell.innerHTML='🔔<b></b>'; document.body.append(bell);
-  bell.onclick=()=>{ov.dataset.bell=1;ov.classList.add('open')};
-  window.addEventListener('bellClosed',count);
-  function count(){const n=PEND.all().length+(document.getElementById('hoyNew').hidden?0:1);bell.querySelector('b').textContent=n||'';bell.classList.toggle('has',n>0)}
+  const ps=document.createElement('div'); ps.className='pend-ov'; document.body.append(ps);
+  function openList(){
+    const L=PEND.all();
+    ps.innerHTML=`<div class="pend-box"><div class="pend-h"><div><h3>🔔 Pendientes</h3><p>${L.length?(L.length===1?'tienes 1 cosa esperándote':'tienes '+L.length+' cosas esperándote'):'todo al día'}</p></div><button class="pend-x" aria-label="Cerrar">×</button></div><div class="pend-l"></div></div>`;
+    const l=ps.querySelector('.pend-l');
+    if(!L.length)l.innerHTML='<div class="pend-empty"><div>💗</div>No tienes nada pendiente.<br>Todo está al día.</div>';
+    L.forEach(v=>{const b=document.createElement('button');b.className='pend-i';const t=String(v.t||'');const m=t.match(/^(\S+)\s(.*)$/);
+      b.innerHTML=`<span class="pend-e">${esc(m?m[1]:'🔔')}</span><span class="pend-t">${esc(m?m[2]:t)}</span><span class="pend-go">Ver →</span>`;
+      b.onclick=()=>{ps.classList.remove('open');setTimeout(()=>v.go&&v.go(),250)};l.append(b)});
+    ps.querySelector('.pend-x').onclick=()=>ps.classList.remove('open');
+    ps.classList.add('open');
+  }
+  ps.addEventListener('click',e=>{if(e.target===ps)ps.classList.remove('open')});
+  bell.onclick=openList;
+  function count(){const n=PEND.all().length;bell.querySelector('b').textContent=n||'';bell.classList.toggle('has',n>0)}
   setInterval(count,2000); window.addEventListener('hoyClosed',count); window.addEventListener('unlocked',()=>setTimeout(count,800));
   function render(){
     if(!P)return; P.innerHTML='';
-    PEND.all().forEach(v=>{const b=document.createElement('button');b.textContent=v.t+' →';
+    PEND.all().filter(v=>v.k!=='notas').forEach(v=>{const b=document.createElement('button');b.textContent=v.t+' →';
       b.onclick=()=>{document.getElementById('hoyBtn').click();setTimeout(()=>v.go&&v.go(),520)};P.append(b)});
   }
   PEND.on(render); render();
@@ -3557,9 +3616,11 @@ let CUR=null;
    EDITOR
    ===================================================================== */
 const SCHEMA=[
+  {g:'⚙️ General'},
   {t:'Página inactiva',special:'inactiva'},
   {t:'Nombres, fecha y candado',f:[['ella','Su nombre','text'],['yo','Tu nombre (firma)','text'],['inicio','Fecha en que empezó todo','date'],['pin','Código del candado (4 números)','text']]},
   {t:'Saludos según la hora',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
+  {g:'🏠 Inicio'},
   {t:'Mensaje del día',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2],['mensajesDia','Frases (cambia una cada día)','list']]},
   {t:'Cumpleaños de Ale',f:[['cumple','Fecha de su cumpleaños (el año no importa)','date'],['cartaCumple','Carta de cumpleaños (se abre solo ese día) · deja una línea vacía entre párrafos','textarea',8]]},
   {t:'Cumpleaños de Jon',f:[['cumpleYo','Tu fecha de cumpleaños (el año no importa)','date']]},
@@ -3567,27 +3628,32 @@ const SCHEMA=[
   {t:'Racha de visitas',f:[['racha','Premios por días seguidos','objlist',[['dias','Días seguidos (número)','text'],['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
   {t:'¿Cómo te sientes hoy?',f:[['animo','Caritas y lo que le respondes','objlist',[['emoji','Emoji','text'],['nombre','Cómo se siente','text'],['respuesta','Lo que le respondes','textarea',2]]]]},
   {t:'Pregunta del día',f:[['preguntas','Preguntas (sale una distinta cada día, en orden)','list']]},
+  {t:'Frase final y mensajitos',f:[['fraseFinal','Frase final · *palabra* = cursiva rosa','textarea',3],['mensajitos','Mensajitos del botón «un poquito más de amor»','list']]},
+  {t:'WhatsApp',f:[['whatsapp.numero','Tu número (con lada, ej. 5255…)','text'],['whatsapp.mensajes','Botones','objlist',[['emoji','Emoji','text'],['boton','Texto del botón','text'],['mensaje','Mensaje que se envía','textarea',2]]]]},
+  {g:'💑 Nosotros'},
   {t:'Nuestra canción',f:[['cancion.titulo','Título','text'],['cancion.artista','Artista','text'],['cancion.link','Link (Spotify, YouTube…)','text']]},
+  {t:'Fotos',f:[['fotos','Galería (también se usan en el memorama y los créditos)','photos'],['polaroidTexto','Texto al revelar la polaroid (la foto sale al azar)','text'],['fotoRompecabezas','Número de foto para el rompecabezas','number']]},
+  {t:'El cielo de esa noche',f:[['horaCielo','Hora del cielo (el día que empezó todo)','time']]},
+  {t:'Sorpresas de cada mes',f:[['sorpresas','Sorpresas con fecha','objlist',[['emoji','Emoji','text'],['nombre','Nombre en la tarjeta (ej. 9 meses)','text'],['fecha','Se abre el','date'],['titulo','Título','text'],['texto','Mensaje','textarea']]],['sorpresasExtra','Sorpresas automáticas para los meses siguientes','objlist',[['emoji','Emoji','text'],['texto','Mensaje','textarea']]]]},
+  {t:'Cápsula del tiempo',f:[['capsula.fecha','Se abre el','date'],['capsula.texto','Mensaje','textarea',8]]},
+  {t:'Créditos de película',f:[['creditos','Créditos','objlist',[['rol','Rol','text'],['quien','Quién / qué','text']]]]},
+  {g:'💌 Cartas'},
   {t:'Carta principal',f:[['carta','Texto · deja una línea vacía entre párrafos','textarea',10]]},
   {t:'Carta de cada mes',f:[['cartasMes','Cartas (se abre cada una el día 12 de ese mes)','objlist',[['mes','Meses que cumplimos (número)','text'],['titulo','Título','text'],['texto','Carta · deja una línea vacía entre párrafos','textarea',8]]]]},
   {t:'Ábrela cuando…',f:[['abrela','Cartas','objlist',[['emoji','Emoji','text'],['cuando','Ábrela cuando…','text'],['texto','Texto de la carta','textarea']]]]},
   {t:'Carta que se escribe sola',f:[['cartaSola','Texto','textarea',9]]},
-  {t:'Fotos',f:[['fotos','Galería (también se usan en el memorama y los créditos)','photos'],['polaroidTexto','Texto al revelar la polaroid (la foto sale al azar)','text'],['fotoRompecabezas','Número de foto para el rompecabezas','number']]},
   {t:'Razones por las que te quiero',f:[['razones','Razones','list']]},
   {t:'Galleta de la fortuna',f:[['fortunas','Mensajes de la galleta','list']]},
+  {t:'Mensaje secreto (easter egg)',f:[['secreto','Texto','textarea',4]]},
+  {g:'🎮 Juegos'},
   {t:'Rasca y gana',f:[['rascaPremios','Premios (sale uno al azar y solo se puede raspar una vez)','objlist',[['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
   {t:'Vales de amor',f:[['vales','Vales','objlist',[['emoji','Emoji','text'],['titulo','Vale por…','text'],['detalle','Detalle','text']]]]},
   {t:'Ruleta de citas',f:[['ruleta','Opciones (máximo 12)','list']]},
-  {t:'Reto de la semana',f:[['retos','Retos (sale uno distinto cada lunes, en orden)','list']]},
   {t:'Rueda de la comida',f:[['comida','Opciones (máximo 12)','list']]},
+  {g:'📝 Planes'},
+  {t:'Reto de la semana',f:[['retos','Retos (sale uno distinto cada lunes, en orden)','list']]},
   {t:'Planes, fotos, vales, notitas y eventos de Ale',special:'kanban'},
-  {t:'El cielo de esa noche',f:[['horaCielo','Hora del cielo (el día que empezó todo)','time']]},
-  {t:'Sorpresas de cada mes',f:[['sorpresas','Sorpresas con fecha','objlist',[['emoji','Emoji','text'],['nombre','Nombre en la tarjeta (ej. 9 meses)','text'],['fecha','Se abre el','date'],['titulo','Título','text'],['texto','Mensaje','textarea']]],['sorpresasExtra','Sorpresas automáticas para los meses siguientes','objlist',[['emoji','Emoji','text'],['texto','Mensaje','textarea']]]]},
-  {t:'Cápsula del tiempo',f:[['capsula.fecha','Se abre el','date'],['capsula.texto','Mensaje','textarea',8]]},
-  {t:'Mensaje secreto (easter egg)',f:[['secreto','Texto','textarea',4]]},
-  {t:'Frase final y mensajitos',f:[['fraseFinal','Frase final · *palabra* = cursiva rosa','textarea',3],['mensajitos','Mensajitos del botón «un poquito más de amor»','list']]},
-  {t:'Créditos de película',f:[['creditos','Créditos','objlist',[['rol','Rol','text'],['quien','Quién / qué','text']]]]},
-  {t:'WhatsApp',f:[['whatsapp.numero','Tu número (con lada, ej. 5255…)','text'],['whatsapp.mensajes','Botones','objlist',[['emoji','Emoji','text'],['boton','Texto del botón','text'],['mensaje','Mensaje que se envía','textarea',2]]]]},
+  {g:'🔧 Ajustes'},
   {t:'Avisos a tu celular',special:'avisos'},
   {t:'Respaldo y tokens',special:'respaldo'},
   {t:'Reiniciar',special:'reset'},
@@ -3626,6 +3692,7 @@ function initEditor(){
 
   // Ayuda de comodines
   if(!KEY_B64) body.append(h('div',{class:'ed-help',html:'⚠️ Abre esta página con tu link de edición completo (el que trae <b>#k=…</b>) para poder guardar.'}));
+  body.append(h('div',{class:'ed-jump'},...SCHEMA.filter(x=>x.g).map(x=>h('button',{onclick:()=>{const e=document.getElementById('edg-'+x.g.replace(/[^a-záéíóúñ]/gi,''));if(e)body.scrollTo({top:e.offsetTop-8,behavior:'smooth'})}},x.g))));
   body.append(h('div',{class:'ed-help',html:'Puedes escribir <b>{ella}</b>, <b>{yo}</b>, <b>{meses}</b> (ej. «8 meses»), <b>{Meses}</b> (ej. «Ocho meses») y <b>{toques}</b>: se actualizan solos cada mes.'}));
 
   // Conexión GitHub
@@ -3661,10 +3728,11 @@ function initEditor(){
       '<li>En <b>Permissions → Repository permissions → Contents</b> elige <b>Read and write</b>.</li>'+
       '<li>Toca <b>Generate token</b>, cópialo y pégalo aquí.</li>'}))
   ], !ghToken());
-  body.append(conSec);
+  
 
   // Secciones de contenido
   SCHEMA.forEach(sec=>{
+    if(sec.g){const gid='edg-'+sec.g.replace(/[^a-záéíóúñ]/gi,'');body.append(h('div',{class:'ed-group',id:gid},sec.g));return}
     if(sec.special==='inactiva'){
       const st=h('div',{class:'ed-note'});
       const tg=h('button',{class:'ed-btn',style:'display:block;margin:6px 0'});
@@ -3870,6 +3938,7 @@ function initEditor(){
     }
     body.append(section(sec.t, sec.f.map(fd=>field(fd))));
   });
+  body.append(conSec);
 
   function section(title,kids,open){
     const key='ed-sec-'+title;
