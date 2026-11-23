@@ -66,6 +66,7 @@ public class MainActivity extends Activity {
     /** Jon abre la página con el editor; Ale la abre normal. */
     // Copia de la página en otro servidor por si la compañía de celular no llega a GitHub
     static final String MIRROR = "https://ale-meses.vercel.app/";
+    long vc() { try { android.content.pm.PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0); return Build.VERSION.SDK_INT >= 28 ? pi.getLongVersionCode() : pi.versionCode; } catch (Exception e) { return 0; } }
     String base() { String h = sp == null ? BASE : sp.getString("host", BASE); return MIRROR.equals(h) ? MIRROR : BASE; }
     String other() { return BASE.equals(base()) ? MIRROR : BASE; }
     String home() { return home(base()); }

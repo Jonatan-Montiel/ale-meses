@@ -40,6 +40,14 @@ jobs:
             nuestro-lugar.apk
             nuestro-lugar-jon.apk
           make_latest: true
+      - name: Publicar copia para descargar desde Vercel (dl/)
+        run: |
+          git config user.name ci && git config user.email ci@users.noreply.github.com
+          git fetch -q origin main && git checkout -q -B pub origin/main
+          mkdir -p dl && cp nuestro-lugar.apk nuestro-lugar-jon.apk dl/ && echo '{"vc":${{ github.run_number }}}' > dl/version.json
+          git add dl && git commit -qm "App v${{ github.run_number }} lista para descargar"
+          for i in 1 2 3 4; do git push -q origin pub:main && break; sleep 5; git fetch -q origin main && git rebase -q origin/main; done
+          git checkout -q ${{ github.sha }}
       - name: Activar KVM para el emulador
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules

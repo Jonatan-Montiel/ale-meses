@@ -29,5 +29,6 @@ sleep 2
 adb shell pidof com.jon.nuestrolugar > $OUT/pid.txt 2>&1 || echo "NO CORRE" > $OUT/pid.txt
 adb shell dumpsys jobscheduler com.jon.nuestrolugar | head -40 > $OUT/jobs.txt 2>&1
 adb logcat -d > $OUT/logcat-todo.txt
+grep "NLUpd" $OUT/logcat-todo.txt > $OUT/updater.txt
 grep -E "AndroidRuntime|FATAL|nuestrolugar|chromium|Console" $OUT/logcat-todo.txt | grep -v "WindowManager" | head -200 > $OUT/errores.txt
 exit 0
