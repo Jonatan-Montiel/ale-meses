@@ -437,12 +437,26 @@
   .nite b{font-family:'Fraunces',serif;font-size:18px;display:block}
   .nite p{font-size:14px;opacity:.9;margin-top:4px}
   .nite button{margin-top:8px;background:none;border:1px solid rgba(207,200,255,.35);color:inherit;border-radius:999px;padding:5px 12px;font:700 11.5px 'Nunito';cursor:pointer}
+  .tm{text-align:center;padding:18px 18px 14px;border:1px solid rgba(122,167,255,.45)!important}
+  .tm-h,.tm-o .tm-h{font:800 11.5px 'Nunito';letter-spacing:.07em;text-transform:uppercase;opacity:.85;margin-bottom:8px}
+  .tm-h i,.dt-tag i{font-style:normal;opacity:.75;text-transform:none;letter-spacing:0;font-weight:600}
+  .dt-seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+  .dt-seg button{border-radius:18px;padding:12px 8px;cursor:pointer;color:#fff;font:800 14.5px 'Nunito';background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.14);line-height:1.25}
+  .dt-seg button small{display:block;font:600 11.5px 'Nunito';opacity:.8;margin-top:3px}
+  .dt-seg button.in.cur{background:rgba(232,93,132,.28);border-color:var(--rose)}
+  .dt-seg button.out.cur{background:rgba(122,167,255,.22);border-color:#7aa7ff}
+  .dt-ban{margin-top:12px;border-radius:14px;padding:10px 12px;font-size:13.5px;text-align:center}
+  .dt-ban.in{background:rgba(232,93,132,.14);border:1px dashed rgba(232,93,132,.6)}
+  .dt-ban.out{background:rgba(122,167,255,.12);border:1px dashed rgba(122,167,255,.65)}
+  .dt-tag{display:inline-block;font:800 11px 'Nunito';border-radius:999px;padding:3px 9px;margin-bottom:6px}
+  .dt-tag.in{background:#fde3ea;color:#b3204f}.dt-tag.out{background:#e3ecff;color:#2d4fa3}
+  body.light .dt-seg button{color:#3d1f2a;background:#fff}
   .tm{text-align:center;padding:18px 18px 14px}
   .tm-e{font-size:48px;line-height:1}
   .tm-v{font:800 30px 'Nunito';margin:6px 0 10px}
   .tm input[type=range]{width:100%;accent-color:var(--rose);height:28px}
   .tm-st{font-size:12.5px;opacity:.7;min-height:16px;margin-top:4px}
-  .tm-o{margin-top:12px;text-align:center;padding:14px}
+  .tm-o{margin-top:12px;text-align:center;padding:14px;border:1px solid rgba(232,93,132,.55)!important}
   .tm-o .bar{height:10px;border-radius:10px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:8px}
   .tm-o .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--rose));border-radius:10px}
   .dt-hoy{background:linear-gradient(160deg,rgba(233,184,114,.22),rgba(232,93,132,.16));border:1px solid rgba(233,184,114,.45);border-radius:20px;padding:14px 16px;margin-bottom:12px;text-align:center}
@@ -1035,6 +1049,7 @@
     <h2>¿Cuánto me extrañas hoy?</h2>
     <div class="sub">desliza y le llega al instante 🌡️</div>
     <div class="card tm">
+      <div class="tm-h" id="tmH"></div>
       <div class="tm-e" id="tmE">🙂</div>
       <div class="tm-v"><b id="tmV">50</b>%</div>
       <input type="range" id="tmR" min="0" max="100" step="5" value="50" aria-label="Cuánto extrañas">
@@ -1056,7 +1071,8 @@
   <section id="detalles">
     <h2>Detalles</h2>
     <div class="sub" id="dtSub">cositas que nos dejamos el uno al otro 💝</div>
-    <div class="cm-chips" id="dtWho"></div>
+    <div class="dt-seg" id="dtWho"></div>
+    <div class="dt-ban" id="dtBan"></div>
     <div class="cm-chips pj-tabs" id="dtTabs"></div>
     <div id="dtBox" style="margin-top:14px"></div>
     <div class="kb-st" id="dtSt"></div>
@@ -1905,7 +1921,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|data-cache|detalles-cache|pend-quitados|actividad-cache|act-visto|act-desde|insignias-cache|insig-init|hoy-visto|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|data-cache|dt-visto-|detalles-cache|pend-quitados|actividad-cache|act-visto|act-desde|insignias-cache|insig-init|hoy-visto|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     try{if(window.AndroidApp){window.AndroidApp.relink();return}}catch(e){}
     location.replace(location.pathname);
@@ -2730,9 +2746,10 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const mine=today(me), o=today(oth), r=$('tmR');
     if(document.activeElement!==r&&mine)r.value=mine.v;
     $('tmV').textContent=r.value; $('tmE').textContent=E(+r.value);
-    $('tmSt').textContent=mine?`le dijiste a ${nm(oth)} que lo extrañas ${mine.v}% hoy`.replace('lo extrañas',me==='yo'?'la extrañas':'lo extrañas'):'todavía no le has dicho hoy';
-    const box=$('tmO'); box.hidden=!o;
-    if(o)box.innerHTML=`<b>${E(o.v)} Hoy ${esc(nm(oth))} te extraña ${o.v}%</b><div class="bar"><i style="width:${o.v}%"></i></div><div style="font-size:12px;opacity:.65;margin-top:6px">${fmtHora(o.u||o.a)}</div>`;
+    $('tmH').innerHTML=`✍️ Tú → ${esc(nm(oth))} <i>· lo que tú sientes, le llega a ${esc(nm(oth))}</i>`;
+    $('tmSt').textContent=mine?`✓ ${nm(oth)} ya sabe que hoy ${me==='yo'?'la':'lo'} extrañas ${mine.v}%`:`mueve la barra y suéltala para mandárselo a ${nm(oth)}`;
+    const box=$('tmO'); box.hidden=false;
+    box.innerHTML=`<div class="tm-h">💌 ${esc(nm(oth))} → tú <i>· lo que siente ${esc(nm(oth))} por ti</i></div>`+(o?`<b>${E(o.v)} Hoy ${esc(nm(oth))} te extraña ${o.v}%</b><div class="bar"><i style="width:${o.v}%"></i></div><div style="font-size:12px;opacity:.65;margin-top:6px">${fmtHora(o.u||o.a)}</div>`:`<div style="font-size:14px;opacity:.75">${esc(nm(oth))} todavía no te dice hoy 💭</div>`);
   }
   $('tmR').addEventListener('input',()=>{$('tmV').textContent=$('tmR').value;$('tmE').textContent=E(+$('tmR').value)});
   $('tmR').addEventListener('change',()=>{const v=+$('tmR').value,id='tm:'+me+':'+DK(MXD()),ex=S.all().find(x=>x.id===id);
@@ -2758,9 +2775,13 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   function songOfDay(w){const L=live('song',w);return L.length?L[doy()%L.length]:null}
   function chips(){
     const W=$('dtWho'); W.innerHTML='';
-    [['mi','💝 Para mí'],['dar','✍️ Para '+nm(oth)]].forEach(([k,l])=>{const b=document.createElement('button');b.textContent=l;b.className=who===k?'cur':'';b.onclick=()=>{who=k;render()};W.append(b)});
+    [['mi','in','💌 Recibido',`lo que ${nm(oth)} te dejó`],['dar','out','✍️ Para '+nm(oth),`lo que tú le dejas`]].forEach(([k,c,l,sm])=>{const b=document.createElement('button');b.innerHTML=`${esc(l)}<small>${esc(sm)}</small>`;b.className=c+(who===k?' cur':'');b.onclick=()=>{who=k;render()};W.append(b)});
+    const ban=$('dtBan'); ban.className='dt-ban '+(who==='mi'?'in':'out');
+    ban.textContent=who==='mi'?`💌 Aquí ves lo que ${nm(oth)} te dejó a ti`:`✍️ Lo que agregues aquí le aparece a ${nm(oth)} en su lado de «Recibido»`;
     const t=$('dtTabs'); t.innerHTML='';
-    T.forEach(([k,l])=>{const b=document.createElement('button');b.textContent=l;b.className=tab===k?'cur':'';b.onclick=()=>{tab=k;render()};t.append(b)});
+    T.forEach(([k,l])=>{const b=document.createElement('button');const n=who==='mi'?live(k,oth).filter(x=>k==='reto'?!x.done:k==='antojo'?!x.r:x.a>(+(localStorage.getItem('dt-visto-'+k)||0))).length:0;
+      b.textContent=l+(n?' · '+n:'');b.className=tab===k?'cur':'';b.onclick=()=>{tab=k;render()};t.append(b)});
+    if(who==='mi')try{localStorage.setItem('dt-visto-'+tab,String(Date.now()))}catch(e){}
   }
   function form(fields,txt,onSave){
     const f=document.createElement('form');f.className='di-add card pj-f';f.autocomplete='off';
@@ -2771,41 +2792,42 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     return f;
   }
   const empty=t=>el(`<div class="kb-empty">${t}</div>`);
-  function item(x,html,mine){const r=el(`<div class="ds-i"><div class="ds-t">${html}</div><div class="ds-f"><span>${fmtDia(x.a)}</span></div></div>`);
+  const tag=mine=>mine?`<span class="dt-tag out">✍️ Tú → ${esc(nm(oth))}</span>`:`<span class="dt-tag in">💌 De ${esc(nm(oth))} para ti</span>`;
+  function item(x,html,mine){const r=el(`<div class="ds-i"><div class="ds-t">${tag(mine)}<br>${html}</div><div class="ds-f"><span>${fmtDia(x.a)}</span></div></div>`);
     if(mine){const d=document.createElement('button');d.className='ds-b';d.textContent='✕';del(d,x);r.querySelector('.ds-f').append(d)}return r}
   function songHTML(x){return `<b>🎵 ${esc(x.t)}</b>${x.ar?' · '+esc(x.ar):''}${x.why?`<div style="margin-top:4px;font-style:italic">“${esc(x.why)}”</div>`:''}${okL(x.l)?`<div><a class="dt-a" href="${esc(x.l)}" target="_blank" rel="noopener">▶ Escuchar</a></div>`:''}`}
   async function photoInto(img,x){try{img.src=await GG.photo(x.g)}catch(e){img.alt='No se pudo cargar'}}
   function render(){
     chips(); box.innerHTML=''; pending();
     const from=who==='mi'?oth:me, mine=who==='dar', L=live(tab,from);
-    $('dtSub').textContent=mine?`lo que le dejas a ${nm(oth)} 💝`:`lo que ${nm(oth)} te dejó 💝`;
+    $('dtSub').textContent=`cositas que ${nm(oth)} y tú se dejan 💝`;
     if(tab==='song'){
-      if(mine)box.append(form([['t','Canción',120],['ar','Artista (opcional)',80],['l','Link de Spotify o YouTube (opcional)',400],['why','¿Por qué te recuerda a mí? (opcional)',300]],'🎵 Agregar a su playlist',v=>{add({k:'song',t:v.t,ar:v.ar,l:okL(v.l)?v.l:'',why:v.why});avisar(`🎵 ${C.ella} agregó una canción a tu playlist: ${v.t}`,'detalle')}));
-      else{const s=songOfDay(oth);if(s)box.append(el(`<div class="dt-hoy"><small>la canción de hoy</small>${songHTML(s).replace('<b>🎵 ','<b>')}</div>`))}
-      const l=el('<div class="pj-l"></div>');if(!L.length)l.append(empty(mine?'agrega canciones que te recuerden a '+esc(nm(oth))+' 🎶':'todavía no hay canciones aquí 🎶'));
+      if(mine)box.append(form([['t','Canción',120],['ar','Artista (opcional)',80],['l','Link de Spotify o YouTube (opcional)',200],['why','¿Por qué te recuerda a '+nm(oth)+'? (opcional)',300]],'🎵 Agregar a la playlist de '+nm(oth),v=>{add({k:'song',t:v.t,ar:v.ar,l:okL(v.l)?v.l:'',why:v.why});avisar(`🎵 ${C.ella} agregó una canción a tu playlist: ${v.t}`,'detalle')}));
+      else{const s=songOfDay(oth);if(s)box.append(el(`<div class="dt-hoy"><small>la canción que ${esc(nm(oth))} te dedica hoy</small>${songHTML(s).replace('<b>🎵 ','<b>')}</div>`))}
+      const l=el('<div class="pj-l"></div>');if(!L.length)l.append(empty(mine?'agrega canciones que te recuerden a '+esc(nm(oth))+' 🎶':esc(nm(oth))+' todavía no te deja canciones 🎶'));
       L.slice().reverse().forEach(x=>l.append(item(x,songHTML(x),mine)));box.append(l);
     }
     if(tab==='reto'){
-      if(mine)box.append(form([['t','Ej. Hoy mándame una selfie 🤳',160]],'🎯 Dejarle un reto',v=>{add({k:'reto',t:v.t});avisar(`🎯 ${C.ella} te dejó un reto: ${v.t}`,'detalle')}));
-      const l=el('<div class="pj-l"></div>');if(!L.length)l.append(empty(mine?'déjale un retito divertido 🎯':'no tienes retos por ahora 🎯'));
+      if(mine)box.append(form([['t','Ej. Hoy mándame una selfie 🤳',160]],'🎯 Dejarle el reto a '+nm(oth),v=>{add({k:'reto',t:v.t});avisar(`🎯 ${C.ella} te dejó un reto: ${v.t}`,'detalle')}));
+      const l=el('<div class="pj-l"></div>');if(!L.length)l.append(empty(mine?'déjale un retito divertido 🎯':esc(nm(oth))+' no te ha dejado retos 🎯'));
       L.slice().sort((a,b)=>(!!a.done-!!b.done)||b.a-a.a).forEach(x=>{const r=item(x,`${x.done?'✅':'🎯'} ${esc(x.t)}${x.done?`<div style="font-size:12px;opacity:.7;margin-top:3px">cumplido el ${fmtDia(x.done)}</div>`:''}`,mine);
         if(!mine&&!x.done){const b=document.createElement('button');b.className='ds-b';b.textContent='✅ ¡Cumplido!';b.onclick=()=>{upd(x,{done:Date.now()});burst(20);avisar(`🎯 ${C.ella} cumplió tu reto: ${x.t}`,'detalle')};r.querySelector('.ds-f').append(b)}
         l.append(r)});box.append(l);
     }
     if(tab==='foto'){
-      if(mine){const f=el(`<form class="di-add card pj-f"><label class="dt-pick"><input type="file" accept="image/*" hidden>📷 Elegir una foto de ${esc(nm(oth))}</label><input class="pq-in" maxlength="160" placeholder="¿Por qué te encanta esta foto?"><button class="btn small">📸 Guardar foto</button></form>`);
+      if(mine){const f=el(`<form class="di-add card pj-f"><label class="dt-pick"><input type="file" accept="image/*" hidden>📷 Elegir una foto de ${esc(nm(oth))}</label><input class="pq-in" maxlength="160" placeholder="¿Por qué te encanta esta foto?"><button class="btn small">📸 Guardársela a ${esc(nm(oth))}</button></form>`);
         const fi=f.querySelector('input[type=file]'),lb=f.querySelector('.dt-pick');fi.onchange=()=>{if(fi.files[0])lb.textContent='✅ '+fi.files[0].name.slice(0,30)};
         f.onsubmit=async e=>{e.preventDefault();if(!GG.on){st.textContent='Activa el guardado compartido en el editor para usar esto';return}if(!fi.files[0]){lb.click();return}
           const b=f.querySelector('.btn');b.disabled=true;st.textContent='Subiendo foto… 📷';
           try{const blob=await GG.shrink(fi.files[0]),g=await GG.newPhoto(blob);add({k:'foto',g,c:f.querySelector('.pq-in').value.trim()});avisar(`📸 ${C.ella} guardó una foto tuya que le encanta`,'detalle');st.textContent='💌 Guardada';burst(12)}
           catch(err){st.textContent='No se pudo subir la foto, intenta otra vez'}b.disabled=false};box.append(f)}
-      const g=el('<div class="dt-ph"></div>');if(!L.length)box.append(empty(mine?'sube fotos de '+esc(nm(oth))+' que te encanten 📸':'todavía no hay fotos aquí 📸'));
-      L.slice().reverse().forEach(x=>{const fg=el(`<figure><img alt=""><figcaption>${x.c?esc(x.c):''}<div style="font-size:11px;opacity:.6">${fmtDia(x.a)}</div></figcaption></figure>`);photoInto(fg.querySelector('img'),x);
+      const g=el('<div class="dt-ph"></div>');if(!L.length)box.append(empty(mine?'sube fotos de '+esc(nm(oth))+' que te encanten 📸':esc(nm(oth))+' todavía no guarda fotos tuyas 📸'));
+      L.slice().reverse().forEach(x=>{const fg=el(`<figure><img alt=""><figcaption>${tag(mine)}<br>${x.c?esc(x.c):''}<div style="font-size:11px;opacity:.6">${fmtDia(x.a)}</div></figcaption></figure>`);photoInto(fg.querySelector('img'),x);
         if(mine){const d=document.createElement('button');d.className='ds-b';d.textContent='✕';del(d,x);fg.append(d)}g.append(fg)});box.append(g);
     }
     if(tab==='antojo'){
-      if(mine)box.append(form([['t','Ej. Hoy se me antojan unos tacos 🌮 / ¿Vamos al cine?',160]],'🍕 Proponer',v=>{add({k:'antojo',t:v.t});avisar(`🍕 ${C.ella} te propone: ${v.t}`,'detalle')}));
-      const l=el('<div class="pj-l"></div>');if(!L.length)l.append(empty(mine?'¿qué se te antoja hacer con '+esc(nm(oth))+'? 🍕':'no hay antojos por ahora 🍕'));
+      if(mine)box.append(form([['t','Ej. Hoy se me antojan unos tacos 🌮 / ¿Vamos al cine?',160]],'🍕 Proponérselo a '+nm(oth),v=>{add({k:'antojo',t:v.t});avisar(`🍕 ${C.ella} te propone: ${v.t}`,'detalle')}));
+      const l=el('<div class="pj-l"></div>');if(!L.length)l.append(empty(mine?'¿qué se te antoja hacer con '+esc(nm(oth))+'? 🍕':esc(nm(oth))+' no te ha propuesto nada 🍕'));
       L.slice().reverse().forEach(x=>{const r=item(x,`🍕 ${esc(x.t)}${x.r?`<div style="font-size:13px;margin-top:4px"><b>${mine?esc(nm(oth))+' dijo: ':'Tú dijiste: '}${R[x.r]}</b></div>`:(mine?'<div style="font-size:12px;opacity:.6;margin-top:3px">esperando respuesta…</div>':'')}`,mine);
         if(!mine){const rr=document.createElement('div');rr.className='dt-r';Object.entries(R).forEach(([k,t])=>{const b=document.createElement('button');b.textContent=t;b.className=x.r===k?'on':'';
           b.onclick=()=>{if(x.r===k)return;upd(x,{r:k});if(k==='si')burst(16);avisar(`🍕 ${C.ella} respondió a «${x.t}»: ${t}`,'detalle')};rr.append(b)});r.querySelector('.ds-t').append(rr)}
