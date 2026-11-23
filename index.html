@@ -532,6 +532,34 @@
   .pj-jar{display:block;margin:0 auto;font-size:110px;line-height:1;background:none;border:0;cursor:pointer;filter:drop-shadow(0 12px 20px rgba(0,0,0,.45))}
   .pj-jar:active{transform:scale(.94)}
   .rch-other{margin-top:10px;font-size:14px;font-weight:700;opacity:.9}
+  /* Pestañas */
+  .tab-off{position:absolute!important;left:-10000px!important;top:0!important;width:100%!important;height:0!important;padding:0!important;overflow:hidden!important;visibility:hidden!important;pointer-events:none!important}
+  nav.tabbar{display:flex;gap:2px;padding:6px;max-width:96vw;width:max-content}
+  nav.tabbar button{background:none;border:0;color:var(--cream);font:800 11px 'Nunito';display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 9px;border-radius:14px;opacity:.75;cursor:pointer;white-space:nowrap}
+  nav.tabbar button span{font-size:19px;line-height:1}
+  nav.tabbar button.cur{background:linear-gradient(135deg,var(--rose),#b3204f);opacity:1;color:#fff}
+  body.light nav.tabbar button{color:#3d1f2a}body.light nav.tabbar button.cur{color:#fff}
+  /* Pendientes */
+  .tip{background:rgba(233,184,114,.16);border:1px solid rgba(233,184,114,.5);border-radius:14px;padding:10px 12px;font-size:13.5px;line-height:1.4;margin:-8px 0 16px;text-align:left}
+  .tip-n{display:inline-block;background:var(--gold);color:#3b0d1c;font-weight:800;font-size:11px;border-radius:999px;padding:2px 8px;margin-right:6px}
+  .tip button{display:block;margin:8px 0 0 auto;border:0;background:rgba(255,255,255,.15);color:inherit;border-radius:999px;padding:5px 12px;font:700 12px 'Nunito';cursor:pointer}
+  body.light .tip{background:#fff4e6}
+  /* Mis avisos */
+  .ma{display:grid;gap:2px;text-align:left}
+  .ma-r{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid rgba(247,198,211,.12);font-size:14.5px;cursor:pointer}
+  .ma-r:last-child{border-bottom:0}
+  .ma-r input{display:none}
+  .ma-r i{flex:none;width:44px;height:26px;border-radius:999px;background:rgba(255,255,255,.2);position:relative;transition:background .2s}
+  .ma-r i::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}
+  .ma-r input:checked+i{background:var(--rose)}.ma-r input:checked+i::after{transform:translateX(18px)}
+  body.light .ma-r i{background:rgba(120,40,70,.18)}
+  .auth-warn{position:fixed;left:10px;right:10px;bottom:84px;z-index:46;background:#9b2c3c;color:#fff;border-radius:14px;padding:12px 40px 12px 14px;font:700 13.5px 'Nunito';box-shadow:0 10px 24px rgba(0,0,0,.4)}
+  .auth-warn button{position:absolute;top:8px;right:8px;border:0;background:none;color:#fff;font-size:16px;cursor:pointer}
+  /* Barra de edición discreta */
+  body.editing:not(.ed-inactiva) .ed-bar{display:none}
+  body.editing:not(.ed-inactiva){padding-top:0}
+  body.editing:not(.ed-inactiva) .ed-fab{top:12px}
+  body.editing:not(.ed-inactiva) .nb-pill{top:12px}
   /* Carta del mes */
   .cm-env{text-align:center}
   .cm-env .e{font-size:46px}
@@ -705,7 +733,7 @@
   #abrazo>h2::before{content:'🤗'} #rasca>h2::before{content:'🌠'} #vales>h2::before{content:'🎟️'} #memorama>h2::before{content:'🃏'}
   #rompecabezas>h2::before{content:'🧩'} #ruleta>h2::before{content:'🎡'} #comida>h2::before{content:'🍽️'} #planes>h2::before{content:'📝'}
   #aprender>h2::before{content:'📚'} #pelis>h2::before{content:'🍿'} #viene>h2::before{content:'🗓️'} #cielo>h2::before{content:'🌌'}
-  #arbol>h2::before{content:'🌳'} #sorpresas>h2::before{content:'🎁'} #constelacion>h2::before{content:'✨'} #capsula>h2::before{content:'⏳'} #reto>h2::before{content:'🎯'} #deseos>h2::before{content:'🎁'} #diario>h2::before{content:'📔'} #cumple>h2::before{content:'🎂'} #extrano>h2::before{content:'🥺'} #recetas>h2::before{content:'🍳'} #adivina>h2::before{content:'🔍'} #cumpleyo>h2::before{content:'🎂'} #parajon>h2::before{content:'💙'}
+  #arbol>h2::before{content:'🌳'} #sorpresas>h2::before{content:'🎁'} #constelacion>h2::before{content:'✨'} #capsula>h2::before{content:'⏳'} #reto>h2::before{content:'🎯'} #deseos>h2::before{content:'🎁'} #diario>h2::before{content:'📔'} #cumple>h2::before{content:'🎂'} #extrano>h2::before{content:'🥺'} #recetas>h2::before{content:'🍳'} #adivina>h2::before{content:'🔍'} #cumpleyo>h2::before{content:'🎂'} #parajon>h2::before{content:'💙'} #misavisos>h2::before{content:'🔔'}
   main section>.sub{font-size:21px;margin-bottom:22px}
   .card,.tile,.song,.capsule,.ev,.kb-col,.rch-p,.an-b{border-radius:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 28px -14px rgba(0,0,0,.6)}
   .tile,.rch-p,.an-b,.ev{border-radius:18px}
@@ -1248,6 +1276,13 @@
     </div>
   </section>
 
+  <!-- MIS AVISOS (Ale) -->
+  <section id="misavisos">
+    <h2>Mis avisos</h2>
+    <div class="sub">elige de qué te llega notificación 🔔</div>
+    <div class="card ma" id="maBox"></div>
+  </section>
+
   <!-- FINAL -->
   <section class="finale" id="final">
     <div class="q" id="finalQ"></div>
@@ -1363,7 +1398,7 @@ const GG=(()=>{
   function gist(force){
     if(!force&&gc&&Date.now()-ga<5000)return Promise.resolve(gc);
     if(gp)return gp;
-    gp=fetch(`https://api.github.com/gists/${K.gist}?t=${Date.now()}`,{headers:H(),cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
+    gp=fetch(`https://api.github.com/gists/${K.gist}?t=${Date.now()}`,{headers:H(),cache:'no-store'}).then(r=>{if(r.status===401||r.status===403)window.dispatchEvent(new Event('ggauth'));if(!r.ok)throw new Error(r.status);return r.json()})
       .then(j=>{gc=j;ga=Date.now();gp=null;return j},e=>{gp=null;throw e});
     return gp;
   }
@@ -1394,7 +1429,7 @@ const GG=(()=>{
     const t=await text(((await r.json()).files||{})['f.bin']); if(!t)throw new Error('vacía');
     return PC[id]=URL.createObjectURL(new Blob([await decBuf(unb64(t).buffer)],{type:type||'image/jpeg'}));
   }
-  return {on,pull,push,merge,shrink,newPhoto,photo};
+  return window.__GG={on,pull,push,merge,shrink,newPhoto,photo};
 })();
 /* ---- Juegos de una sola vez (rasca y gana, ruleta): se guardan y se sincronizan ---- */
 const JUEGOS=(()=>{
@@ -1426,6 +1461,7 @@ const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'
 const AV_LAST={};
 function avisarElla(txt,tipo){
   if(!AV.ntfyElla||tipo==='entrada')return;
+  try{if(ELLA_PREF.off()[tipo])return}catch(e){}
   let m=txt.split(C.ella+' ').join(C.yo+' ');
   if(tipo==='pregunta')m='💭 '+C.yo+' ya contestó la pregunta del día · contesta para ver su respuesta';
   const title=({nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo,deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',extrano:'🥺 '+C.yo+' te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ A '+C.yo+' le gustó',parajon:'💙 '+C.yo}[tipo])||'💗 '+C.yo;
@@ -1469,6 +1505,12 @@ function SHARED(file,field,LK,max,onChange){
   setTimeout(refresh,400); document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
   return {all:()=>L, add(x){L.push(x);keep();onChange();sync()}, save(){keep();onChange();sync()}};
 }
+const PEND=window.PEND=(()=>{const m={},subs=[];return {set(k,v){if(v&&v.n)m[k]=v;else delete m[k];subs.forEach(f=>{try{f()}catch(e){}})},all:()=>Object.values(m),on:f=>subs.push(f)}})();
+const ELLA_PREF=(()=>{let off={};const subs=[];
+  const S=SHARED('prefs.bin','p','prefs-cache',20,()=>{const x=S.all().find(y=>y.id==='ella');off=(x&&x.off)||{};subs.forEach(f=>{try{f()}catch(e){}})});
+  {const x=S.all().find(y=>y.id==='ella');off=(x&&x.off)||{}}
+  return {off:()=>off,on:f=>subs.push(f),set(o){off=o;const x=S.all().find(y=>y.id==='ella');if(x){x.off=o;x.u=Date.now();S.save()}else S.add({id:'ella',off:o,a:Date.now(),u:Date.now()});subs.forEach(f=>{try{f()}catch(e){}})}};
+})();
 const fmtDia=t=>new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short'});
 const fmtHora=t=>new Date(t).toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'});
 
@@ -1672,7 +1714,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     try{if(window.AndroidApp){window.AndroidApp.relink();return}}catch(e){}
     location.replace(location.pathname);
@@ -2347,10 +2389,13 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const SK='notas-visto'; let seen=+(localStorage.getItem(SK)||0)||0;
   const mine=()=>me()||(EDIT?'yo':'ella');
   const unread=()=>notes.filter(x=>!x.x&&NEWER(x,'rnb')&&x.w!==mine()&&x.a>seen);
-  const markSeen=()=>{if(!unread().length)return;seen=Date.now();try{localStorage.setItem(SK,String(seen))}catch(_){}badge()};
+  const markSeen=()=>{try{localStorage.setItem('like-visto',String(Date.now()))}catch(_){}PEND.set('likes',null);if(!unread().length)return;seen=Date.now();try{localStorage.setItem(SK,String(seen))}catch(_){}badge()};
   const goBuzon=()=>{document.getElementById('buzon').scrollIntoView({behavior:'smooth'});pill.hidden=true;setTimeout(markSeen,1800)};
   pill.onclick=goBuzon;
   function badge(){
+    {let ls=0;try{ls=+(localStorage.getItem('like-visto')||0)}catch(e){}const mw=mine(), ow=mw==='yo'?'ella':'yo';
+      const nl=notes.filter(x=>!x.x&&x.w===mw&&x.lk&&(+x.lk[ow]||0)>ls).length;
+      PEND.set('likes',{n:nl,t:'❤️ A '+(ow==='yo'?C.yo:C.ella)+(nl===1?' le gustó tu notita':' le gustaron '+nl+' notitas'),go:()=>GOTO('buzon')})}
     const u=unread(), n=u.length, from=n?(u[0].w==='yo'?C.yo:C.ella):'';
     const txt=n?`💌 ${n===1?'Tienes 1 notita nueva':'Tienes '+n+' notitas nuevas'} de ${from}`:'';
     const locked=document.body.classList.contains('locked')||document.getElementById('hoyOv').classList.contains('open');
@@ -2458,6 +2503,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const bub=(w,t)=>`<div class="pq-a ${w===me()?'me':'them'}"><b>${esc(nm(w))}</b>${esc(t).replace(/\n/g,'<br>')}</div>`;
   function render(){
     const k=DK(MXD()), q=Q[idxOf(k)], mine=ans(k,me()), his=ans(k,other());
+    PEND.set('pregunta',{n:his&&!mine?1:0,t:'💭 '+nm(other())+' ya contestó la pregunta del día',go:()=>GOTO('pregunta')});
     const [y,m,d]=k.split('-').map(Number);
     let h=`<div class="card pq"><div class="daily-l">Pregunta del día · ${d} de ${MESN[m-1]}</div><div class="daily">${esc(GEN(q))}</div>`;
     if(!mine||editing){
@@ -2589,6 +2635,7 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
   function render(){
     const now=MXD(), wk=DK(mon(now)), r=R[idx(wk)], done=S.all().find(x=>!x.x&&NEWER(x,'rre')&&x.id===wk);
     const left=7-((now.getDay()+6)%7);
+    PEND.set('reto',{n:done?0:1,t:'🎯 Reto de la semana: '+r,go:()=>GOTO('reto')});
     let h=`<div class="card rt"><div class="daily-l">Reto de esta semana</div><div class="daily">${esc(r)}</div>`;
     if(done){h+=`<div class="rt-ok">✅ ¡Lo cumplimos! · ${fmtDia(done.a)}</div>${done.ph?'<div class="di-ph rt-ph">💗</div>':''}${done.n?`<div class="rt-n">“${esc(done.n)}”</div>`:''}<button class="pq-ed" id="rtUndo">↩ Deshacer</button>`}
     else h+=`<div class="rt-left">${left===1?'Hoy es el último día':'Quedan '+left+' días'} para cumplirlo ⏳</div>
@@ -2754,10 +2801,11 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
     $('dailyL').textContent='Mensaje de '+C.ella+' para ti · '+MXD().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
   }
   function pending(){
-    const P=$('hoyPend'); if(!P)return; P.innerHTML='';
     const c=live('carta').filter(x=>!x.o).length, v=live('vale').filter(x=>!x.c).length, r=Math.max(0,live('ticket').length-live('win').length);
-    [[c,c===1?'📬 1 carta de '+C.ella+' sin abrir':'📬 '+c+' cartas de '+C.ella+' sin abrir','carta'],[v,v===1?'🎟️ 1 vale por canjear':'🎟️ '+v+' vales por canjear','vale'],[r,r===1?'🌠 1 rasca y gana por raspar':'🌠 '+r+' rasca y gana por raspar','rasca']]
-      .forEach(([n,t,k])=>{if(!n)return;const b=document.createElement('button');b.textContent=t+' →';b.onclick=()=>{tab=k;document.getElementById('hoyBtn').click();setTimeout(()=>{render();sec.scrollIntoView({behavior:'smooth'})},520)};P.append(b)});
+    const go=k=>()=>{tab=k;render();sec.scrollIntoView({behavior:'smooth'})};
+    PEND.set('pj-carta',{n:c,t:c===1?'📬 1 carta de '+C.ella+' sin abrir':'📬 '+c+' cartas de '+C.ella+' sin abrir',go:go('carta')});
+    PEND.set('pj-vale',{n:v,t:v===1?'🎟️ 1 vale por canjear':'🎟️ '+v+' vales por canjear',go:go('vale')});
+    PEND.set('pj-rasca',{n:r,t:r===1?'🌠 1 rasca y gana por raspar':'🌠 '+r+' rasca y gana por raspar',go:go('rasca')});
   }
   function form(fields,btnTxt,onSave){
     const f=document.createElement('form'); f.className='di-add card pj-f'; f.autocomplete='off';
@@ -2878,6 +2926,95 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
   render();
 })();
 
+/* ====== Avisos que Ale quiere recibir ====== */
+(function(){
+  const sec=document.getElementById('misavisos'), box=document.getElementById('maBox');
+  if(VIEWER()!=='ella'){sec.remove();return}
+  const LIST=[['nota','💌 Te deja una notita'],['voz','🎙️ Te manda un mensaje de voz'],['like','❤️ Le da like a lo tuyo'],['extrano','🥺 Te dice que te extraña'],['pregunta','💭 Contesta la pregunta del día'],
+    ['animo','🌤️ Dice cómo se siente'],['diario','📔 Guarda un momento en el diario'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Cosas que aprender'],['peli','🍿 Pelis y series'],
+    ['evento','🗓️ Agrega algo a «Lo que viene»'],['deseo','🎁 Lista de deseos'],['receta','🍳 Agrega una receta'],['reto','🎯 Reto de la semana'],['foto','📷 Sube fotos'],['recuerdo','📷 Guarda un recuerdo'],['parajon','💙 Usa lo que le dejas en «Para Jon»']];
+  function render(){
+    const off=ELLA_PREF.off(); box.innerHTML='';
+    LIST.forEach(([k,l])=>{const r=document.createElement('label');r.className='ma-r';
+      r.innerHTML=`<span>${l}</span><input type="checkbox" ${off[k]?'':'checked'}><i></i>`;
+      r.querySelector('input').onchange=e=>{const o=Object.assign({},ELLA_PREF.off());if(e.target.checked)delete o[k];else o[k]=1;ELLA_PREF.set(o)};box.append(r)});
+  }
+  ELLA_PREF.on(render); render();
+})();
+
+/* ====== Pendientes en la pantalla del mensaje ====== */
+(function(){
+  const P=document.getElementById('hoyPend');
+  function render(){
+    if(!P)return; P.innerHTML='';
+    PEND.all().forEach(v=>{const b=document.createElement('button');b.textContent=v.t+' →';
+      b.onclick=()=>{document.getElementById('hoyBtn').click();setTimeout(()=>v.go&&v.go(),520)};P.append(b)});
+  }
+  PEND.on(render); render();
+})();
+
+/* ====== Mini recorrido para Ale (una vez por sección) ====== */
+(function(){
+  if(VIEWER()!=='ella')return;
+  const T={parajon:'Aquí le dejas cosas a '+C.yo+': mensajes del día, razones, cartas, vales y rasca y gana. Él lo ve como «De '+C.ella+' para ti» 💙',
+    cumpleyo:'Escríbele su carta de cumpleaños cuando quieras: queda sellada y '+C.yo+' solo la puede leer ese día 🤫',
+    diario:'Guarden juntos los momentos que no quieren olvidar, con foto y fecha 📔',
+    voz:'Toca «Grabar mensaje», escúchalo y envíalo. Le llega a '+C.yo+' al instante 🎙️',
+    pregunta:'Cada día hay una pregunta nueva. Contesta para ver lo que respondió '+C.yo+' 💭',
+    animo:'Toca la carita de cómo te sientes y '+C.yo+' te responde 🌤️',
+    extrano:'Tócalo cuando lo extrañes y le llega un aviso 🥺',
+    recetas:'Guarden lo que cocinan juntos y quién lo hizo mejor 👑',
+    deseos:'Anota lo que te gusta; '+C.yo+' lo ve (y puede apartarlo sin que te enteres 😉)',
+    reto:'Cada lunes hay un reto nuevo para los dos. Al cumplirlo, toca «¡Lo cumplimos!» 🎯',
+    adivina:'Aclara la foto poco a poco y adivina dónde o cuándo fue 🔍',
+    pelis:'Lo que quieren ver juntos; al terminar cada quien pone sus estrellas ⭐',
+    racha:'Entra todos los días para subir tu racha y desbloquear premios 🔥',
+    misavisos:'Aquí eliges de qué cosas te llegan avisos al celular 🔔'};
+  Object.entries(T).forEach(([id,t])=>{
+    const s=document.getElementById(id); let seen=false; try{seen=localStorage.getItem('tip-'+id)==='1'}catch(e){}
+    if(!s||seen)return; const sub=s.querySelector('.sub')||s.querySelector('h2'); if(!sub)return;
+    const d=document.createElement('div');d.className='tip';d.innerHTML=`<span class="tip-n">✨ Nuevo</span>${esc(t)}<button aria-label="Entendido">Entendido</button>`;
+    d.querySelector('button').onclick=()=>{try{localStorage.setItem('tip-'+id,'1')}catch(e){}d.remove()};
+    sub.after(d);
+  });
+})();
+
+/* ====== Aviso si el guardado compartido dejó de funcionar (solo Jon) ====== */
+(function(){
+  if(VIEWER()!=='yo')return;
+  window.addEventListener('ggauth',()=>{if(document.getElementById('authWarn'))return;const d=document.createElement('div');d.id='authWarn';d.className='auth-warn';
+    d.innerHTML='⚠️ El token del guardado compartido (Gists) venció o ya no funciona. Renuévalo en el editor → «Planes, fotos, vales…».<button>✕</button>';d.querySelector('button').onclick=()=>d.remove();document.body.append(d)});
+})();
+
+/* ====== Pestañas ====== */
+(function(){
+  const J=VIEWER()==='yo';
+  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','cumple','cumpleyo','racha','animo','pregunta','extrano','misavisos','final']],
+    ['nosotros','💑','Nosotros',['cancion','momentos','polaroid','diario','cielo','constelacion','arbol','sorpresas','capsula']],
+    ['cartas','💌','Cartas',['carta','cartames','abrela','buzon','voz','escribir','razones','galleta','medidor','abrazo']],
+    ['juegos','🎮','Juegos',['rasca','vales','memorama','rompecabezas','adivina','ruleta','comida']],
+    ['planes','📝','Planes',['planes','aprender','pelis','recetas','reto','deseos','viene']],
+    ['parajon','💙',J?'De '+C.ella:'Para '+C.yo,['parajon']]];
+  const nav=document.querySelector('nav'); nav.innerHTML=''; nav.classList.add('tabbar');
+  TABS.forEach(([k,,,ids])=>ids.forEach(id=>{const s=document.getElementById(id);if(s)s.dataset.tab=k}));
+  document.querySelectorAll('main section').forEach(s=>{if(!s.dataset.tab)s.dataset.tab='inicio'});
+  let cur=null;
+  function setTab(k,keep){
+    if(k===cur)return; cur=k;
+    document.querySelectorAll('main section').forEach(s=>s.classList.toggle('tab-off',s.dataset.tab!==k));
+    nav.querySelectorAll('button').forEach(b=>b.classList.toggle('cur',b.dataset.k===k));
+    try{sessionStorage.setItem('tab',k)}catch(e){}
+    if(!keep)window.scrollTo(0,0);
+    window.dispatchEvent(new Event('resize'));
+  }
+  TABS.forEach(([k,i,n])=>{const b=document.createElement('button');b.dataset.k=k;b.innerHTML=`<span>${i}</span>${esc(n)}`;b.onclick=()=>setTab(k);nav.append(b)});
+  const orig=Element.prototype.scrollIntoView;
+  Element.prototype.scrollIntoView=function(...a){try{const s=this.closest&&this.closest('main section');if(s&&s.dataset.tab&&s.dataset.tab!==cur)setTab(s.dataset.tab,true)}catch(e){}return orig.apply(this,a)};
+  window.GOTO=id=>{const s=document.getElementById(id);if(s)s.scrollIntoView({behavior:'smooth'})};
+  let start='inicio'; try{start=sessionStorage.getItem('tab')||'inicio'}catch(e){}
+  setTab(TABS.some(t=>t[0]===start)?start:'inicio');
+})();
+
 /* ====== Carta del mes ====== */
 (function(){
   const L=(C.cartasMes||[]).map(o=>({m:parseInt(o.mes)||0,t:FILL(o.titulo),x:o.texto||''})).filter(o=>o.m>0&&o.x.trim()).sort((a,b)=>a.m-b.m);
@@ -2888,6 +3025,7 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
   const body=t=>FILL(t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('');
   function render(){
     box.innerHTML='';
+    {let op=true;try{op=!cur||localStorage.getItem('cm-av-'+cur.m)==='1'}catch(e){}PEND.set('cartames',{n:VIEWER()==='ella'&&!op?1:0,t:'✉️ Tu carta de los '+(cur&&cur.m)+' meses ya se puede abrir',go:()=>GOTO('cartames')})}
     if(!cur){box.innerHTML=`<div class="card cm-env"><div class="e">🔒</div><h3>${next?'Muy pronto':'Pronto habrá una carta aquí'}</h3><div class="t">${next?'la primera se abre el '+dateOf(next.m):'💌'}</div></div>`;return}
     const c=document.createElement('div');c.className='card cm-env';
     c.innerHTML=`<div class="e">${isOpen?'💌':'✉️'}</div><h3>Carta de los ${cur.m} meses</h3><div class="t">${esc(cur.t)}</div>`;
@@ -2914,6 +3052,8 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
   player.addEventListener('ended',()=>{const el=list.querySelector(`[data-id="${playing}"]`);if(el){el.querySelector('.vz-play').textContent='▶';el.querySelector('.vz-bar i').style.width='0'}playing=null});
   function render(){
     const live=S.all().filter(x=>!x.x&&NEWER(x,'rvz')).sort((a,b)=>a.a-b.a), me=VIEWER();
+    {let seen=0;try{seen=+(localStorage.getItem('voz-visto')||0)}catch(e){}const n=live.filter(x=>x.w!==me&&x.a>seen).length;
+      PEND.set('voz',{n,t:n===1?'🎙️ 1 mensaje de voz nuevo':'🎙️ '+n+' mensajes de voz nuevos',go:()=>GOTO('voz')})}
     list.innerHTML=live.length?'':'<div class="nb-empty">aún no hay mensajes de voz… ¡graba el primero! 🎙️</div>';
     live.forEach(x=>{
       const d=document.createElement('div');d.className='vz-m '+(x.w===me?'me':'them');d.dataset.id=x.id;
@@ -2937,6 +3077,7 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
     list.scrollTop=list.scrollHeight;
   }
   render();
+  new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&!document.body.classList.contains('locked'))setTimeout(()=>{try{localStorage.setItem('voz-visto',String(Date.now()))}catch(_){}PEND.set('voz',null)},1500)}),{threshold:.3}).observe(list);
   if(!GG.on){btn.hidden=true;st.textContent='Los mensajes de voz necesitan el guardado compartido activado';return}
   if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder)){btn.hidden=true;st.textContent='Este celular no deja grabar audio desde aquí';return}
   let rec=null, chunks=[], t0=0, tick=null, blob=null, secs=0, stream=null;
@@ -3311,6 +3452,7 @@ const SCHEMA=[
   {t:'Créditos de película',f:[['creditos','Créditos','objlist',[['rol','Rol','text'],['quien','Quién / qué','text']]]]},
   {t:'WhatsApp',f:[['whatsapp.numero','Tu número (con lada, ej. 5255…)','text'],['whatsapp.mensajes','Botones','objlist',[['emoji','Emoji','text'],['boton','Texto del botón','text'],['mensaje','Mensaje que se envía','textarea',2]]]]},
   {t:'Avisos a tu celular',special:'avisos'},
+  {t:'Respaldo y tokens',special:'respaldo'},
   {t:'Reiniciar',special:'reset'},
 ];
 const getP=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
@@ -3502,6 +3644,57 @@ function initEditor(){
           '<li>En <b>Permissions → Account permissions → Gists</b> elige <b>Read and write</b>. Nada más.</li>'+
           '<li>Toca <b>Generate token</b>, cópialo y pégalo aquí.</li>'}))
       ]));
+      return;
+    }
+    if(sec.special==='respaldo'){
+      const msg=h('div',{class:'ed-note'}), tmsg=h('div',{class:'ed-note'});
+      const b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+      async function backup(){
+        const K=D.kanban||{}; if(!K.gist||!K.token){msg.textContent='Primero activa el guardado compartido (sección «Planes, fotos…»).';msg.className='ed-note bad';return}
+        msg.textContent='Armando el respaldo… (puede tardar un poco por las fotos y audios)';msg.className='ed-note';
+        try{
+          const H={Authorization:'Bearer '+K.token,Accept:'application/vnd.github+json'};
+          const g=await (await fetch('https://api.github.com/gists/'+K.gist+'?t='+Date.now(),{headers:H,cache:'no-store'})).json();
+          const files={}, ids=new Set();
+          for(const [n,f] of Object.entries(g.files||{})){let t=f.content;if(f.truncated&&f.raw_url)t=await (await fetch(f.raw_url)).text();files[n]=t;
+            try{const o=JSON.parse(new TextDecoder().decode(await decBuf(Uint8Array.from(atob(String(t).trim()),c=>c.charCodeAt(0)).buffer)));
+              JSON.stringify(o,(k,v)=>{if((k==='ph'||k==='g')&&typeof v==='string'&&/^[0-9a-f]{20,}$/.test(v))ids.add(v);return v})}catch(e){}}
+          const media={}; let i=0;
+          for(const id of ids){i++;msg.textContent=`Descargando fotos y audios… ${i}/${ids.size}`;
+            try{const r=await (await fetch('https://api.github.com/gists/'+id,{headers:H,cache:'no-store'})).json();const f=(r.files||{})['f.bin'];if(f){media[id]=f.truncated&&f.raw_url?await (await fetch(f.raw_url)).text():f.content}}catch(e){}}
+          let dataBin=''; try{const R=ghRepo(),t=ghToken();const r=await fetch(`https://api.github.com/repos/${R.owner}/${R.repo}/contents/data.bin?ref=${R.branch||'main'}&t=${Date.now()}`,{headers:Object.assign(ghH(t),{Accept:'application/vnd.github.raw+json'}),cache:'no-store'});if(r.ok)dataBin=b64(new Uint8Array(await r.arrayBuffer()))}catch(e){}
+          const out=JSON.stringify({tipo:'respaldo-nuestro-lugar',v:1,fecha:new Date().toISOString(),nota:'Todo va cifrado: sin el link especial no se puede leer.',dataBin,gist:files,media});
+          const name='respaldo-nuestro-lugar-'+new Date().toISOString().slice(0,10)+'.json';
+          if(window.AndroidApp){msg.innerHTML='Desde la app no se pueden descargar archivos. Abre el editor en el navegador (la página con <b>?editar</b>) y toca este botón ahí.';msg.className='ed-note bad';return}
+          const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'application/json'}));a.download=name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);
+          D.ultimoRespaldo=Date.now();markDirty();
+          msg.textContent=`✅ Listo: ${name} (${Math.round(out.length/1024)} KB, ${Object.keys(files).length} archivos y ${Object.keys(media).length} fotos/audios). Guárdalo en tu Drive o compu.`;msg.className='ed-note ok';
+        }catch(e){msg.textContent='No se pudo armar el respaldo: '+e.message;msg.className='ed-note bad'}
+      }
+      async function tokens(){
+        tmsg.textContent='Revisando tokens…';tmsg.className='ed-note';const out=[];
+        const chk=async(label,tok,url)=>{if(!tok){out.push(`${label}: sin configurar`);return}
+          try{const r=await fetch(url,{headers:{Authorization:'Bearer '+tok,Accept:'application/vnd.github+json'},cache:'no-store'});
+            const ex=r.headers.get('github-authentication-token-expiration');
+            if(r.status===401){out.push(`❌ ${label}: venció o no es válido. Hay que crear uno nuevo.`);return}
+            if(ex){const d=Math.round((new Date(ex)-Date.now())/864e5);out.push(`${d<=15?'⚠️':'✅'} ${label}: vence en ${d} días (${new Date(ex).toLocaleDateString('es-MX')})`)}
+            else out.push(`✅ ${label}: funciona${D.tokenVence?'':' (pon abajo la fecha en que vence para avisarte)'}`)}catch(e){out.push(`${label}: no se pudo revisar`)}};
+        const R=ghRepo(); await chk('Token de la página (GitHub)',ghToken(),R?`https://api.github.com/repos/${R.owner}/${R.repo}`:'https://api.github.com/user');
+        await chk('Token del guardado compartido (Gists)',(D.kanban||{}).token,(D.kanban||{}).gist?'https://api.github.com/gists/'+D.kanban.gist:'https://api.github.com/gists');
+        if(D.tokenVence){const d=Math.round((new Date(D.tokenVence+'T12:00:00')-Date.now())/864e5);out.push(`${d<=15?'⚠️':'📅'} Fecha que pusiste: vence en ${d} días`)}
+        tmsg.innerHTML=out.map(esc0).join('<br>');tmsg.className='ed-note '+(out.some(x=>/❌|⚠️/.test(x))?'bad':'ok');
+      }
+      const esc0=x=>String(x).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+      const vd=h('input',{class:'ed-in',type:'date',value:D.tokenVence||''});vd.addEventListener('input',()=>{D.tokenVence=vd.value;markDirty()});
+      const last=D.ultimoRespaldo?'Último respaldo: '+new Date(D.ultimoRespaldo).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}):'Todavía no has hecho ningún respaldo.';
+      body.append(section('💾 '+sec.t,[
+        h('div',{class:'ed-note',html:'Descarga en un archivo <b>todo</b> lo de la página: notitas, audios, diario, fotos, cartas, respuestas, planes… (sigue cifrado). Hazlo de vez en cuando y guárdalo en tu Drive o compu.'}),
+        h('button',{class:'ed-btn',onclick:backup},'💾 Descargar respaldo'),h('div',{class:'ed-note'},last),msg,
+        h('div',{class:'ed-flab',style:'margin-top:14px'},'🔑 Vencimiento de tus tokens'),
+        h('div',{class:'ed-note'},'Si un token vence, ya no se guarda nada. Revisa aquí cuándo vencen.'),
+        h('button',{class:'ed-btn',onclick:tokens},'Revisar tokens'),tmsg,
+        h('label',{class:'ed-lab'},h('span',null,'Fecha en que vence tu token (opcional, para avisarte)'),vd)]));
+      setTimeout(()=>{if(D.tokenVence){const d=Math.round((new Date(D.tokenVence+'T12:00:00')-Date.now())/864e5);if(d<=15){status.textContent=d<0?'⚠️ Tu token ya venció: renuévalo':'⚠️ Tu token vence en '+d+' días: renuévalo';status.className='ed-status bad'}}},800);
       return;
     }
     if(sec.special==='reset'){
