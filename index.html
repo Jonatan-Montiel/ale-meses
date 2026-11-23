@@ -443,6 +443,7 @@
   body.locked .bell,body:has(#hoyOv.open) .bell,body:has(.an-ov) .bell,body:has(.pend-ov.open) .bell{display:none}
   .pend-ov{position:fixed;inset:0;z-index:62;background:rgba(10,2,6,.7);display:none;align-items:flex-start;justify-content:center;padding:14px}
   .pend-ov.open{display:flex;animation:fadeIn .25s}
+  .pend-all{display:block;margin:10px auto 0;background:none;border:1px solid rgba(232,93,132,.45);color:inherit;border-radius:999px;padding:8px 16px;font:700 13px 'Nunito';cursor:pointer}
   .pend-box{width:100%;max-width:520px;max-height:calc(100vh - 28px);overflow:auto;background:radial-gradient(120% 60% at 50% 0%,#6b1838,#2a0a18 70%);border:1px solid rgba(247,198,211,.2);border-radius:24px;padding:18px 16px 20px;box-shadow:0 20px 50px rgba(0,0,0,.6);animation:pop .45s cubic-bezier(.2,.9,.3,1.3)}
   .pend-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
   .pend-h h3{font:600 26px 'Fraunces',serif;color:#fff}.pend-h p{font-family:'Caveat',cursive;font-size:21px;color:var(--blush)}
@@ -1574,17 +1575,21 @@ const AV_TIPOS=window.AV_TIPOS=[['vale','🎟️ Canjea un vale'],['nota','💌 
 const AV_OFF_DEF=window.AV_OFF_DEF={};
 const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'&&AV.notas===false)return false;return !off[t]};
 const AV_LAST={};
+const ACT_Q=window.ACT_Q=[];
+function ACT_LOG(t,k,w){if(k==='entrada'||k==='secreto')return;try{const it={id:UID(),t,k,w,a:Date.now(),u:Date.now()};window.ACT?ACT.add(it):ACT_Q.push(it)}catch(e){}}
 function avisarElla(txt,tipo){
-  if(!AV.ntfyElla||tipo==='entrada'||tipo==='secreto')return;
-  try{if(ELLA_PREF.off()[tipo])return}catch(e){}
+  if(tipo==='entrada'||tipo==='secreto')return;
   let m=txt.split(C.ella+' ').join(C.yo+' ');
   if(tipo==='pregunta')m='💭 '+C.yo+' ya contestó la pregunta del día · contesta para ver su respuesta';
+  ACT_LOG(m,tipo,'yo');
+  if(!AV.ntfyElla)return;
+  try{if(ELLA_PREF.off()[tipo])return}catch(e){}
   const title=({insignia:'🏅 ¡Nueva insignia!',nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo,deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',extrano:'🥺 '+C.yo+' te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ A '+C.yo+' le gustó',parajon:'💙 '+C.yo}[tipo])||'💗 '+C.yo;
   fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfyElla.trim(),title,message:m,tags:['love_letter'],priority:4})}).catch(()=>{});
 }
 function avisar(txt,tipo){
   let soyYo=EDIT; try{if(localStorage.getItem('yo-soy')==='yo')soyYo=true}catch(e){}
-  if(soyYo)avisarElla(txt,tipo);
+  if(soyYo)avisarElla(txt,tipo); else ACT_LOG(txt,tipo,'ella');
   if(!AV.ntfy)return;
   if(soyYo&&AV.yo===false)return;
   if(!avOn(tipo))return;
@@ -1846,7 +1851,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|data-cache|insignias-cache|insig-init|hoy-visto|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|data-cache|actividad-cache|act-visto|act-desde|insignias-cache|insig-init|hoy-visto|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     try{if(window.AndroidApp){window.AndroidApp.relink();return}}catch(e){}
     location.replace(location.pathname);
@@ -3151,6 +3156,29 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   ELLA_PREF.on(render); render();
 })();
 
+/* ====== Lo nuevo de Jon en la campana de Ale ====== */
+(function(){
+  let show=()=>{};
+  const S=window.ACT=SHARED('actividad.bin','e','actividad-cache',120,()=>show());
+  ACT_Q.splice(0).forEach(x=>S.add(x));
+  const ELLA=VIEWER()==='ella', fromOther=x=>ELLA?x.w!=='ella':x.w==='ella';
+  const DUP={nota:1,voz:1,pregunta:1,like:1};
+  const SEC={plan:'planes',aprender:'aprender',peli:'pelis',evento:'viene',foto:'momentos',recuerdo:'momentos',deseo:'deseos',diario:'diario',reto:'reto',extrano:'extrano',receta:'recetas',animo:'animo',insignia:'insignias',abrazo:'abrazo',racha:'racha',cartames:'cartames',comida:'comida',adivina:'adivina',cumple:ELLA?'cumpleyo':'cumple',especial:'sanvalentin',parajon:'parajon',vale:'vales',ruleta:'ruleta',abrela:'abrela',rasca:'rasca',sorpresa:'sorpresas',capsula:'capsula'};
+  let seen=new Set(); try{seen=new Set(JSON.parse(localStorage.getItem('act-visto')||'[]'))}catch(e){}
+  let since=+(localStorage.getItem('act-desde')||0); if(!since){since=Date.now();try{localStorage.setItem('act-desde',String(since))}catch(e){}}
+  const save=()=>{try{localStorage.setItem('act-visto',JSON.stringify([...seen].slice(-300)))}catch(e){}};
+  let shown=[];
+  window.ACT_SEEN_ALL=()=>{S.all().forEach(x=>seen.add(x.id));save();show()};
+  show=function(){
+    shown.forEach(k=>PEND.set(k,null)); shown=[];
+    const wk=Date.now()-7*864e5;
+    S.all().filter(x=>!x.x&&fromOther(x)&&!DUP[x.k]&&(x.a||0)>since&&(x.a||0)>wk&&!seen.has(x.id)).sort((a,b)=>b.a-a.a).slice(0,20).forEach(x=>{
+      const k='act-'+x.id; shown.push(k);
+      PEND.set(k,{n:1,t:x.t,act:1,go:()=>{seen.add(x.id);save();show();GOTO(SEC[x.k]||'inicio')}})});
+  };
+  show();
+})();
+
 /* ====== Pendientes en la pantalla del mensaje + campana ====== */
 (function(){
   const P=document.getElementById('hoyPend'), ov=document.getElementById('hoyOv');
@@ -3164,6 +3192,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     L.forEach(v=>{const b=document.createElement('button');b.className='pend-i';const t=String(v.t||'');const m=t.match(/^(\S+)\s(.*)$/);
       b.innerHTML=`<span class="pend-e">${esc(m?m[1]:'🔔')}</span><span class="pend-t">${esc(m?m[2]:t)}</span><span class="pend-go">Ver →</span>`;
       b.onclick=()=>{ps.classList.remove('open');setTimeout(()=>v.go&&v.go(),250)};l.append(b)});
+    if(L.some(v=>v.act)&&window.ACT_SEEN_ALL){const a=document.createElement('button');a.className='pend-all';a.textContent='✓ Marcar lo nuevo como visto';a.onclick=()=>{ACT_SEEN_ALL();openList()};l.append(a)}
     ps.querySelector('.pend-x').onclick=()=>ps.classList.remove('open');
     ps.classList.add('open');
   }
@@ -3173,7 +3202,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   setInterval(count,2000); window.addEventListener('hoyClosed',count); window.addEventListener('unlocked',()=>setTimeout(count,800));
   function render(){
     if(!P)return; P.innerHTML='';
-    PEND.all().filter(v=>v.k!=='notas').forEach(v=>{const b=document.createElement('button');b.textContent=v.t+' →';
+    PEND.all().filter(v=>v.k!=='notas'&&!v.act).forEach(v=>{const b=document.createElement('button');b.textContent=v.t+' →';
       b.onclick=()=>{document.getElementById('hoyBtn').click();setTimeout(()=>v.go&&v.go(),520)};P.append(b)});
   }
   PEND.on(render); render();
