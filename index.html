@@ -2109,7 +2109,7 @@ galRender();
   window.__bioOk=()=>{if(!open){v='';paint();ok()}};
   // después de guardar en el editor, la página se recarga: no vuelvas a pedir el código
   let edU=0; try{edU=+(sessionStorage.getItem('ed-unlock')||0);sessionStorage.removeItem('ed-unlock')}catch(e){}
-  if(EDIT&&edU>Date.now()){setTimeout(()=>{if(!open){v='';paint();ok()}},300)}
+  if(EDIT&&edU>Date.now()){lock.style.display='none';lock.classList.add('out');document.body.classList.remove('locked');open=true;setTimeout(()=>{try{last=Date.now()}catch(e){}window.dispatchEvent(new Event('unlocked'))},50)}
   else if(hasBio()){bioB.hidden=false;bioB.onclick=askBio;setTimeout(askBio,500)}
   /* ---- Volver a bloquear si se deja sin usar o al regresar de otra app ---- */
   function relock(){
@@ -4691,7 +4691,9 @@ async function loadContent(){
   const t0=Date.now(); api.then(()=>DG('contenido por API en '+(Date.now()-t0)+' ms'),e=>DG('API falló: '+e));
   const pages=fetchT('data.bin?t='+Date.now(),{cache:'no-store'},20000).then(r=>r.ok?r.arrayBuffer():Promise.reject(r.status));
   pages.then(()=>DG('contenido por Pages en '+(Date.now()-t0)+' ms'),e=>DG('Pages falló: '+e));
-  const net=Promise.any([api,pages]).then(buf=>{try{localStorage.setItem('data-cache',b64buf(buf))}catch(e){}return buf});
+  // la API trae lo recién guardado; Pages/Vercel tardan un poco en actualizarse, así que solo se usan si la API no responde
+  const apiFirst=new Promise((ok,ko)=>{let done=false;api.then(b=>{done=true;ok(b)},()=>{if(!done){done=true;pages.then(ok,ko)}});setTimeout(()=>{if(!done)pages.then(b=>{if(!done){done=true;ok(b)}},()=>{})},EDIT?6000:3500)});
+  const net=apiFirst.then(buf=>{try{localStorage.setItem('data-cache',b64buf(buf))}catch(e){}return buf});
   let cached=null; try{const t=localStorage.getItem('data-cache');if(t)cached=Uint8Array.from(atob(t),c=>c.charCodeAt(0)).buffer}catch(e){}
   let buf=null;
   if(cached&&!EDIT){buf=await Promise.race([net.catch(()=>null),new Promise(ok=>setTimeout(()=>ok(null),2500))]);if(!buf){buf=cached;window.__offline=navigator.onLine===false?1:0}}
