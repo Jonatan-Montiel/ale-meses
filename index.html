@@ -4000,6 +4000,8 @@ function ghRepo(){
     const owner=h.split('.')[0], seg=location.pathname.split('/').filter(Boolean)[0];
     return {owner, repo:(seg&&!/\.html?$/.test(seg))?seg:h, branch:'main'};
   }
+  // copia en Vercel (por si la compañía de celular no llega a GitHub): el repositorio es el mismo
+  if(/(^|\.)vercel\.app$/.test(h))return {owner:'Jonatan-Montiel',repo:'ale-meses',branch:'main'};
   return null;
 }
 const ghToken=()=>LS.get('gh-token')||'';
@@ -4186,7 +4188,7 @@ function initEditor(){
   const brIn=h('input',{class:'ed-in',placeholder:'main',value:R0.branch||'main'});
   const tokIn=h('input',{class:'ed-in',type:'password',placeholder:'github_pat_…',value:ghToken(),autocomplete:'off'});
   const conMsg=h('div',{class:'ed-note'});
-  const storeCon=()=>{const [o,r]=repoIn.value.trim().split('/');if(o&&r)LS.set('gh-repo',JSON.stringify({owner:o.trim(),repo:r.trim(),branch:brIn.value.trim()||'main'}));LS.set('gh-token',tokIn.value.trim())};
+  const storeCon=()=>{let v=repoIn.value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\/+$/,'');if(v&&!v.includes('/'))v='Jonatan-Montiel/'+v;if(v!==repoIn.value)repoIn.value=v;const [o,r]=v.split('/');if(o&&r)LS.set('gh-repo',JSON.stringify({owner:o.trim(),repo:r.trim(),branch:brIn.value.trim()||'main'}));LS.set('gh-token',tokIn.value.trim())};
   [repoIn,brIn,tokIn].forEach(i=>i.addEventListener('change',storeCon));
   async function testCon(){
     storeCon(); const R=ghRepo(), t=ghToken();
