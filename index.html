@@ -582,6 +582,18 @@
   .ho p{font-size:16.5px;line-height:1.45;margin-top:10px}
   .ho-x{display:grid;gap:4px;margin-top:12px;font-size:13px;opacity:.85}
   body.light .db-col{background:#fff}
+  .ds{text-align:center}
+  .ds-vis{display:flex;align-items:center;justify-content:center;gap:10px;margin:4px 0 8px}
+  .ds-vis .dt{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font:800 18px 'Nunito';color:#fff}
+  .ds-vis .a{background:#e85d84}.ds-vis .j{background:#4f86f7}
+  .ds-vis .ln{font-size:18px;color:var(--blush);white-space:nowrap}
+  .ds-t{font:800 22px 'Nunito';margin-bottom:12px}
+  .ds-sw{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;background:rgba(255,255,255,.06);border-radius:14px;padding:12px 14px;font-weight:700;cursor:pointer}
+  .ds-sw input{display:none}.ds-sw i{flex:none;width:46px;height:26px;border-radius:999px;background:rgba(255,255,255,.25);position:relative;transition:.2s}
+  .ds-sw i::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+  .ds-sw input:checked+i{background:var(--rose)}.ds-sw input:checked+i::after{left:23px}
+  .ds-n{font-size:13px;margin-top:10px;opacity:.85}
+  .ds-p{font-size:12px;opacity:.65;margin-top:10px;line-height:1.4}
   .bell{position:fixed;top:12px;left:12px;z-index:44;width:44px;height:44px;border-radius:50%;border:1px solid rgba(247,198,211,.3);background:rgba(30,6,16,.65);font-size:20px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35)}
   .bell b{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:999px;background:var(--rose);color:#fff;font:800 11.5px/20px 'Nunito';padding:0 5px;display:none}
   .bell.has b{display:block}.bell.has{animation:beat 2.4s ease-in-out infinite}
@@ -967,7 +979,7 @@
   main section{padding:62px 0 26px}
   main section>h2{font-size:31px;letter-spacing:-.2px;line-height:1.15}
   main section>h2::before{display:grid;place-items:center;width:46px;height:46px;margin:0 auto 12px;border-radius:50%;font-size:22px;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.22);box-shadow:0 6px 16px -6px rgba(0,0,0,.45)}
-  #contador>h2::before{content:'💞'} #racha>h2::before{content:'🔥'} #probable>h2::before{content:'🤔'} #botella>h2::before{content:'🍾'} #debo>h2::before{content:'😘'} #elige>h2::before{content:'🎲'} #horoscopo>h2::before{content:'🔮'} #corazones>h2::before{content:'💗'} #pizarra>h2::before{content:'🎨'} #fotoreto>h2::before{content:'📸'} #sello>h2::before{content:'🗓️'} #termo>h2::before{content:'🌡️'} #detalles>h2::before{content:'💝'} #insignias>h2::before{content:'🏅'} #animo>h2::before{content:'🌤️'} #pregunta>h2::before{content:'💭'}
+  #contador>h2::before{content:'💞'} #racha>h2::before{content:'🔥'} #probable>h2::before{content:'🤔'} #distancia>h2::before{content:'📍'} #botella>h2::before{content:'🍾'} #debo>h2::before{content:'😘'} #elige>h2::before{content:'🎲'} #horoscopo>h2::before{content:'🔮'} #corazones>h2::before{content:'💗'} #pizarra>h2::before{content:'🎨'} #fotoreto>h2::before{content:'📸'} #sello>h2::before{content:'🗓️'} #termo>h2::before{content:'🌡️'} #detalles>h2::before{content:'💝'} #insignias>h2::before{content:'🏅'} #animo>h2::before{content:'🌤️'} #pregunta>h2::before{content:'💭'}
   #cancion>h2::before{content:'🎵'} #carta>h2::before{content:'💌'} #cartames>h2::before{content:'✉️'} #abrela>h2::before{content:'📬'}
   #buzon>h2::before{content:'📮'} #voz>h2::before{content:'🎙️'} #escribir>h2::before{content:'✍️'} #momentos>h2::before{content:'📸'}
   #polaroid>h2::before{content:'🖼️'} #razones>h2::before{content:'🫙'} #galleta>h2::before{content:'🥠'} #medidor>h2::before{content:'💗'}
@@ -1170,6 +1182,13 @@
     <div class="sub">elige uno y ve cómo se va llenando el mes 🗓️</div>
     <div class="card"><div class="sl-pick" id="slPick"></div><div class="sl-st" id="slSt"></div></div>
     <div class="card sl-cal" id="slCal"></div>
+  </section>
+
+  <!-- DISTANCIA -->
+  <section id="distancia">
+    <h2>¿Qué tan lejos estamos?</h2>
+    <div class="sub">para el widget de distancia 📍</div>
+    <div id="dsBox"></div>
   </section>
 
   <!-- HORÓSCOPO -->
@@ -3429,6 +3448,44 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   render(); setInterval(render,600000);
 })();
 
+/* ====== Widgets de la app: distancia, cómo está el otro y cuenta regresiva ====== */
+(function(){
+  const A=window.AndroidApp, me=VIEWER(), oth=me==='yo'?'ella':'yo', nm=w=>w==='yo'?C.yo:C.ella, $=id=>document.getElementById(id);
+  const L=k=>{try{const v=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(v)?v:[]}catch(e){return []}};
+  // --- sección «Distancia» (para prender o apagar compartir la ubicación) ---
+  const box=$('dsBox');
+  function paint(){
+    if(!box)return;
+    if(!(A&&A.setLoc)){box.innerHTML=`<div class="card" style="text-align:center;font-size:14.5px">📍 El widget de distancia funciona en la app de Android. ${window.AndroidApp?'Actualiza la app para usarlo.':''}</div>`;return}
+    const st=A.locState(), [k,txt]=String(A.distText()).split('|'), on=st!=='off';
+    box.innerHTML=`<div class="card ds">
+      <div class="ds-vis"><span class="dt a">A</span><span class="ln">${k==='juntos'?'─── ❤️ ───':k==='lejos'?'~~~ 💗 ~~~':'· · · 🤍 · · ·'}</span><span class="dt j">J</span></div>
+      <div class="ds-t">${esc(txt)}</div>
+      <label class="ds-sw"><span>Compartir mi ubicación con ${esc(nm(oth))}</span><input type="checkbox" ${on?'checked':''}><i></i></label>
+      <div class="ds-n">${st==='noperm'?'⚠️ Falta darle permiso de ubicación a la app.':st==='nobg'?'⚠️ Para que se actualice con la app cerrada, elige «Permitir todo el tiempo». <button class="pq-ed" id="dsBg">Abrir permiso</button>':on?'✅ Prendido · se actualiza cada 15–30 min':'Apagado · '+esc(nm(oth))+' verá que lo pausaste'}</div>
+      <div class="ds-p">🔒 Solo se comparte la <b>distancia</b>, nunca tu dirección ni un mapa. Va cifrada y la puedes apagar cuando quieras. Para que funcione, los dos tienen que tenerla prendida.</div></div>`;
+    box.querySelector('input').onchange=e=>{A.setLoc(e.target.checked);setTimeout(paint,800);setTimeout(paint,5000)};
+    const bb=$('dsBg'); if(bb)bb.onclick=()=>A.askBgLoc&&A.askBgLoc();
+  }
+  window.__locUpd=paint; paint(); setInterval(paint,60000); document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(paint,1500)});
+  if(!(A&&A.setInfo))return;
+  // --- datos para los widgets «Cómo está» y «Cuenta regresiva» ---
+  let last='';
+  function push(){
+    try{
+      const d=DK(MXD()), est={d};
+      const an=L('animo-cache').filter(x=>!x.x&&x.w===oth&&DK(MXD(x.a))===d).sort((a,b)=>b.a-a.a)[0]; if(an)est.animo=an.m+' '+GEN(an.n||'',oth).toLowerCase();
+      const tm=L('detalles-cache').find(x=>x.id==='tm:'+oth+':'+d&&!x.x); if(tm)est.termo=String(tm.v);
+      const sl=L('sellos-cache').find(x=>x.id===d+':'+oth&&!x.x); if(sl)est.sello=sl.e;
+      const ev=L('eventos-cache').filter(x=>!x.x&&x.f&&x.f>=d).sort((a,b)=>a.f<b.f?-1:1).slice(0,8).map(x=>({t:x.t,f:x.f}));
+      const cu={inicio:C.inicio,cumple:C.cumple||'',cumpleYo:C.cumpleYo||'',ella:C.ella,yo:C.yo,eventos:ev};
+      const j=JSON.stringify([est,cu]); if(j===last)return; last=j;
+      A.setInfo('estado',JSON.stringify(est)); A.setInfo('cuenta',JSON.stringify(cu));
+    }catch(e){}
+  }
+  setTimeout(push,3000); setInterval(push,60000); window.addEventListener('unlocked',()=>setTimeout(push,2500));
+})();
+
 /* ====== ¿Cómo te sientes hoy? ====== */
 (function(){
   const M=(C.animo||[]).filter(o=>o.emoji).map(o=>({e:o.emoji,n:FILL(o.nombre),r:FILL(o.respuesta)}));
@@ -4173,7 +4230,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
 /* ====== Pestañas ====== */
 (function(){
   const J=VIEWER()==='yo';
-  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','insignias','animo','termo','sello','horoscopo','pregunta','extrano','misavisos','final']],
+  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','insignias','animo','termo','sello','distancia','horoscopo','pregunta','extrano','misavisos','final']],
     ['nosotros','💑','Nosotros',['detalles','cancion','momentos','polaroid','diario','cielo','constelacion','arbol','sorpresas','capsula']],
     ['cartas','💌','Cartas',['carta','cartames','abrela','buzon','voz','botella','pizarra','escribir','razones','galleta','medidor','abrazo']],
     ['juegos','🎮','Juegos',['probable','fotoreto','elige','debo','corazones','rasca','vales','memorama','rompecabezas','adivina','ruleta','comida']],
