@@ -19,6 +19,7 @@ import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceError;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -155,11 +156,26 @@ public class MainActivity extends Activity {
         } catch (Exception e) { return true; }
     }
 
-    void loadHome(String url) {
+    // Carga la página; si no responde (internet lento o sin permiso de datos) usa la copia guardada y, si tampoco, muestra cómo arreglarlo.
+    int loadId = 0; boolean loadErr = false, fromCache = false, visible = false;
+    void loadHome(String url) { loadHome(url, !online()); }
+    void loadHome(String url, boolean cache) {
         if (wv == null) return;
-        wv.getSettings().setCacheMode(online() ? WebSettings.LOAD_NO_CACHE : WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        pageReady = false;
+        fromCache = cache; loadErr = false; pageReady = false; visible = false;
+        wv.getSettings().setCacheMode(cache ? WebSettings.LOAD_CACHE_ELSE_NETWORK : WebSettings.LOAD_NO_CACHE);
+        final int id = ++loadId; final WebView v = wv;
         wv.loadUrl(url != null ? url : home());
+        v.postDelayed(() -> { if (wv == v && id == loadId && !pageReady && !visible) fallback(); }, cache ? 12000 : 9000);
+    }
+    void fallback() {
+        if (wv == null) return;
+        if (!fromCache) { wv.stopLoading(); loadHome(null, true); return; }
+        wv.stopLoading(); loadId++;
+        String h = "<html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='margin:0;background:#3b0d1c;color:#fff7f0;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center'>"
+            + "<div style='padding:28px;max-width:340px'><div style='font-size:54px'>💌</div><h2 style='margin:10px 0 6px'>No pude conectarme</h2>"
+            + "<p style='opacity:.85;line-height:1.45'>Revisa tu internet. Si estás con datos, revisa que <b>Nuestro lugar</b> tenga permiso de usar datos móviles:<br><small>Ajustes → Aplicaciones → Nuestro lugar → Datos móviles</small></p>"
+            + "<button onclick='AndroidApp.retry()' style='margin-top:14px;border:0;border-radius:999px;padding:14px 28px;background:#e85d84;color:#fff;font-size:16px;font-weight:700'>Reintentar ♥</button></div></body></html>";
+        wv.loadDataWithBaseURL(null, h, "text/html", "utf-8", null);
     }
 
     @Override
@@ -258,7 +274,18 @@ public class MainActivity extends Activity {
             }
 
             @Override
+            public void onPageCommitVisible(WebView v, String url) {
+                if (url != null && url.startsWith(BASE) && !loadErr) visible = true;
+            }
+
+            @Override
+            public void onReceivedError(WebView v, WebResourceRequest r, WebResourceError e) {
+                if (r != null && r.isForMainFrame() && v == wv) { loadErr = true; v.post(MainActivity.this::fallback); }
+            }
+
+            @Override
             public void onPageFinished(final WebView v, String url) {
+                if (loadErr || url == null || !url.startsWith(BASE)) return;
                 pageReady = true;
                 v.postDelayed(MainActivity.this::deliver, 1500);
                 String w = sp.getString("who", "");
@@ -374,6 +401,9 @@ public class MainActivity extends Activity {
     }
 
     class Bridge {
+        @JavascriptInterface
+        public void retry() { runOnUiThread(() -> loadHome(null, false)); }
+
         @JavascriptInterface
         public void setTopic(String t) {
             String nt = t == null ? "" : t.trim();
