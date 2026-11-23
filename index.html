@@ -4060,6 +4060,7 @@ function slowScreen(msg){
 }
 setTimeout(()=>slowScreen('Está tardando más de lo normal en cargar…'),20000);
 const DG=m=>{try{window.AndroidApp&&AndroidApp.diag&&AndroidApp.diag(m)}catch(e){}};
+try{if(window.AndroidApp&&AndroidApp.saveKey&&KEY_B64)AndroidApp.saveKey(KEY_B64)}catch(e){}
 async function loadContent(){
   DG('arrancó el código');
   // se piden las dos fuentes a la vez y gana la primera; si el internet está lento y ya hay una copia guardada, se abre con ella

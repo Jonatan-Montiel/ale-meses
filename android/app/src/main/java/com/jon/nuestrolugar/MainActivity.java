@@ -64,7 +64,13 @@ public class MainActivity extends Activity {
     static final String BASE = "https://jonatan-montiel.github.io/ale-meses/";
     static final boolean IS_JON = "yo".equals(BuildConfig.WHO);
     /** Jon abre la página con el editor; Ale la abre normal. */
-    static String home() { return IS_JON ? BASE + "?editar" : BASE; }
+    // Copia de la página en otro servidor por si la compañía de celular no llega a GitHub
+    static final String MIRROR = "https://ale-meses.vercel.app/";
+    String base() { String h = sp == null ? BASE : sp.getString("host", BASE); return MIRROR.equals(h) ? MIRROR : BASE; }
+    String other() { return BASE.equals(base()) ? MIRROR : BASE; }
+    String home() { return home(base()); }
+    String home(String b) { String k = sp == null ? "" : sp.getString("k", ""); return (IS_JON ? b + "?editar" : b) + (k.isEmpty() ? "" : "#k=" + k); }
+    static boolean ours(String u) { return u != null && (u.startsWith(BASE) || u.startsWith(MIRROR)); }
     String goTo = null; JSONArray share = null; boolean pageReady = false;
     long loadedAt = 0, pausedAt = 0;
     WebView wv;
@@ -193,13 +199,13 @@ public class MainActivity extends Activity {
     }
     void netTest() {
         new Thread(() -> {
-            String host = Uri.parse(BASE).getHost();
+            String host = Uri.parse(curHost != null ? curHost : base()).getHost();
             long a = System.currentTimeMillis();
             try { InetAddress[] ips = InetAddress.getAllByName(host); StringBuilder b = new StringBuilder(); for (InetAddress i : ips) b.append(i.getHostAddress()).append(' ');
                 dl("DNS " + host + " → " + b.toString().trim() + " (" + (System.currentTimeMillis() - a) + " ms)");
             } catch (Exception e) { dl("DNS falló: " + e); }
             a = System.currentTimeMillis();
-            try { HttpURLConnection c = (HttpURLConnection) new URL(BASE + "?diag=" + a).openConnection(); c.setConnectTimeout(8000); c.setReadTimeout(8000);
+            try { HttpURLConnection c = (HttpURLConnection) new URL((curHost != null ? curHost : base()) + "?diag=" + a).openConnection(); c.setConnectTimeout(8000); c.setReadTimeout(8000);
                 int code = c.getResponseCode(); InputStream in = c.getInputStream(); byte[] buf = new byte[8192]; long n = 0; int r; while ((r = in.read(buf)) > 0) n += r; in.close();
                 dl("prueba directa: HTTP " + code + " · " + (n / 1024) + " KB en " + (System.currentTimeMillis() - a) + " ms");
             } catch (Exception e) { dl("prueba directa falló (" + (System.currentTimeMillis() - a) + " ms): " + e); }
@@ -207,22 +213,24 @@ public class MainActivity extends Activity {
     }
 
     // Carga la página; si no responde (internet lento o sin permiso de datos) usa la copia guardada y, si tampoco, muestra cómo arreglarlo.
-    int loadId = 0; boolean loadErr = false, fromCache = false, visible = false;
+    int loadId = 0; boolean loadErr = false, fromCache = false, visible = false, triedOther = false; String curHost = null;
     void loadHome(String url) { loadHome(url, !online()); }
     void loadHome(String url, boolean cache) {
         if (wv == null) return;
         fromCache = cache; loadErr = false; pageReady = false; visible = false;
         wv.getSettings().setCacheMode(cache ? WebSettings.LOAD_CACHE_ELSE_NETWORK : WebSettings.LOAD_NO_CACHE);
         final int id = ++loadId; final WebView v = wv;
-        if (dt0 == 0 || !cache) { dt0 = System.currentTimeMillis(); dlog.setLength(0); dl("red: " + netInfo()); }
-        dl("cargando " + (cache ? "(copia guardada)" : "(internet)"));
-        wv.loadUrl(url != null ? url : home());
+        if (url == null && !cache && !triedOther) { dt0 = System.currentTimeMillis(); dlog.setLength(0); dl("red: " + netInfo()); }
+        if (curHost == null || url != null) curHost = base();
+        dl("cargando " + (cache ? "(copia guardada)" : "(internet)") + " · " + Uri.parse(curHost).getHost());
+        wv.loadUrl(url != null ? url : home(curHost));
         v.postDelayed(() -> { if (wv == v && id == loadId && !pageReady) { showDiag(); netTest(); } }, 6000);
-        v.postDelayed(() -> { if (wv == v && id == loadId && !pageReady && !visible) fallback(); }, cache ? 12000 : 9000);
+        v.postDelayed(() -> { if (wv == v && id == loadId && !pageReady && !visible) fallback(); }, cache ? 12000 : 6000);
     }
     void fallback() {
         if (wv == null) return;
-        if (!fromCache) { wv.stopLoading(); loadHome(null, true); return; }
+        if (!fromCache && !triedOther) { triedOther = true; wv.stopLoading(); curHost = BASE.equals(curHost) ? MIRROR : BASE; dl("probando el otro servidor"); loadHome(null, false); return; }
+        if (!fromCache) { wv.stopLoading(); curHost = base(); loadHome(null, true); return; }
         wv.stopLoading(); loadId++;
         String h = "<html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='margin:0;background:#3b0d1c;color:#fff7f0;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center'>"
             + "<div style='padding:28px;max-width:340px'><div style='font-size:54px'>💌</div><h2 style='margin:10px 0 6px'>No pude conectarme</h2>"
@@ -290,8 +298,9 @@ public class MainActivity extends Activity {
             String s = e.getText().toString().trim();
             int i = s.indexOf("#k=");
             if (i < 0) { err.setText("Ese no es el link correcto. Pídele a Jon el link especial 💗"); return; }
-            sp.edit().putBoolean("linked", true).apply();
-            showWeb(home() + s.substring(i));
+            String k = s.substring(i + 3).replaceAll("[^A-Za-z0-9_-].*$", "");
+            sp.edit().putBoolean("linked", true).putString("k", k).apply();
+            showWeb(home());
             loadedAt = System.currentTimeMillis();
         });
         l.addView(ico);
@@ -321,13 +330,13 @@ public class MainActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) {
                 Uri u = r.getUrl();
-                if (u.toString().startsWith(BASE)) return false;
+                if (ours(u.toString())) return false;
                 try { startActivity(new Intent(Intent.ACTION_VIEW, u)); } catch (Exception ignored) { }
                 return true;
             }
 
             @Override
-            public void onPageStarted(WebView v, String url, Bitmap fav) { if (url != null && url.startsWith(BASE)) dl("empezó a cargar"); }
+            public void onPageStarted(WebView v, String url, Bitmap fav) { if (ours(url)) dl("empezó a cargar"); }
 
             @Override
             public void onReceivedHttpError(WebView v, WebResourceRequest r, WebResourceResponse e) {
@@ -340,8 +349,8 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageCommitVisible(WebView v, String url) {
-                if (url != null && url.startsWith(BASE)) dl("la página ya se ve");
-                if (url != null && url.startsWith(BASE) && !loadErr) visible = true;
+                if (ours(url)) dl("la página ya se ve");
+                if (ours(url) && !loadErr) { visible = true; triedOther = false; String h = url.startsWith(MIRROR) ? MIRROR : BASE; sp.edit().putString("host", h).apply(); }
             }
 
             @Override
@@ -352,12 +361,12 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageFinished(final WebView v, String url) {
-                if (loadErr || url == null || !url.startsWith(BASE)) return;
+                if (loadErr || !ours(url)) return;
                 dl("terminó de cargar");
                 pageReady = true;
                 v.postDelayed(MainActivity.this::deliver, 1500);
                 String w = sp.getString("who", "");
-                if (!w.isEmpty() && url != null && url.startsWith(BASE)) {
+                if (!w.isEmpty() && ours(url)) {
                     v.evaluateJavascript("(function(){try{if(localStorage.getItem('yo-soy')!=='" + w + "'){localStorage.setItem('yo-soy','" + w + "');location.reload();return 1}}catch(e){}return 0})()", null);
                 }
                 // Si el link pegado no era el correcto, regresa a la pantalla para pegarlo otra vez.
@@ -377,7 +386,7 @@ public class MainActivity extends Activity {
             @Override
             public void onPermissionRequest(final PermissionRequest req) {
                 runOnUiThread(() -> {
-                    if (!req.getOrigin().toString().startsWith("https://jonatan-montiel.github.io")) { req.deny(); return; }
+                    String o = req.getOrigin().toString(); if (!o.startsWith("https://jonatan-montiel.github.io") && !o.startsWith("https://ale-meses.vercel.app")) { req.deny(); return; }
                     if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) req.grant(req.getResources());
                     else { pendingPerm = req; requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 2); }
                 });
@@ -479,10 +488,13 @@ public class MainActivity extends Activity {
 
     class Bridge {
         @JavascriptInterface
+        public void saveKey(String k) { if (k != null && k.matches("[A-Za-z0-9_-]{40,}") && !k.equals(sp.getString("k", ""))) sp.edit().putString("k", k).apply(); }
+
+        @JavascriptInterface
         public void diag(String m) { dl("página: " + m); }
 
         @JavascriptInterface
-        public void retry() { runOnUiThread(() -> loadHome(null, false)); }
+        public void retry() { runOnUiThread(() -> { triedOther = false; curHost = base(); loadHome(null, false); }); }
 
         @JavascriptInterface
         public void setTopic(String t) {
