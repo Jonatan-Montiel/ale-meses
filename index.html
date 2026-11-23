@@ -4060,17 +4060,16 @@ function slowScreen(msg){
 }
 setTimeout(()=>slowScreen('Está tardando más de lo normal en cargar…'),20000);
 async function loadContent(){
-  const R=ghRepo(); let buf=null;
-  if(R){
-    try{
-      const r=await fetchT(`https://api.github.com/repos/${R.owner}/${R.repo}/contents/data.bin?ref=${encodeURIComponent(R.branch||'main')}&t=${Date.now()}`,
-        {headers:Object.assign(ghH(EDIT?ghToken():''),{Accept:'application/vnd.github.raw+json'}),cache:'no-store'},7000);
-      if(r.ok) buf=await r.arrayBuffer();
-    }catch(e){}
-  }
-  if(!buf){try{const r=await fetchT('data.bin?t='+Date.now(),{cache:'no-store'},15000); if(r.ok) buf=await r.arrayBuffer()}catch(e){}}
-  if(buf){try{localStorage.setItem('data-cache',b64buf(buf))}catch(e){}}
-  else{try{const t=localStorage.getItem('data-cache');if(t){buf=Uint8Array.from(atob(t),c=>c.charCodeAt(0)).buffer;window.__offline=1}}catch(e){}}
+  // se piden las dos fuentes a la vez y gana la primera; si el internet está lento y ya hay una copia guardada, se abre con ella
+  const R=ghRepo();
+  const api=R?fetchT(`https://api.github.com/repos/${R.owner}/${R.repo}/contents/data.bin?ref=${encodeURIComponent(R.branch||'main')}&t=${Date.now()}`,
+      {headers:Object.assign(ghH(EDIT?ghToken():''),{Accept:'application/vnd.github.raw+json'}),cache:'no-store'},12000).then(r=>r.ok?r.arrayBuffer():Promise.reject(r.status)):Promise.reject('sin repo');
+  const pages=fetchT('data.bin?t='+Date.now(),{cache:'no-store'},20000).then(r=>r.ok?r.arrayBuffer():Promise.reject(r.status));
+  const net=Promise.any([api,pages]).then(buf=>{try{localStorage.setItem('data-cache',b64buf(buf))}catch(e){}return buf});
+  let cached=null; try{const t=localStorage.getItem('data-cache');if(t)cached=Uint8Array.from(atob(t),c=>c.charCodeAt(0)).buffer}catch(e){}
+  let buf=null;
+  if(cached&&!EDIT){buf=await Promise.race([net.catch(()=>null),new Promise(ok=>setTimeout(()=>ok(null),2500))]);if(!buf){buf=cached;window.__offline=navigator.onLine===false?1:0}}
+  else{buf=await net.catch(()=>null);if(!buf&&cached){buf=cached;window.__offline=1}}
   if(!buf) throw new Error('nodata');
   return JSON.parse(new TextDecoder().decode(await decBuf(buf)));
 }
