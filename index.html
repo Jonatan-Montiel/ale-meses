@@ -17,7 +17,7 @@
 <link rel="alternate icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Caveat:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Caveat:wght@500;700&family=Nunito:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <style>
   :root{
     --wine:#3b0d1c; --wine2:#5a1430; --rose:#e85d84; --blush:#f7c6d3;
@@ -3206,10 +3206,16 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     const end=()=>{if(x0==null)return;x0=null;b.style.transition='transform .22s,opacity .22s,height .22s,margin .22s,padding .22s';
       if(drag&&Math.abs(dx)>90){b.style.transform=`translateX(${dx>0?420:-420}px)`;b.style.opacity='0';
         setTimeout(()=>{b.style.height=b.offsetHeight+'px';void b.offsetWidth;b.style.height='0';b.style.paddingTop=b.style.paddingBottom='0';b.style.marginTop='-10px';b.style.borderWidth='0'},200);
-        setTimeout(()=>{quitar(v);openList()},430)}
+        setTimeout(()=>{quitar(v);b.remove();head()},430)}
       else{b.style.transform='';b.style.opacity=''}
       if(drag){b.dataset.drag='1';setTimeout(()=>delete b.dataset.drag,50)}};
     b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end);
+  }
+  function head(){
+    const L=VIS(), p=ps.querySelector('.pend-h p'), l=ps.querySelector('.pend-l'); if(!p||!l)return;
+    p.textContent=L.length?(L.length===1?'tienes 1 cosa esperándote':'tienes '+L.length+' cosas esperándote'):'todo al día';
+    if(!L.some(v=>v.act)){const a=l.querySelector('.pend-all');if(a)a.remove()}
+    if(!L.length)l.innerHTML='<div class="pend-empty" style="animation:fadeIn .3s"><div>💗</div>No tienes nada pendiente.<br>Todo está al día.</div>';
   }
   function openList(){
     const L=VIS();
@@ -3219,8 +3225,9 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     else{const tip=document.createElement('div');tip.className='pend-tip';tip.textContent='desliza a un lado para quitar ↔';l.append(tip)}
     L.forEach(v=>{const b=document.createElement('button');b.className='pend-i';const t=String(v.t||'');const m=t.match(/^(\S+)\s(.*)$/);
       b.innerHTML=`<span class="pend-e">${esc(m?m[1]:'🔔')}</span><span class="pend-t">${esc(m?m[2]:t)}</span><span class="pend-go">Ver →</span>`;
+      if(v.act)b.dataset.act='1';
       b.onclick=()=>{if(b.dataset.drag)return;ps.classList.remove('open');setTimeout(()=>v.go&&v.go(),250)};swipe(b,v);l.append(b)});
-    if(L.some(v=>v.act)&&window.ACT_SEEN_ALL){const a=document.createElement('button');a.className='pend-all';a.textContent='✓ Marcar lo nuevo como visto';a.onclick=()=>{ACT_SEEN_ALL();openList()};l.append(a)}
+    if(L.some(v=>v.act)&&window.ACT_SEEN_ALL){const a=document.createElement('button');a.className='pend-all';a.textContent='✓ Marcar lo nuevo como visto';a.onclick=()=>{l.querySelectorAll('.pend-i').forEach(x=>{if(x.dataset.act){x.style.transition='opacity .2s';x.style.opacity='0';setTimeout(()=>x.remove(),200)}});ACT_SEEN_ALL();setTimeout(head,220)};l.append(a)}
     ps.querySelector('.pend-x').onclick=()=>ps.classList.remove('open');
     ps.classList.add('open');
   }
@@ -3733,10 +3740,17 @@ const PHOTO_CACHE={};
 async function photoBlobURL(p){
   if(PHOTO_CACHE[p])return PHOTO_CACHE[p];
   if(!/\.bin$/.test(p))return p; // fotos antiguas sin cifrar
-  const R=ghRepo(); let r=await fetchT(p,{cache:'force-cache'},10000).catch(()=>null);
-  if((!r||!r.ok)&&R)r=await fetchT(rawURL(R,p),{},8000).catch(()=>null);
-  if(!r||!r.ok)return '';
-  const plain=await decBuf(await r.arrayBuffer());
+  // las fotos (cifradas) se guardan en el celular para no descargarlas cada vez que se abre
+  let cs=null; try{cs=window.caches&&await caches.open('fotos-v1')}catch(e){}
+  let buf=null; try{const h=cs&&await cs.match(p);if(h)buf=await h.arrayBuffer()}catch(e){}
+  if(!buf){
+    const R=ghRepo(); let r=await fetchT(p,{cache:'force-cache'},10000).catch(()=>null);
+    if((!r||!r.ok)&&R)r=await fetchT(rawURL(R,p),{},8000).catch(()=>null);
+    if(!r||!r.ok)return '';
+    buf=await r.arrayBuffer();
+    try{cs&&await cs.put(p,new Response(buf.slice(0),{headers:{'Content-Type':'application/octet-stream'}}))}catch(e){}
+  }
+  let plain; try{plain=await decBuf(buf)}catch(e){try{cs&&cs.delete(p)}catch(_){}return ''}
   return PHOTO_CACHE[p]=URL.createObjectURL(new Blob([plain],{type:'image/jpeg'}));
 }
 function noKeyScreen(msg){
