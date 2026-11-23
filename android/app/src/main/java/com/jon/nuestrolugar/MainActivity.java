@@ -487,6 +487,34 @@ public class MainActivity extends Activity {
     String shortU(Uri u) { String x = u.toString(); x = x.replaceAll("#.*$", ""); return x.length() > 70 ? x.substring(0, 70) + "…" : x; }
 
     class Bridge {
+        /* ---- Compartir en WhatsApp, Facebook, Instagram… ---- */
+        @JavascriptInterface
+        public boolean shareImage(String b64, String text) {
+            try {
+                byte[] data = Base64.decode(b64.replaceFirst("^data:[^,]*,", ""), Base64.DEFAULT);
+                java.io.File dir = new java.io.File(getCacheDir(), "share"); dir.mkdirs();
+                java.io.File[] old = dir.listFiles(); if (old != null) for (java.io.File o : old) if (System.currentTimeMillis() - o.lastModified() > 3600000L) o.delete();
+                String name = "nl" + System.currentTimeMillis() + ".jpg";
+                try (java.io.FileOutputStream os = new java.io.FileOutputStream(new java.io.File(dir, name))) { os.write(data); }
+                Uri u = Uri.parse("content://" + getPackageName() + ".share/" + name);
+                Intent i = new Intent(Intent.ACTION_SEND).setType("image/jpeg").putExtra(Intent.EXTRA_STREAM, u).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                if (text != null && !text.isEmpty()) i.putExtra(Intent.EXTRA_TEXT, text);
+                i.setClipData(ClipData.newRawUri("", u));
+                final Intent ch = Intent.createChooser(i, "Compartir 💗");
+                runOnUiThread(() -> { try { startActivity(ch); } catch (Exception ignored) { } });
+                return true;
+            } catch (Exception e) { return false; }
+        }
+
+        @JavascriptInterface
+        public boolean shareText(String text) {
+            try {
+                final Intent ch = Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), "Compartir 💗");
+                runOnUiThread(() -> { try { startActivity(ch); } catch (Exception ignored) { } });
+                return true;
+            } catch (Exception e) { return false; }
+        }
+
         @JavascriptInterface
         public void saveKey(String k) { if (k != null && k.matches("[A-Za-z0-9_-]{40,}") && !k.equals(sp.getString("k", ""))) sp.edit().putString("k", k).apply(); }
 
