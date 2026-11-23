@@ -158,7 +158,7 @@ public class MainActivity extends Activity {
         if (wv == null || !pageReady || (goTo == null && share == null)) return;
         String js = "(function(){var g=" + (goTo == null ? "null" : JSONObject.quote(goTo)) + ",s=" + (share == null ? "null" : share.toString()) + ";"
                 + "if(document.body.classList.contains('locked')||!window.GOTO){window.__goAfterUnlock=g;window.__pendingShare=s}"
-                + "else{if(s&&window.__sharePhotos)window.__sharePhotos(s);else if(g)GOTO(g)}})()";
+                + "else{if(s&&window.__sharePhotos)window.__sharePhotos(s);else if(g)(window.GO_ANY||GOTO)(g)}})()";
         goTo = null; share = null;
         wv.evaluateJavascript(js, null);
     }

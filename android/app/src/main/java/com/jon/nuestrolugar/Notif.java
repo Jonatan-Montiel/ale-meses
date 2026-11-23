@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.graphics.Color;
 import android.os.Build;
 import android.content.SharedPreferences;
@@ -39,16 +40,22 @@ class Notif {
         if (appVisible) return; // ya lo está viendo en la página
         String title = o.optString("title", "");
         if (title.isEmpty()) title = "💗 Nuestro lugar";
-        show(c, id.hashCode(), title, o.optString("message", ""), true);
+        // a qué sección llevar al tocarla: viene en el link (…?ir=tipo)
+        String ir = null;
+        try { String ck = o.optString("click", ""); if (!ck.isEmpty()) { String t = Uri.parse(ck).getQueryParameter("ir"); if (t != null && t.matches("[a-z]{2,20}")) ir = "n:" + t + "\n" + o.optString("message", ""); } } catch (Exception ignored) { }
+        show(c, id.hashCode(), title, o.optString("message", ""), true, ir);
     }
 
     static void show(Context c, int id, String title, String msg) { show(c, id, title, msg, false); }
 
-    static void show(Context c, int id, String title, String msg, boolean actions) {
+    static void show(Context c, int id, String title, String msg, boolean actions) { show(c, id, title, msg, actions, null); }
+
+    static void show(Context c, int id, String title, String msg, boolean actions, String ir) {
         channel(c);
         Intent i = new Intent(c, MainActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pi = PendingIntent.getActivity(c, 0, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        if (ir != null) i.putExtra("ir", ir);
+        PendingIntent pi = PendingIntent.getActivity(c, ir != null ? id : 0, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(c, CH) : new Notification.Builder(c);
         b.setSmallIcon(R.drawable.ic_stat)
                 .setColor(Color.parseColor("#e85d84"))
