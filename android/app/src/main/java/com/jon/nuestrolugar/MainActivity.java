@@ -26,6 +26,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.content.ContentValues;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Icon;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Base64;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import android.hardware.biometrics.BiometricManager;
 import android.hardware.biometrics.BiometricPrompt;
 import android.os.CancellationSignal;
@@ -36,7 +54,8 @@ public class MainActivity extends Activity {
     static final String BASE = "https://jonatan-montiel.github.io/ale-meses/";
     static final boolean IS_JON = "yo".equals(BuildConfig.WHO);
     /** Jon abre la página con el editor; Ale la abre normal. */
-    static String home() { return (IS_JON ? BASE + "?editar&v=" : BASE + "?v=") + (System.currentTimeMillis() / 1000); }
+    static String home() { return IS_JON ? BASE + "?editar" : BASE; }
+    String goTo = null; JSONArray share = null; boolean pageReady = false;
     long loadedAt = 0, pausedAt = 0;
     WebView wv;
     ValueCallback<Uri[]> fileCb;
@@ -58,6 +77,89 @@ public class MainActivity extends Activity {
         if (!sp.getBoolean("linked", false)) showLinkScreen();
         else showWeb(null);
         Updater.check(this);
+        Reminder.schedule(this);
+        setupShortcuts();
+        handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent i) {
+        super.onNewIntent(i);
+        setIntent(i);
+        handleIntent(i);
+        deliver();
+    }
+
+    void setupShortcuts() {
+        if (Build.VERSION.SDK_INT < 25) return;
+        try {
+            ShortcutManager sm = getSystemService(ShortcutManager.class);
+            if (sm == null) return;
+            String[][] S = {{"buzon", "💌 Buzón", "Dejar una notita"}, {"extrano", "🥺 Te extraño", "Decir que lo extrañas"}, {"voz", "🎙️ Mensaje de voz", "Grabar un mensaje"}};
+            ArrayList<ShortcutInfo> L = new ArrayList<>();
+            for (String[] x : S) {
+                Intent i = new Intent(Intent.ACTION_VIEW).setClass(this, MainActivity.class).putExtra("ir", x[0]);
+                L.add(new ShortcutInfo.Builder(this, x[0]).setShortLabel(x[1]).setLongLabel(x[2]).setIcon(Icon.createWithResource(this, R.mipmap.ic_launcher)).setIntent(i).build());
+            }
+            sm.setDynamicShortcuts(L);
+        } catch (Exception ignored) { }
+    }
+
+    /** Atajos del ícono y fotos compartidas desde la galería. */
+    void handleIntent(Intent i) {
+        if (i == null) return;
+        String ir = i.getStringExtra("ir");
+        if (ir != null) { goTo = ir; i.removeExtra("ir"); }
+        String a = i.getAction();
+        if (Intent.ACTION_SEND.equals(a) || Intent.ACTION_SEND_MULTIPLE.equals(a)) {
+            ArrayList<Uri> us = new ArrayList<>();
+            if (Intent.ACTION_SEND.equals(a)) { Uri u = i.getParcelableExtra(Intent.EXTRA_STREAM); if (u != null) us.add(u); }
+            else { ArrayList<Uri> m = i.getParcelableArrayListExtra(Intent.EXTRA_STREAM); if (m != null) us.addAll(m); }
+            JSONArray arr = new JSONArray();
+            for (int k = 0; k < us.size() && k < 10; k++) { String d = shrink(us.get(k)); if (d != null) arr.put(d); }
+            if (arr.length() > 0) { share = arr; goTo = "momentos"; }
+            i.setAction(Intent.ACTION_MAIN);
+        }
+    }
+
+    String shrink(Uri u) {
+        try {
+            BitmapFactory.Options o = new BitmapFactory.Options(); o.inJustDecodeBounds = true;
+            try (InputStream in = getContentResolver().openInputStream(u)) { BitmapFactory.decodeStream(in, null, o); }
+            int s = 1; while (Math.max(o.outWidth, o.outHeight) / s > 2400) s *= 2;
+            BitmapFactory.Options o2 = new BitmapFactory.Options(); o2.inSampleSize = s;
+            Bitmap b; try (InputStream in = getContentResolver().openInputStream(u)) { b = BitmapFactory.decodeStream(in, null, o2); }
+            if (b == null) return null;
+            float sc = Math.min(1f, 1600f / Math.max(b.getWidth(), b.getHeight()));
+            if (sc < 1f) b = Bitmap.createScaledBitmap(b, Math.round(b.getWidth() * sc), Math.round(b.getHeight() * sc), true);
+            ByteArrayOutputStream bo = new ByteArrayOutputStream(); b.compress(Bitmap.CompressFormat.JPEG, 85, bo);
+            return "data:image/jpeg;base64," + Base64.encodeToString(bo.toByteArray(), Base64.NO_WRAP);
+        } catch (Exception e) { return null; }
+    }
+
+    /** Le pasa a la página el atajo o las fotos pendientes (se usan después del candado). */
+    void deliver() {
+        if (wv == null || !pageReady || (goTo == null && share == null)) return;
+        String js = "(function(){var g=" + (goTo == null ? "null" : JSONObject.quote(goTo)) + ",s=" + (share == null ? "null" : share.toString()) + ";"
+                + "if(document.body.classList.contains('locked')||!window.GOTO){window.__goAfterUnlock=g;window.__pendingShare=s}"
+                + "else{if(s&&window.__sharePhotos)window.__sharePhotos(s);else if(g)GOTO(g)}})()";
+        goTo = null; share = null;
+        wv.evaluateJavascript(js, null);
+    }
+
+    boolean online() {
+        try {
+            ConnectivityManager cm = getSystemService(ConnectivityManager.class);
+            NetworkCapabilities nc = cm.getNetworkCapabilities(cm.getActiveNetwork());
+            return nc != null && nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+        } catch (Exception e) { return true; }
+    }
+
+    void loadHome(String url) {
+        if (wv == null) return;
+        wv.getSettings().setCacheMode(online() ? WebSettings.LOAD_NO_CACHE : WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        pageReady = false;
+        wv.loadUrl(url != null ? url : home());
     }
 
     @Override
@@ -65,7 +167,7 @@ public class MainActivity extends Activity {
         super.onResume();
         Notif.appVisible = true; // lo que llegue mientras la ve, ya lo ve en la página
         // Si estuvo cerrada un rato, carga la versión más nueva de la página.
-        if (wv != null && pausedAt > 0 && System.currentTimeMillis() - pausedAt > 2 * 60 * 1000L) { loadedAt = System.currentTimeMillis(); wv.loadUrl(home()); }
+        if (wv != null && pausedAt > 0 && System.currentTimeMillis() - pausedAt > 2 * 60 * 1000L) { loadedAt = System.currentTimeMillis(); loadHome(null); }
     }
 
     @Override
@@ -157,6 +259,8 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageFinished(final WebView v, String url) {
+                pageReady = true;
+                v.postDelayed(MainActivity.this::deliver, 1500);
                 String w = sp.getString("who", "");
                 if (!w.isEmpty() && url != null && url.startsWith(BASE)) {
                     v.evaluateJavascript("(function(){try{if(localStorage.getItem('yo-soy')!=='" + w + "'){localStorage.setItem('yo-soy','" + w + "');location.reload();return 1}}catch(e){}return 0})()", null);
@@ -197,7 +301,7 @@ public class MainActivity extends Activity {
             }
         });
         setContentView(wv);
-        wv.loadUrl(url != null ? url : home());
+        loadHome(url);
     }
 
     boolean bioBusy = false;
@@ -292,6 +396,41 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public boolean hasBio() { return bioAvailable(); }
+        @JavascriptInterface
+        public void setWidget(String json) { sp.edit().putString("widget", json).apply(); Widget.refresh(MainActivity.this); }
+
+        @JavascriptInterface
+        public void setRacha(int n) { sp.edit().putInt("racha", n).apply(); }
+
+        @JavascriptInterface
+        public void visited() { sp.edit().putString("visto", Reminder.today()).apply(); }
+
+        @JavascriptInterface
+        public void setOther(String topic, String myName) { sp.edit().putString("other", topic == null ? "" : topic.trim()).putString("myName", myName == null ? "" : myName).apply(); }
+
+        @JavascriptInterface
+        public int takeExtrano() { int n = sp.getInt("pendExtrano", 0); sp.edit().putInt("pendExtrano", 0).apply(); return n; }
+
+        @JavascriptInterface
+        public String saveFile(String name, String text) {
+            try {
+                byte[] data = text.getBytes("UTF-8");
+                if (Build.VERSION.SDK_INT >= 29) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+                    cv.put(MediaStore.MediaColumns.MIME_TYPE, "application/json");
+                    cv.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+                    Uri u = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, cv);
+                    try (OutputStream os = getContentResolver().openOutputStream(u)) { os.write(data); }
+                    return "Descargas/" + name;
+                } else {
+                    java.io.File f = new java.io.File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), name);
+                    try (OutputStream os = new java.io.FileOutputStream(f)) { os.write(data); }
+                    return f.getAbsolutePath();
+                }
+            } catch (Exception e) { return ""; }
+        }
+
 
         @JavascriptInterface
         public void bio() { runOnUiThread(MainActivity.this::askBio); }

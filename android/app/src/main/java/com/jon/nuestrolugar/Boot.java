@@ -10,5 +10,7 @@ public class Boot extends BroadcastReceiver {
     public void onReceive(Context c, Intent i) {
         PollJob.schedule(c);
         StreamService.start(c);
+        Reminder.schedule(c);
+        Widget.refresh(c);
     }
 }

@@ -39,10 +39,12 @@ class Notif {
         if (appVisible) return; // ya lo está viendo en la página
         String title = o.optString("title", "");
         if (title.isEmpty()) title = "💗 Nuestro lugar";
-        show(c, id.hashCode(), title, o.optString("message", ""));
+        show(c, id.hashCode(), title, o.optString("message", ""), true);
     }
 
-    static void show(Context c, int id, String title, String msg) {
+    static void show(Context c, int id, String title, String msg) { show(c, id, title, msg, false); }
+
+    static void show(Context c, int id, String title, String msg, boolean actions) {
         channel(c);
         Intent i = new Intent(c, MainActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -56,6 +58,14 @@ class Notif {
                 .setAutoCancel(true)
                 .setContentIntent(pi);
         if (Build.VERSION.SDK_INT < 26) b.setPriority(Notification.PRIORITY_HIGH).setDefaults(Notification.DEFAULT_ALL);
+        if (actions) {
+            String[][] A = {{"love", "❤️ Me encanta"}, {"extrano", "🥺 Te extraño"}};
+            for (int k = 0; k < A.length; k++) {
+                Intent ai = new Intent(c, Action.class).putExtra("act", A[k][0]).putExtra("nid", id);
+                PendingIntent ap = PendingIntent.getBroadcast(c, id * 3 + k, ai, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                b.addAction(new Notification.Action.Builder(null, A[k][1], ap).build());
+            }
+        }
         NotificationManager nm = c.getSystemService(NotificationManager.class);
         if (nm != null) nm.notify(id, b.build());
     }

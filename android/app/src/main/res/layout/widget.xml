@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/wRoot" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:gravity="center" android:padding="12dp" android:background="@drawable/widget_bg">
+  <TextView android:id="@+id/wDias" android:layout_width="wrap_content" android:layout_height="wrap_content"
+      android:textColor="#FFFFFF" android:textSize="30sp" android:textStyle="bold" android:text="💗"/>
+  <TextView android:id="@+id/wSub" android:layout_width="wrap_content" android:layout_height="wrap_content"
+      android:textColor="#F7C6D3" android:textSize="12sp" android:text="días juntos"/>
+  <TextView android:id="@+id/wMsg" android:layout_width="match_parent" android:layout_height="wrap_content"
+      android:layout_marginTop="6dp" android:gravity="center" android:maxLines="3" android:ellipsize="end"
+      android:textColor="#FFF7F0" android:textSize="13sp" android:textStyle="italic" android:text="Abre la app para ver el mensaje de hoy"/>
+</LinearLayout>
