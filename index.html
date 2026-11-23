@@ -561,6 +561,21 @@
   body.editing:not(.ed-inactiva){padding-top:0}
   body.editing:not(.ed-inactiva) .ed-fab{top:12px}
   body.editing:not(.ed-inactiva) .nb-pill{top:12px}
+  /* Fechas especiales */
+  .esp-b{background:linear-gradient(135deg,#2e9d5b,#c0263f)}
+  #snow{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+  #snow i{position:absolute;top:-30px;color:#fff;opacity:.65;font-style:normal;animation:snow linear infinite;will-change:transform}
+  @keyframes snow{to{transform:translateY(110vh) translateX(30px)}}
+  .an-ov{position:fixed;inset:0;z-index:70;background:radial-gradient(120% 80% at 50% 0%,#7a1d40,#2a0a18);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;cursor:pointer}
+  .an-bar{position:absolute;top:16px;left:14px;right:14px;display:flex;gap:4px}.an-bar i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.25)}.an-bar i.on{background:#fff}
+  .an-x{position:absolute;top:26px;right:12px;background:none;border:0;color:#fff;font-size:30px;cursor:pointer}
+  .an-s{animation:pop .5s cubic-bezier(.2,.9,.3,1.3)}
+  .an-big{font-size:72px;line-height:1;margin-bottom:12px}
+  .an-n{font-family:'Fraunces',serif;font-size:72px;font-weight:600;line-height:1}
+  .an-s h2{font-family:'Fraunces',serif;font-size:34px;margin-bottom:8px}
+  .an-s p{font-size:19px;margin-top:8px}.an-s small{display:block;margin-top:8px;opacity:.75;font-size:14px}
+  .an-q{font-family:'Caveat',cursive;font-size:30px;line-height:1.2;margin-top:10px;max-width:320px}
+  .an-h{position:absolute;bottom:30px;font-size:13px;opacity:.6}
   /* Carta del mes */
   .cm-env{text-align:center}
   .cm-env .e{font-size:46px}
@@ -734,7 +749,7 @@
   #abrazo>h2::before{content:'🤗'} #rasca>h2::before{content:'🌠'} #vales>h2::before{content:'🎟️'} #memorama>h2::before{content:'🃏'}
   #rompecabezas>h2::before{content:'🧩'} #ruleta>h2::before{content:'🎡'} #comida>h2::before{content:'🍽️'} #planes>h2::before{content:'📝'}
   #aprender>h2::before{content:'📚'} #pelis>h2::before{content:'🍿'} #viene>h2::before{content:'🗓️'} #cielo>h2::before{content:'🌌'}
-  #arbol>h2::before{content:'🌳'} #sorpresas>h2::before{content:'🎁'} #constelacion>h2::before{content:'✨'} #capsula>h2::before{content:'⏳'} #reto>h2::before{content:'🎯'} #deseos>h2::before{content:'🎁'} #diario>h2::before{content:'📔'} #cumple>h2::before{content:'🎂'} #extrano>h2::before{content:'🥺'} #recetas>h2::before{content:'🍳'} #adivina>h2::before{content:'🔍'} #cumpleyo>h2::before{content:'🎂'} #parajon>h2::before{content:'💙'} #misavisos>h2::before{content:'🔔'}
+  #arbol>h2::before{content:'🌳'} #sorpresas>h2::before{content:'🎁'} #constelacion>h2::before{content:'✨'} #capsula>h2::before{content:'⏳'} #reto>h2::before{content:'🎯'} #deseos>h2::before{content:'🎁'} #diario>h2::before{content:'📔'} #cumple>h2::before{content:'🎂'} #extrano>h2::before{content:'🥺'} #recetas>h2::before{content:'🍳'} #adivina>h2::before{content:'🔍'} #cumpleyo>h2::before{content:'🎂'} #parajon>h2::before{content:'💙'} #aniversario>h2::before{content:'🥂'} #sanvalentin>h2::before{content:'💝'} #misavisos>h2::before{content:'🔔'}
   main section>.sub{font-size:21px;margin-bottom:22px}
   .card,.tile,.song,.capsule,.ev,.kb-col,.rch-p,.an-b{border-radius:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 28px -14px rgba(0,0,0,.6)}
   .tile,.rch-p,.an-b,.ev{border-radius:18px}
@@ -859,6 +874,20 @@
     <h2>El cumpleaños de Jon</h2>
     <div class="sub">para celebrarlo como se merece 💙</div>
     <div id="cyBox"></div>
+  </section>
+
+  <!-- ANIVERSARIO -->
+  <section id="aniversario">
+    <h2>Nuestro aniversario</h2>
+    <div class="sub">cada año, todo lo que vivimos 🥂</div>
+    <div id="anBox"></div>
+  </section>
+
+  <!-- SAN VALENTÍN -->
+  <section id="sanvalentin" hidden>
+    <h2>San Valentín</h2>
+    <div class="sub">nuestro día 💝</div>
+    <div id="svBox"></div>
   </section>
 
   <!-- RACHA -->
@@ -1456,7 +1485,7 @@ const AV=C.avisos||{};
 const AV_TIPOS=window.AV_TIPOS=[['vale','🎟️ Canjea un vale'],['nota','💌 Te deja una notita en el buzón'],['ruleta','🎡 Gira la ruleta de citas'],['abrela','💌 Abre una carta «Ábrela cuando…»'],
   ['abrazo','🤗 Te manda un abrazo (corazón presionado)'],['rasca','🌠 Raspa el rasca y gana'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Agrega o aprende algo nuevo'],
   ['evento','🗓️ Agrega algo a «Lo que viene»'],['foto','📷 Sube fotos al carrusel'],['recuerdo','📷 Guarda un recuerdo de algo que hicieron'],['sorpresa','🎁 Abre la sorpresa del mes'],
-  ['capsula','⏳ Abre la cápsula del tiempo'],['racha','🔥 Desbloquea un premio de su racha'],['animo','🌤️ Dice cómo se siente'],['voz','🎙️ Te manda un mensaje de voz'],['cartames','✉️ Abre la carta del mes'],['comida','🍽️ Gira la rueda de la comida'],['pregunta','💭 Responde la pregunta del día'],['deseo','🎁 Agrega algo a su lista de deseos'],['diario','📔 Guarda un momento en el diario'],['reto','🎯 Cumplen el reto de la semana'],['extrano','🥺 Te dice que te extraña'],['receta','🍳 Agrega una receta'],['adivina','🔍 Adivina una foto'],['like','❤️ Le da like a tus notitas o audios'],['cumple','🎂 Abre su carta de cumpleaños'],['parajon','💙 Lo que te deja en «Para Jon» (vales, cartas, rasca…)'],['peli','🍿 Agrega, ve o califica una peli o serie'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (cada vez que entra)']];
+  ['capsula','⏳ Abre la cápsula del tiempo'],['racha','🔥 Desbloquea un premio de su racha'],['animo','🌤️ Dice cómo se siente'],['voz','🎙️ Te manda un mensaje de voz'],['cartames','✉️ Abre la carta del mes'],['comida','🍽️ Gira la rueda de la comida'],['pregunta','💭 Responde la pregunta del día'],['deseo','🎁 Agrega algo a su lista de deseos'],['diario','📔 Guarda un momento en el diario'],['reto','🎯 Cumplen el reto de la semana'],['extrano','🥺 Te dice que te extraña'],['receta','🍳 Agrega una receta'],['adivina','🔍 Adivina una foto'],['like','❤️ Le da like a tus notitas o audios'],['cumple','🎂 Abre su carta de cumpleaños'],['especial','💝 Fechas especiales (San Valentín, aniversario)'],['parajon','💙 Lo que te deja en «Para Jon» (vales, cartas, rasca…)'],['peli','🍿 Agrega, ve o califica una peli o serie'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (cada vez que entra)']];
 const AV_OFF_DEF=window.AV_OFF_DEF={};
 const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'&&AV.notas===false)return false;return !off[t]};
 const AV_LAST={};
@@ -1478,7 +1507,7 @@ function avisar(txt,tipo){
   try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
   const quien=soyYo?C.yo:C.ella;
   if(soyYo){ txt=txt.split(C.ella+' ').join(C.yo+' ').replace(/ te (dejó|mandó)/,' le $1'); }
-  const title=({vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',parajon:'💙 Para '+C.yo,extrano:'🥺 Te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ Le gustó',cumple:'🎂 Cumpleaños',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
+  const title=({vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',especial:'💝 Fecha especial',parajon:'💙 Para '+C.yo,extrano:'🥺 Te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ Le gustó',cumple:'🎂 Cumpleaños',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
   fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
 }
 const VIEWER=()=>{if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
@@ -1715,7 +1744,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     try{if(window.AndroidApp){window.AndroidApp.relink();return}}catch(e){}
     location.replace(location.pathname);
@@ -2987,10 +3016,100 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
     d.innerHTML='⚠️ El token del guardado compartido (Gists) venció o ya no funciona. Renuévalo en el editor → «Planes, fotos, vales…».<button>✕</button>';d.querySelector('button').onclick=()=>d.remove();document.body.append(d)});
 })();
 
+/* ====== Fechas especiales: Navidad, San Valentín y aniversario ====== */
+(function(){
+  const now=MXD(), Y=now.getFullYear(), M=now.getMonth()+1, Dd=now.getDate(), J=VIEWER()==='yo';
+  const hero=document.getElementById('inicio');
+  const banner=(t)=>{const b=document.createElement('div');b.className='cu-banner esp-b';b.textContent=t;hero.prepend(b)};
+  /* --- Navidad (1 dic – 6 ene) --- */
+  const xmas=(M===12)||(M===1&&Dd<=6);
+  if(xmas){
+    document.body.classList.add('xmas');
+    const t=M===12&&Dd===24?'🎄 ¡Feliz Nochebuena, mi amor! ✨':M===12&&Dd===25?'🎄 ¡Feliz Navidad, mi amor! 🎁':M===12&&Dd===31?'🎆 ¡Feliz fin de año! Gracias por este año juntos 💗':M===1&&Dd===1?'🎆 ¡Feliz Año Nuevo, mi amor! 🥂':'🎄 Felices fiestas, mi amor ❄️';
+    banner(J?t.replace('mi amor',C.ella).replace('juntos 💗','juntos 💙'):t);
+    const sn=document.createElement('div');sn.id='snow';
+    for(let i=0;i<16;i++){const f=document.createElement('i');f.textContent=i%3?'❄':'♥';f.style.left=(Math.random()*100)+'%';f.style.animationDuration=(9+Math.random()*9)+'s';f.style.animationDelay=(-Math.random()*16)+'s';f.style.fontSize=(10+Math.random()*10)+'px';sn.append(f)}
+    document.body.append(sn);
+    if((M===12&&(Dd===24||Dd===25))||(M===1&&Dd===1))window.addEventListener('hoyClosed',()=>setTimeout(()=>{if(window.confetti)confetti(110);burst(30)},300));
+  }
+  /* --- San Valentín (cuenta regresiva desde el 1 de febrero, carta el 14) --- */
+  const sv=document.getElementById('sanvalentin'), svb=document.getElementById('svBox');
+  const S=SHARED('especiales.bin','e','especiales-cache',20,()=>renderSV());
+  function renderSV(){
+    if(!(M===2&&Dd<=14)&&!(EDIT&&new URLSearchParams(location.search).has('vista'))){sv.hidden=true;return}
+    sv.hidden=false; const day=M===2&&Dd===14, left=14-Dd;
+    const mine=S.all().find(x=>x.id==='sv-ella-'+Y&&!x.x);
+    let h='';
+    if(!day)h=`<div class="card cu"><div class="cu-e">💝</div><div class="daily-l">San Valentín · 14 de febrero</div><div class="cu-n"><b>${left}</b><span>${left===1?'día':'días'}</span></div><div class="cu-t">${left===1?'¡mañana es nuestro día! 💘':'ya casi es nuestro día 💕'}</div></div>`;
+    else h=`<div class="card cu today"><div class="cu-e">💝</div><h3 class="cu-h">¡Feliz San Valentín, ${esc(J?C.yo:C.ella)}!</h3><div class="cu-t">hoy y siempre, tú 💘</div>
+      ${(!J&&C.cartaSanValentin)?'<button class="btn small" id="svOpen">💌 Abrir mi carta de San Valentín</button>':''}${(J&&mine)?'<button class="btn small" id="svOpen">💌 Abrir la carta de '+esc(C.ella)+'</button>':''}</div>`;
+    svb.innerHTML=h;
+    const op=document.getElementById('svOpen');
+    if(op)op.onclick=()=>{const txt=J?mine.t:FILL(C.cartaSanValentin);const p=document.createElement('div');p.className='paper';p.innerHTML=String(txt).split(/\n\s*\n/).map(x=>'<p>'+esc(x).replace(/\n/g,'<br>')+'</p>').join('')+`<p class="sign">${J?'— '+esc(C.ella)+' 💙':esc(SIGN)}</p>`;
+      op.replaceWith(p);if(window.confetti)confetti(90);burst(30);
+      let d=false;try{const k='sv-av-'+Y;d=localStorage.getItem(k)==='1';localStorage.setItem(k,'1')}catch(e){}
+      if(!d)avisar(J?`💝 ${C.ella} abrió la carta de San Valentín que le escribiste`:`💝 ${C.ella} abrió su carta de San Valentín`,'especial')};
+    if(!J){ // Ale le puede escribir una carta a Jon para ese día
+      const f=document.createElement('div');f.className='di-add card pj-f';
+      f.innerHTML=`<div class="daily-l">Tu carta de San Valentín para ${esc(C.yo)} 🤫</div><textarea class="pq-in" rows="4" maxlength="3000" placeholder="${esc(C.yo)} la podrá abrir el 14 de febrero">${mine?esc(mine.t):''}</textarea><button class="btn small">💌 Guardar</button><div class="kb-st"></div>`;
+      f.querySelector('button').onclick=()=>{const t=f.querySelector('textarea').value.trim();if(!t)return;
+        if(mine){mine.t=t;mine.u=Date.now();S.save()}else{S.add({id:'sv-ella-'+Y,t,a:Date.now(),u:Date.now()});avisar(`🤫 ${C.ella} te escribió algo para San Valentín`,'especial')}
+        f.querySelector('.kb-st').textContent='💌 Guardada';burst(10)};
+      svb.append(f);
+    }
+    if(day&&!renderSV.done){renderSV.done=1;banner(J?'💝 ¡Feliz San Valentín, '+C.yo+'!':'💝 ¡Feliz San Valentín, mi amor!');window.addEventListener('hoyClosed',()=>setTimeout(()=>{if(window.confetti)confetti(110);burst(40)},300))}
+  }
+  renderSV();
+  /* --- Aniversario: «Nuestro año en números» --- */
+  const an=document.getElementById('aniversario'), anb=document.getElementById('anBox');
+  const yrs=Math.floor(MONTHS/12), nextA=new Date(SY+yrs+1,SM-1,SD), today=new Date(Y,M-1,Dd);
+  const isAnniv=MONTHS>=12&&M===SM&&Dd===SD;
+  const n1=yrs>=1?yrs:1, from=new Date(SY+(yrs>=1?yrs-1:0),SM-1,SD).getTime(), to=yrs>=1?new Date(SY+yrs,SM-1,SD+1).getTime():Date.now();
+  function stats(){
+    const L=k=>{try{return JSON.parse(localStorage.getItem(k)||'[]')||[]}catch(e){return []}}, inR=x=>{const t=x.a||x.u||0;return t>=from&&t<to&&!x.x};
+    const notas=L('notas-cache').filter(inR), voz=L('voz-cache').filter(inR), diario=L('diario-cache').filter(inR), retos=L('retos-cache').filter(inR),
+      pelis=L('pelis-cache').filter(x=>!x.x&&x.c==='d'), planes=L('planes-cache').filter(x=>!x.x&&x.c==='d'), recetas=L('recetas-cache').filter(inR),
+      ex=L('extrano-cache').filter(inR), preg=L('preguntas-cache').filter(inR), fotosAle=L('fotos-ale-cache');
+    const days=Math.round(((yrs>=1?Math.min(Date.now(),to):Date.now())-START)/864e5);
+    const pq=new Set(); const by={}; preg.forEach(x=>{by[x.d]=(by[x.d]||0)+1}); Object.entries(by).forEach(([d,c])=>{if(c>=2)pq.add(d)});
+    const likes=notas.filter(x=>x.lk&&(x.lk.yo||x.lk.ella)).length;
+    return [['💞',days,'días juntos','y cada uno valió la pena'],['💌',notas.length,'notitas en el buzón',likes?`y ${likes} con ❤️`:''],['🎙️',voz.length,'mensajes de voz',''],
+      ['📸',(C.fotos||[]).length+(Array.isArray(fotosAle)?fotosAle.length:0),'fotos juntos',''],['📔',diario.length,'momentos en el diario',''],['💭',pq.size,'preguntas que contestamos los dos',''],
+      ['🎯',retos.length,'retos cumplidos',''],['🍿',pelis.length,'pelis y series que vimos',''],['🎉',planes.length,'planes que logramos',''],['🍳',recetas.length,'recetas que cocinamos',''],
+      ['🥺',ex.length,'veces que nos extrañamos',`${C.ella}: ${ex.filter(x=>x.w==='ella').length} · ${C.yo}: ${ex.filter(x=>x.w==='yo').length}`]].filter(s=>s[1]>0);
+  }
+  function show(){
+    const st=stats(), di=(()=>{try{return JSON.parse(localStorage.getItem('diario-cache')||'[]').filter(x=>!x.x&&(x.a||0)>=from&&(x.a||0)<to)}catch(e){return []}})();
+    const fav=di.sort(()=>Math.random()-.5).slice(0,3);
+    const slides=[`<div class="an-big">🥂</div><h2>${n1===1?'Nuestro primer año':'Nuestro año '+n1}</h2><p>${esc(C.ella)} & ${esc(C.yo)} en números</p>`]
+      .concat(st.map(([e,n,l,x])=>`<div class="an-big">${e}</div><div class="an-n">${n.toLocaleString('es-MX')}</div><p>${esc(l)}</p>${x?`<small>${esc(x)}</small>`:''}`));
+    if(C.cancion&&C.cancion.titulo)slides.push(`<div class="an-big">🎵</div><p>La canción de nuestro año</p><div class="an-n" style="font-size:30px">${esc(C.cancion.titulo)}</div><small>${esc(C.cancion.artista||'')}</small>`);
+    fav.forEach(x=>slides.push(`<div class="an-big">📔</div><p>Un momento que guardamos</p><div class="an-q">“${esc(x.t||'')}”</div><small>${esc(x.d||'')}</small>`));
+    slides.push(`<div class="an-big">💗</div><h2>Por muchos años más</h2><p>${J?'te amo, '+esc(C.ella):'te amo, mi amor'}</p>`);
+    const ov=document.createElement('div');ov.className='an-ov';let i=0;
+    const paint=()=>{ov.innerHTML=`<div class="an-bar">${slides.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join('')}</div><button class="an-x" aria-label="Cerrar">×</button><div class="an-s">${slides[i]}</div><div class="an-h">${i<slides.length-1?'toca para seguir →':'toca para cerrar'}</div>`;
+      ov.querySelector('.an-x').onclick=e=>{e.stopPropagation();ov.remove()}};
+    ov.onclick=()=>{if(i<slides.length-1){i++;paint();burst(6)}else ov.remove()};
+    paint();document.body.append(ov);if(window.confetti)confetti(80);
+  }
+  function renderA(){
+    const prev=EDIT&&MONTHS<12;
+    if(MONTHS>=12){
+      anb.innerHTML=`<div class="card cu${isAnniv?' today':''}"><div class="cu-e">🥂</div>${isAnniv?`<h3 class="cu-h">¡Feliz ${n1===1?'primer':''} aniversario!</h3><div class="cu-t">${n1} ${n1===1?'año':'años'} de nosotros 💗</div>`:`<div class="daily-l">${n1===1?'Nuestro primer año':'Nuestro año '+n1}</div>`}<button class="btn small" id="anBtn">✨ Ver nuestro año en números</button></div>`;
+    } else {
+      const d=Math.round((nextA-today)/864e5);
+      anb.innerHTML=`<div class="card cu"><div class="cu-e">🥂</div><div class="daily-l">Nuestro primer aniversario · ${SD} de ${MESN[SM-1]}</div><div class="cu-n"><b>${d}</b><span>${d===1?'día':'días'}</span></div><div class="cu-t">${d<=7?'¡ya casi es nuestro primer año! 🎉':d<=31?'falta menos de un mes para nuestro primer año 💗':'contando los días para nuestro primer año 💗'}</div>${prev?'<button class="btn small alt" id="anBtn">👀 Vista previa (solo tú)</button>':''}</div>`;
+    }
+    const b=document.getElementById('anBtn'); if(b)b.onclick=show;
+  }
+  renderA();
+  if(isAnniv){banner('🥂 ¡Feliz aniversario, mi amor! 💗');window.addEventListener('hoyClosed',()=>setTimeout(()=>{show();let d=false;try{const k='an-av-'+Y;d=localStorage.getItem(k)==='1';localStorage.setItem(k,'1')}catch(e){}if(!d&&!J)avisar(`🥂 ${C.ella} vio «Nuestro año en números»`,'especial')},600),{once:true})}
+})();
+
 /* ====== Pestañas ====== */
 (function(){
   const J=VIEWER()==='yo';
-  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','cumple','cumpleyo','racha','animo','pregunta','extrano','misavisos','final']],
+  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','animo','pregunta','extrano','misavisos','final']],
     ['nosotros','💑','Nosotros',['cancion','momentos','polaroid','diario','cielo','constelacion','arbol','sorpresas','capsula']],
     ['cartas','💌','Cartas',['carta','cartames','abrela','buzon','voz','escribir','razones','galleta','medidor','abrazo']],
     ['juegos','🎮','Juegos',['rasca','vales','memorama','rompecabezas','adivina','ruleta','comida']],
@@ -3327,7 +3446,7 @@ document.getElementById('moreLove').addEventListener('click',()=>{
 /* =====================================================================
    CARGA DEL CONTENIDO (content.json en tu repo de GitHub)
    ===================================================================== */
-const DEFAULTS = {"ella": "", "yo": "", "inicio": "2026-01-01", "pin": "0000", "pistas": [], "saludos": {"manana": "", "tarde": "", "noche": ""}, "mensajesDia": [], "cancion": {"titulo": "", "artista": "", "link": ""}, "carta": "", "abrela": [], "cartaSola": "", "fotos": [], "fotoPolaroid": 1, "polaroidTexto": "", "fotoRompecabezas": 1, "razones": [], "fortunas": [], "rasca": {"emoji": "", "titulo": "", "texto": ""}, "vales": [], "ruleta": [], "lista": [], "horaCielo": "21:00", "sorpresas": [], "sorpresasExtra": [], "capsula": {"fecha": "2030-01-01", "texto": ""}, "secreto": "", "fraseFinal": "", "mensajitos": [], "creditos": [], "whatsapp": {"numero": "", "mensajes": []}, "reinicio": "1", "kanban": {}, "racha": [{"dias": "15", "emoji": "🎟️", "titulo": "Cita sorpresa", "texto": "Por 15 días seguidos: una cita que yo planeo completita, tú solo llegas."}, {"dias": "45", "emoji": "🍰", "titulo": "Tu postre favorito", "texto": "Por 45 días seguidos: te llevo tu postre favorito a donde estés."}, {"dias": "100", "emoji": "👑", "titulo": "Un día de reina", "texto": "Por 100 días seguidos: un día entero dedicado a ti y tú pones todas las reglas."}], "animo": [{"emoji": "😊", "nombre": "Feliz", "respuesta": "¡Me encanta verte feliz! Que nada te quite esa sonrisa hoy 💗"}, {"emoji": "🥰", "nombre": "Enamorada", "respuesta": "Yo también, mi amor. Cada día más 🥰"}, {"emoji": "😴", "nombre": "Cansada", "respuesta": "Descansa tantito, preciosa. Hoy te mereces una siesta y muchos apapachos 💤"}, {"emoji": "😔", "nombre": "Triste", "respuesta": "Aquí estoy para ti, siempre. Te mando un abrazo enorme 🤗 y si quieres, háblame."}, {"emoji": "😣", "nombre": "Estresada", "respuesta": "Respira hondo… tú puedes con todo. Y si no, aquí estoy para ayudarte 💪💗"}, {"emoji": "😤", "nombre": "Enojada", "respuesta": "Ay, mi amor… cuéntame qué pasó, te escucho. (Y si fui yo, perdóname 🙈)"}], "cartasMes": [{"mes": "8", "titulo": "Ocho meses contigo", "texto": "Mi amor:\n\nHoy cumplimos ocho meses y todavía me sorprende lo bonito que se siente estar contigo. Gracias por cada risa, cada abrazo y por hacer que los días normales se sientan especiales.\n\nNo sé qué nos traiga el siguiente mes, pero sé que lo quiero vivir contigo.\n\nTe amo mucho, {ella}."}, {"mes": "9", "titulo": "Nueve meses de nosotros", "texto": "Mi vida:\n\nNueve meses ya. Cada mes que pasa te conozco un poquito más y te quiero un poquito más también.\n\nGracias por elegirme todos los días. Yo te elijo a ti, hoy y siempre.\n\nCon todo mi amor."}], "comida": ["🌮 Tacos", "🍕 Pizza", "🍣 Sushi", "🍔 Hamburguesas", "🍜 Ramen", "🍝 Pasta", "🥗 Algo sanito", "🌯 Burritos", "🍗 Alitas", "🥘 Comida casera"], "preguntas": ["¿Qué fue lo primero que pensaste de mí cuando me conociste?", "¿Cuál ha sido tu momento favorito conmigo hasta ahora?", "Si pudiéramos irnos de viaje mañana, ¿a dónde iríamos?", "¿Qué canción te recuerda a mí?", "¿Qué es lo que más te gusta de nosotros?", "¿Cuál sería nuestra cita perfecta?", "¿Qué es algo que nunca me has contado?", "¿Qué comida te gustaría que cocináramos juntos?", "¿En qué momento supiste que te gustaba?", "¿Qué sueño te gustaría que cumpliéramos juntos?", "¿Qué es lo más bonito que he hecho por ti?", "Si fuéramos una película, ¿cómo se llamaría?", "¿Qué te hace sentir más querida?", "¿Cómo te imaginas que estaremos en un año?", "¿Qué es algo pequeño que hago y que te encanta?", "¿Cuál es tu recuerdo favorito de nuestra primera cita?", "Si pudieras revivir un día conmigo, ¿cuál sería?", "¿Qué apodo te gustaría que te dijera?", "¿Qué es algo nuevo que quieras que aprendamos juntos?", "¿Qué te da más risa de mí?", "¿Qué es lo que más extrañas de mí cuando no estamos juntos?", "¿Qué lugar te gustaría que conociéramos en la ciudad?", "¿Qué tres palabras nos describen como pareja?", "¿Cuál es tu plan ideal para un domingo conmigo?", "¿Qué te gustaría que hiciéramos en nuestro aniversario?", "¿Qué es algo que admiras de mí?", "¿Qué te gustaría que hiciera más seguido?", "¿Cuál es la foto nuestra que más te gusta y por qué?", "Si tuviéramos una mascota, ¿cómo se llamaría?", "¿Qué quieres decirme hoy que no me hayas dicho?"], "retos": ["Cocinar juntos una receta que nunca hayamos hecho 🍳", "Tomarnos una foto juntos en un lugar nuevo 📸", "Tener una cita sin celulares 📵", "Escribirnos una carta a mano y dárnosla en persona ✉️", "Ver el atardecer juntos 🌅", "Probar un postre que nunca hayamos probado 🍰", "Hacer una noche de juegos de mesa 🎲", "Caminar por un lugar de la ciudad que no conozcamos 🚶", "Bailar juntos una canción en casa 💃", "Hacer un picnic 🧺", "Ver una película que elija el otro, sin quejarnos 🎬", "Darnos un masaje 💆", "Ir a desayunar a un lugar nuevo 🥞", "Decirnos 3 cosas que admiramos del otro 💗", "Hacer una manualidad juntos ✂️", "Visitar un museo 🏛️", "Prepararle el desayuno sorpresa al otro ☕", "Planear juntos nuestro próximo viaje ✈️", "Recrear nuestra primera cita 💕", "Hacer juntos algo que nos dé un poquito de miedo 🎢"], "cumple": "", "cartaCumple": "Feliz cumpleaños, mi amor 🎂\n\nHoy celebro que existes y que la vida me regaló la suerte de encontrarte. Gracias por tu risa, por tu forma de ver el mundo y por hacerme tan feliz todos los días.\n\nQue este año te traiga todo lo que sueñas, y que me dejes estar a tu lado para verte cumplirlo.\n\nTe amo muchísimo, {ella}. Hoy y siempre.", "cumpleYo": ""};
+const DEFAULTS = {"ella": "", "yo": "", "inicio": "2026-01-01", "pin": "0000", "pistas": [], "saludos": {"manana": "", "tarde": "", "noche": ""}, "mensajesDia": [], "cancion": {"titulo": "", "artista": "", "link": ""}, "carta": "", "abrela": [], "cartaSola": "", "fotos": [], "fotoPolaroid": 1, "polaroidTexto": "", "fotoRompecabezas": 1, "razones": [], "fortunas": [], "rasca": {"emoji": "", "titulo": "", "texto": ""}, "vales": [], "ruleta": [], "lista": [], "horaCielo": "21:00", "sorpresas": [], "sorpresasExtra": [], "capsula": {"fecha": "2030-01-01", "texto": ""}, "secreto": "", "fraseFinal": "", "mensajitos": [], "creditos": [], "whatsapp": {"numero": "", "mensajes": []}, "reinicio": "1", "kanban": {}, "racha": [{"dias": "15", "emoji": "🎟️", "titulo": "Cita sorpresa", "texto": "Por 15 días seguidos: una cita que yo planeo completita, tú solo llegas."}, {"dias": "45", "emoji": "🍰", "titulo": "Tu postre favorito", "texto": "Por 45 días seguidos: te llevo tu postre favorito a donde estés."}, {"dias": "100", "emoji": "👑", "titulo": "Un día de reina", "texto": "Por 100 días seguidos: un día entero dedicado a ti y tú pones todas las reglas."}], "animo": [{"emoji": "😊", "nombre": "Feliz", "respuesta": "¡Me encanta verte feliz! Que nada te quite esa sonrisa hoy 💗"}, {"emoji": "🥰", "nombre": "Enamorada", "respuesta": "Yo también, mi amor. Cada día más 🥰"}, {"emoji": "😴", "nombre": "Cansada", "respuesta": "Descansa tantito, preciosa. Hoy te mereces una siesta y muchos apapachos 💤"}, {"emoji": "😔", "nombre": "Triste", "respuesta": "Aquí estoy para ti, siempre. Te mando un abrazo enorme 🤗 y si quieres, háblame."}, {"emoji": "😣", "nombre": "Estresada", "respuesta": "Respira hondo… tú puedes con todo. Y si no, aquí estoy para ayudarte 💪💗"}, {"emoji": "😤", "nombre": "Enojada", "respuesta": "Ay, mi amor… cuéntame qué pasó, te escucho. (Y si fui yo, perdóname 🙈)"}], "cartasMes": [{"mes": "8", "titulo": "Ocho meses contigo", "texto": "Mi amor:\n\nHoy cumplimos ocho meses y todavía me sorprende lo bonito que se siente estar contigo. Gracias por cada risa, cada abrazo y por hacer que los días normales se sientan especiales.\n\nNo sé qué nos traiga el siguiente mes, pero sé que lo quiero vivir contigo.\n\nTe amo mucho, {ella}."}, {"mes": "9", "titulo": "Nueve meses de nosotros", "texto": "Mi vida:\n\nNueve meses ya. Cada mes que pasa te conozco un poquito más y te quiero un poquito más también.\n\nGracias por elegirme todos los días. Yo te elijo a ti, hoy y siempre.\n\nCon todo mi amor."}], "comida": ["🌮 Tacos", "🍕 Pizza", "🍣 Sushi", "🍔 Hamburguesas", "🍜 Ramen", "🍝 Pasta", "🥗 Algo sanito", "🌯 Burritos", "🍗 Alitas", "🥘 Comida casera"], "preguntas": ["¿Qué fue lo primero que pensaste de mí cuando me conociste?", "¿Cuál ha sido tu momento favorito conmigo hasta ahora?", "Si pudiéramos irnos de viaje mañana, ¿a dónde iríamos?", "¿Qué canción te recuerda a mí?", "¿Qué es lo que más te gusta de nosotros?", "¿Cuál sería nuestra cita perfecta?", "¿Qué es algo que nunca me has contado?", "¿Qué comida te gustaría que cocináramos juntos?", "¿En qué momento supiste que te gustaba?", "¿Qué sueño te gustaría que cumpliéramos juntos?", "¿Qué es lo más bonito que he hecho por ti?", "Si fuéramos una película, ¿cómo se llamaría?", "¿Qué te hace sentir más querida?", "¿Cómo te imaginas que estaremos en un año?", "¿Qué es algo pequeño que hago y que te encanta?", "¿Cuál es tu recuerdo favorito de nuestra primera cita?", "Si pudieras revivir un día conmigo, ¿cuál sería?", "¿Qué apodo te gustaría que te dijera?", "¿Qué es algo nuevo que quieras que aprendamos juntos?", "¿Qué te da más risa de mí?", "¿Qué es lo que más extrañas de mí cuando no estamos juntos?", "¿Qué lugar te gustaría que conociéramos en la ciudad?", "¿Qué tres palabras nos describen como pareja?", "¿Cuál es tu plan ideal para un domingo conmigo?", "¿Qué te gustaría que hiciéramos en nuestro aniversario?", "¿Qué es algo que admiras de mí?", "¿Qué te gustaría que hiciera más seguido?", "¿Cuál es la foto nuestra que más te gusta y por qué?", "Si tuviéramos una mascota, ¿cómo se llamaría?", "¿Qué quieres decirme hoy que no me hayas dicho?"], "retos": ["Cocinar juntos una receta que nunca hayamos hecho 🍳", "Tomarnos una foto juntos en un lugar nuevo 📸", "Tener una cita sin celulares 📵", "Escribirnos una carta a mano y dárnosla en persona ✉️", "Ver el atardecer juntos 🌅", "Probar un postre que nunca hayamos probado 🍰", "Hacer una noche de juegos de mesa 🎲", "Caminar por un lugar de la ciudad que no conozcamos 🚶", "Bailar juntos una canción en casa 💃", "Hacer un picnic 🧺", "Ver una película que elija el otro, sin quejarnos 🎬", "Darnos un masaje 💆", "Ir a desayunar a un lugar nuevo 🥞", "Decirnos 3 cosas que admiramos del otro 💗", "Hacer una manualidad juntos ✂️", "Visitar un museo 🏛️", "Prepararle el desayuno sorpresa al otro ☕", "Planear juntos nuestro próximo viaje ✈️", "Recrear nuestra primera cita 💕", "Hacer juntos algo que nos dé un poquito de miedo 🎢"], "cumple": "", "cartaCumple": "Feliz cumpleaños, mi amor 🎂\n\nHoy celebro que existes y que la vida me regaló la suerte de encontrarte. Gracias por tu risa, por tu forma de ver el mundo y por hacerme tan feliz todos los días.\n\nQue este año te traiga todo lo que sueñas, y que me dejes estar a tu lado para verte cumplirlo.\n\nTe amo muchísimo, {ella}. Hoy y siempre.", "cumpleYo": "", "cartaSanValentin": "Mi amor:\n\nFeliz San Valentín. Gracias por llenar mis días de risas, de abrazos y de cosas bonitas. Contigo todo se siente fácil y todo vale la pena.\n\nHoy, y todos los días, te elijo a ti.\n\nTe amo, {ella}."};
 const EDIT = /[?&]editar\b/.test(location.search) || location.hash==='#editar';
 const LS={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
 function ghRepo(){
@@ -3428,6 +3547,7 @@ const SCHEMA=[
   {t:'Mensaje del día',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2],['mensajesDia','Frases (cambia una cada día)','list']]},
   {t:'Cumpleaños de Ale',f:[['cumple','Fecha de su cumpleaños (el año no importa)','date'],['cartaCumple','Carta de cumpleaños (se abre solo ese día) · deja una línea vacía entre párrafos','textarea',8]]},
   {t:'Cumpleaños de Jon',f:[['cumpleYo','Tu fecha de cumpleaños (el año no importa)','date']]},
+  {t:'Fechas especiales',f:[['cartaSanValentin','Carta de San Valentín para Ale (se abre el 14 de febrero)','textarea',6]]},
   {t:'Racha de visitas',f:[['racha','Premios por días seguidos','objlist',[['dias','Días seguidos (número)','text'],['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
   {t:'¿Cómo te sientes hoy?',f:[['animo','Caritas y lo que le respondes','objlist',[['emoji','Emoji','text'],['nombre','Cómo se siente','text'],['respuesta','Lo que le respondes','textarea',2]]]]},
   {t:'Pregunta del día',f:[['preguntas','Preguntas (sale una distinta cada día, en orden)','list']]},
