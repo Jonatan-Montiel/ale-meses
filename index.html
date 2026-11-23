@@ -2882,6 +2882,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const s=songOfDay(oth); if(s){const a=el(`<${okL(s.l)?'a':'div'} ${okL(s.l)?`href="${esc(s.l)}" target="_blank" rel="noopener"`:''}>🎵 ${esc(nm(oth))} te dedica hoy: <b>${esc(s.t)}</b>${s.ar?' · '+esc(s.ar):''}</${okL(s.l)?'a':'div'}>`);x.append(a)}
     const F=live('foto',oth); if(F.length){const f=F[(doy()*7)%F.length];const w=el(`<div><img alt=""><div style="margin-top:6px">${f.c?'“'+esc(f.c)+'”':'📸 una foto tuya que le encanta a '+esc(nm(oth))}</div></div>`);x.append(w);photoInto(w.querySelector('img'),f)}
   }
+  window.DT_GO=(t,w)=>{if(t)tab=t;who=w||'mi';render();GOTO('detalles')};
   window.addEventListener('detalles',()=>{render();extra()}); render(); extra();
 })();
 
@@ -3221,6 +3222,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const del=(btn,x)=>{let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent='¿Borrar?';setTimeout(()=>{armed=false;btn.textContent='✕'},2500);return}upd(x,{x:1})}};
   const T=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['cartaj','💌 Una carta'],['mes','✉️ Carta del mes'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana']];
   let tab='msg', razon=null, carta=null, pick=null, scratching=false, cjOpen=false, mesOpen=null, mesSel=0;
+  window.PJ_GO=t=>{if(t)tab=t;render();GOTO('parajon')};
   const doy=()=>{const n=MXD();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)};
   const el=(h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
   function todayMsg(){const L=live('msg');return L.length?L[doy()%L.length]:null}
@@ -3418,11 +3420,18 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const ELLA=VIEWER()==='ella', fromOther=x=>ELLA?x.w!=='ella':x.w==='ella';
   // lo que ya tiene su propio pendiente en la campana no se repite
   const DUP=x=>(x.k==='detalle'&&/te dejó un reto|te propone/.test(x.t||''))||x.k==='nota'||x.k==='voz'||x.k==='pregunta'||(x.k==='like'&&/notita/.test(x.t||''));
-  const SEC={plan:'planes',aprender:'aprender',peli:'pelis',evento:'viene',foto:'momentos',recuerdo:'momentos',deseo:'deseos',diario:'diario',reto:'reto',extrano:'extrano',receta:'recetas',animo:'animo',insignia:'insignias',abrazo:'abrazo',racha:'racha',cartames:'cartames',comida:'comida',adivina:'adivina',cumple:ELLA?'cumpleyo':'cumple',especial:'sanvalentin',parajon:'parajon',vale:'vales',ruleta:'ruleta',abrela:'abrela',rasca:'rasca',sorpresa:'sorpresas',capsula:'capsula',like:'voz',secreto:'final',entrada:'inicio',detalle:'detalles',termo:'termo'};
+  const SEC={plan:'planes',aprender:'aprender',peli:'pelis',evento:'viene',foto:'momentos',recuerdo:'planes',deseo:'deseos',diario:'diario',reto:'reto',extrano:'extrano',receta:'recetas',animo:'animo',insignia:'insignias',abrazo:'abrazo',racha:'racha',cartames:'cartames',comida:'comida',adivina:'adivina',cumple:ELLA?'cumpleyo':'cumple',especial:'sanvalentin',parajon:'parajon',vale:'vales',ruleta:'ruleta',abrela:'abrela',rasca:'rasca',sorpresa:'sorpresas',capsula:'capsula',like:'voz',secreto:'final',entrada:'inicio',detalle:'detalles',termo:'termo'};
   let seen=new Set(); try{seen=new Set(JSON.parse(localStorage.getItem('act-visto')||'[]'))}catch(e){}
   let since=+(localStorage.getItem('act-desde')||0); if(!since){since=Date.now();try{localStorage.setItem('act-desde',String(since))}catch(e){}}
   const save=()=>{try{localStorage.setItem('act-visto',JSON.stringify([...seen].slice(-300)))}catch(e){}};
   const sk=x=>x.id+'@'+(x.u||0);
+  function ir(x){const t=x.t||'';
+    if(x.k==='detalle'&&window.DT_GO){const tb=/canción|playlist/.test(t)?'song':/reto/.test(t)?'reto':/foto/.test(t)?'foto':/propone|respondió/.test(t)?'antojo':'song';
+      const mine=/cumplió tu reto|respondió a/.test(t);return DT_GO(tb,mine?'dar':'mi')}
+    if(x.k==='parajon'){const tb=/cumpleaños/.test(t)?null:/carta de los \d+ meses/.test(t)?'mes':/Ábrela cuando/.test(t)?'carta':/escribió una carta|abrió la carta que le/.test(t)?'cartaj':/vale/.test(t)?'vale':/rasca/.test(t)?'rasca':/razón|frasco/.test(t)?'razon':'msg';
+      if(!tb)return GOTO('cumpleyo'); if(window.PJ_GO)return PJ_GO(tb)}
+    if(x.k==='especial')return GOTO(/año en números/.test(t)?'aniversario':'sanvalentin');
+    GOTO(SEC[x.k]||'inicio')}
   const hora=t=>new Date(t).toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit',timeZone:'America/Mexico_City'});
   const txt=x=>x.k==='entrada'?`👀 ${C.ella} entró a la app${x.n>1?' '+x.n+' veces hoy · la última':''} a las ${hora(x.a)}`:x.t;
   let shown=[];
@@ -3432,7 +3441,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     const wk=Date.now()-7*864e5, today='in:'+DK(MXD());
     S.all().filter(x=>!x.x&&fromOther(x)&&!DUP(x)&&(x.k!=='entrada'||x.id===today)&&(x.a||0)>since&&(x.a||0)>wk&&!seen.has(sk(x))).sort((a,b)=>b.a-a.a).slice(0,20).forEach(x=>{
       const k='act-'+x.id; shown.push(k);
-      PEND.set(k,{n:1,t:txt(x),act:1,del:()=>{seen.add(sk(x));save();show()},go:()=>{seen.add(sk(x));save();show();GOTO(SEC[x.k]||'inicio')}})});
+      PEND.set(k,{n:1,t:txt(x),act:1,del:()=>{seen.add(sk(x));save();show()},go:()=>{seen.add(sk(x));save();show();ir(x)}})});
   };
   show(); setInterval(show,60000);
 })();
