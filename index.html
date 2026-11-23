@@ -1135,7 +1135,7 @@
   <!-- BUZÓN -->
   <section id="buzon">
     <h2>Buzón de notitas</h2>
-    <div class="sub">déjame un mensajito, yo te contesto 💌</div>
+    <div class="sub" id="nbSub">notitas entre los dos: tú escribes y el otro contesta 💌</div>
     <div class="nb" id="nbList"></div>
     <div class="nb-who" id="nbWho" hidden></div>
     <form class="kb-add" id="nbForm" autocomplete="off">
@@ -1163,7 +1163,7 @@
   <!-- MENSAJES DE VOZ -->
   <section id="voz">
     <h2>Mensajes de voz</h2>
-    <div class="sub">para cuando quieras escuchar mi voz 🎙️</div>
+    <div class="sub" id="vzSub">los dos pueden grabar y escuchar 🎙️</div>
     <div class="vz-list" id="vzList"></div>
     <div class="vz-rec">
       <button class="btn" id="vzBtn">🎙️ Grabar mensaje</button>
@@ -3598,8 +3598,10 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
    const E=VIEWER()==='ella';
    const lab=k=>k==='dos'?['dos','💞 De los dos']:k==='cada'?[E?'ella':'yo',E?'💗 Para ti · de '+C.yo:'💙 Para ti · de '+C.ella]
      :k==='ella'?['ella',E?'💗 Para ti · de '+C.yo:'💗 Para '+C.ella+' · así lo ve ella']:['yo',E?'💙 Para '+C.yo+' · tú se lo dejas':'💙 Para ti · de '+C.ella];
+   {const o=E?C.yo:C.ella;const a=document.getElementById('nbSub'),b=document.getElementById('vzSub');if(a)a.textContent=`notitas entre ${o} y tú: los dos escriben y se contestan 💌`;if(b)b.textContent=`mensajes de voz entre ${o} y tú: los dos graban y escuchan 🎙️`}
+   const DOS2={buzon:'💞 De los dos · los dos escriben',voz:'💞 De los dos · los dos graban'};
    document.querySelectorAll('main section[id]').forEach(sec=>{if(sec.id==='inicio'||sec.id==='final')return;const h=sec.querySelector(':scope>h2');if(!h)return;
-     const [c,t]=lab(FOR[sec.id]||'dos'),b=document.createElement('div');b.className='for-tag '+c;b.textContent=t;h.after(b)})}
+     const [c,t0]=lab(FOR[sec.id]||'dos'),t=DOS2[sec.id]||t0,b=document.createElement('div');b.className='for-tag '+c;b.textContent=t;h.after(b)})}
   let cur=null;
   function setTab(k,keep){
     if(k===cur)return; cur=k;
