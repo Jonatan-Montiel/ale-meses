@@ -20,16 +20,21 @@ public class Action extends BroadcastReceiver {
         int nid = i.getIntExtra("nid", 0);
         NotificationManager nm = c.getSystemService(NotificationManager.class);
         if (nm != null) nm.cancel(nid);
+        final PendingResult pr = goAsync();
+        send(c, act, pr::finish);
+    }
+
+    /** Le manda al otro «te extraña» o «le encantó» (también lo usa el widget). */
+    static void send(final Context c, final String act, final Runnable done) {
         final SharedPreferences sp = c.getSharedPreferences("nl", Context.MODE_PRIVATE);
         final String other = sp.getString("other", ""), me = sp.getString("myName", MainActivity.IS_JON ? "Jon" : "Ale");
         if ("extrano".equals(act)) sp.edit().putInt("pendExtrano", sp.getInt("pendExtrano", 0) + 1).apply();
-        if (other.isEmpty()) return;
-        final PendingResult pr = goAsync();
+        if (other.isEmpty()) { if (done != null) done.run(); return; }
         new Thread(() -> {
             try {
                 JSONObject o = new JSONObject();
                 o.put("topic", other);
-                if ("extrano".equals(act)) { o.put("title", "🥺 " + me + " te extraña"); o.put("message", "🥺 " + me + " te extraña"); }
+                if ("extrano".equals(act)) { o.put("title", "🥺 " + me + " te extraña"); o.put("message", "🥺 " + me + " te extraña"); o.put("click", "https://ale-meses.vercel.app/?ir=extrano"); }
                 else { o.put("title", "❤️ A " + me + " le encantó"); o.put("message", "❤️ A " + me + " le encantó lo que le mandaste"); }
                 o.put("priority", 4);
                 HttpURLConnection h = (HttpURLConnection) new URL("https://ntfy.sh/").openConnection();
@@ -37,7 +42,7 @@ public class Action extends BroadcastReceiver {
                 try (OutputStream os = h.getOutputStream()) { os.write(o.toString().getBytes("UTF-8")); }
                 h.getResponseCode(); h.disconnect();
             } catch (Exception ignored) { }
-            pr.finish();
+            if (done != null) done.run();
         }).start();
     }
 }

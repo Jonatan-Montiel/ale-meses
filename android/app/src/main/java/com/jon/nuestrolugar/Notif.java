@@ -37,6 +37,7 @@ class Notif {
         String nseen = (id + "," + seen);
         if (nseen.length() > 600) nseen = nseen.substring(0, 600);
         sp.edit().putString("seen", nseen).putString("since", id.isEmpty() ? String.valueOf(System.currentTimeMillis() / 1000) : id).apply();
+        try { String ck = o.optString("click", ""); String tp = ck.isEmpty() ? null : Uri.parse(ck).getQueryParameter("ir"); WidgetEstado.fromNtfy(c, tp, o.optString("message", "")); } catch (Exception ignored) { }
         if (appVisible) return; // ya lo está viendo en la página
         String title = o.optString("title", "");
         if (title.isEmpty()) title = "💗 Nuestro lugar";

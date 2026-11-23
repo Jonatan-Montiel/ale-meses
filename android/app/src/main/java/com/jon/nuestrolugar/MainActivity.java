@@ -243,6 +243,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         Notif.appVisible = true; // lo que llegue mientras la ve, ya lo ve en la página
+        if (Loc.on(this)) new Thread(() -> Loc.sync(getApplicationContext())).start();
         Updater.check(this); // cada vez que la abre (máximo cada 30 min) revisa si hay versión nueva
         // Si estuvo cerrada un rato, carga la versión más nueva de la página.
         if (wv != null && pausedAt > 0 && System.currentTimeMillis() - pausedAt > 2 * 60 * 1000L) { loadedAt = System.currentTimeMillis(); loadHome(null); }
@@ -456,6 +457,12 @@ public class MainActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int c, String[] p, int[] g) {
+        if (c == 7 || c == 8) {
+            if (c == 7 && Loc.perm(this)) askBg();
+            new Thread(() -> Loc.sync(getApplicationContext())).start();
+            if (wv != null) wv.postDelayed(() -> { if (wv != null) wv.evaluateJavascript("window.__locUpd&&__locUpd()", null); }, 600);
+            return;
+        }
         if (c == 2 && pendingPerm != null) {
             if (g.length > 0 && g[0] == PackageManager.PERMISSION_GRANTED) pendingPerm.grant(pendingPerm.getResources());
             else pendingPerm.deny();
@@ -487,7 +494,45 @@ public class MainActivity extends Activity {
 
     String shortU(Uri u) { String x = u.toString(); x = x.replaceAll("#.*$", ""); return x.length() > 70 ? x.substring(0, 70) + "…" : x; }
 
+    void askBg() {
+        if (Build.VERSION.SDK_INT < 29 || Loc.bg(this)) return;
+        new android.app.AlertDialog.Builder(this).setTitle("📍 Un paso más")
+            .setMessage("Para que la distancia se actualice aunque la app esté cerrada, en la siguiente pantalla elige «Permitir todo el tiempo». Solo se comparte la distancia, cifrada.")
+            .setPositiveButton("Continuar", (d, w) -> { try { requestPermissions(new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 8); } catch (Exception ignored) { } })
+            .setNegativeButton("Ahora no", null).show();
+    }
+
     class Bridge {
+        /* ---- Widgets: distancia, cómo está y cuenta regresiva ---- */
+        @JavascriptInterface
+        public void setLoc(boolean on) {
+            sp.edit().putBoolean("loc-on", on).putBoolean("loc-off-sent", false).putLong("loc-sent", 0).apply();
+            runOnUiThread(() -> {
+                if (on && !Loc.perm(MainActivity.this)) requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 7);
+                else if (on) askBg();
+            });
+            new Thread(() -> Loc.sync(getApplicationContext())).start();
+        }
+
+        @JavascriptInterface
+        public String locState() { return !Loc.on(MainActivity.this) ? "off" : !Loc.perm(MainActivity.this) ? "noperm" : !Loc.bg(MainActivity.this) ? "nobg" : "on"; }
+
+        @JavascriptInterface
+        public String distText() { String[] st = Loc.state(MainActivity.this); return st[0] + "|" + st[1]; }
+
+        @JavascriptInterface
+        public void askBgLoc() { runOnUiThread(MainActivity.this::askBg); }
+
+        @JavascriptInterface
+        public void setInfo(String key, String json) {
+            if (!"cuenta".equals(key) && !"estado".equals(key)) return;
+            try {
+                if ("estado".equals(key)) { org.json.JSONObject n = new org.json.JSONObject(json), o = new org.json.JSONObject(sp.getString("estado", "{}")); if (n.optString("d").equals(o.optString("d"))) { java.util.Iterator<String> it = o.keys(); while (it.hasNext()) { String k = it.next(); if (!n.has(k)) n.put(k, o.get(k)); } } json = n.toString(); }
+            } catch (Exception ignored) { }
+            sp.edit().putString(key, json).apply();
+            WidgetCuenta.refresh(MainActivity.this); WidgetEstado.refresh(MainActivity.this);
+        }
+
         /* ---- Compartir en WhatsApp, Facebook, Instagram… ---- */
         @JavascriptInterface
         public boolean shareImage(String b64, String text) {

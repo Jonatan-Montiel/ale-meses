@@ -8,6 +8,9 @@
   <uses-permission android:name="android.permission.RECORD_AUDIO"/>
   <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+  <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING"/>
   <application android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher"
       android:theme="@style/Tema" android:allowBackup="false" android:usesCleartextTraffic="false">
@@ -33,6 +36,22 @@
     <receiver android:name=".Widget" android:exported="true" android:label="@string/app_name">
       <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
       <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info"/>
+    </receiver>
+    <receiver android:name=".WidgetDist" android:exported="true" android:label="📍 Distancia">
+      <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_dist_info"/>
+    </receiver>
+    <receiver android:name=".WidgetExtrano" android:exported="true" android:label="🥺 Te extraño">
+      <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_extrano_info"/>
+    </receiver>
+    <receiver android:name=".WidgetEstado" android:exported="true" android:label="🌤️ Cómo está">
+      <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_estado_info"/>
+    </receiver>
+    <receiver android:name=".WidgetCuenta" android:exported="true" android:label="⏳ Cuenta regresiva">
+      <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_cuenta_info"/>
     </receiver>
     <provider android:name=".ShareProvider" android:authorities="${applicationId}.share" android:exported="false" android:grantUriPermissions="true"/>
     <receiver android:name=".Reminder" android:exported="false"/>
