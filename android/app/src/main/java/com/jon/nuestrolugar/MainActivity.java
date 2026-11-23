@@ -506,6 +506,9 @@ public class MainActivity extends Activity {
     }
 
     class Bridge {
+        @JavascriptInterface
+        public int appVersion() { try { android.content.pm.PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0); return (int) (Build.VERSION.SDK_INT >= 28 ? pi.getLongVersionCode() : pi.versionCode); } catch (Exception e) { return 0; } }
+
         /* ---- Widgets: distancia, cómo está y cuenta regresiva ---- */
         @JavascriptInterface
         public void setLoc(boolean on) {
