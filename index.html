@@ -1689,6 +1689,7 @@ galRender();
   let v='', open=false, cd=null;
   ['1','2','3','4','5','6','7','8','9','♥','0','⌫'].forEach(k=>{
     const b=document.createElement('button'); b.textContent=k; if(k==='♥'||k==='⌫')b.className='ghost';
+    if(k==='♥')b.setAttribute('aria-label','Borrar todo'); if(k==='⌫')b.setAttribute('aria-label','Borrar uno');
     b.addEventListener('click',()=>press(k)); pad.appendChild(b);
   });
   const btns=()=>pad.querySelectorAll('button');
@@ -1704,7 +1705,7 @@ galRender();
   function press(k){
     if(lockedFor()>0)return;
     if(k==='⌫'){v=v.slice(0,-1);paint();return}
-    if(k==='♥'){burst(8);return}
+    if(k==='♥'){if(v){v='';paint();const d=document.getElementById('pinDots');d.classList.remove('err');void d.offsetWidth;d.classList.add('err')}return}
     if(v.length>=4)return; v+=k; paint();
     if(v.length===4)setTimeout(test,200);
   }
