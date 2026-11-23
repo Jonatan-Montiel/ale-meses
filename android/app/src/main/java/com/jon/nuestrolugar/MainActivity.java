@@ -26,6 +26,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.hardware.biometrics.BiometricManager;
+import android.hardware.biometrics.BiometricPrompt;
+import android.os.CancellationSignal;
 import android.widget.ScrollView;
 import android.view.inputmethod.EditorInfo;
 
@@ -197,6 +200,44 @@ public class MainActivity extends Activity {
         wv.loadUrl(url != null ? url : home());
     }
 
+    boolean bioBusy = false;
+
+    boolean bioAvailable() {
+        try {
+            if (Build.VERSION.SDK_INT >= 30) {
+                BiometricManager bm = getSystemService(BiometricManager.class);
+                return bm != null && bm.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) == BiometricManager.BIOMETRIC_SUCCESS;
+            } else if (Build.VERSION.SDK_INT == 29) {
+                BiometricManager bm = getSystemService(BiometricManager.class);
+                return bm != null && bm.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
+            } else if (Build.VERSION.SDK_INT == 28) {
+                return getPackageManager().hasSystemFeature(PackageManager.FEATURE_FINGERPRINT);
+            }
+        } catch (Exception ignored) { }
+        return false;
+    }
+
+    void askBio() {
+        if (bioBusy || Build.VERSION.SDK_INT < 28 || !bioAvailable()) return;
+        bioBusy = true;
+        try {
+            BiometricPrompt.Builder b = new BiometricPrompt.Builder(this)
+                    .setTitle("Nuestro lugar 💗")
+                    .setSubtitle("Usa tu huella para entrar")
+                    .setNegativeButton("Usar código", getMainExecutor(), (d, w) -> bioBusy = false);
+            if (Build.VERSION.SDK_INT >= 30) b.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK);
+            b.build().authenticate(new CancellationSignal(), getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
+                @Override
+                public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult r) {
+                    bioBusy = false;
+                    if (wv != null) wv.evaluateJavascript("window.__bioOk&&window.__bioOk()", null);
+                }
+                @Override
+                public void onAuthenticationError(int code, CharSequence msg) { bioBusy = false; }
+            });
+        } catch (Exception e) { bioBusy = false; }
+    }
+
     @Override
     public void onRequestPermissionsResult(int c, String[] p, int[] g) {
         if (c == 2 && pendingPerm != null) {
@@ -248,5 +289,11 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public boolean isApp() { return true; }
+
+        @JavascriptInterface
+        public boolean hasBio() { return bioAvailable(); }
+
+        @JavascriptInterface
+        public void bio() { runOnUiThread(MainActivity.this::askBio); }
     }
 }

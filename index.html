@@ -99,6 +99,8 @@
   .pad{display:grid;grid-template-columns:repeat(3,72px);gap:14px;margin-top:10px}
   .pad button{height:72px;border-radius:50%;border:1px solid rgba(247,198,211,.3);background:rgba(255,255,255,.07);color:#fff;font:600 26px 'Nunito';cursor:pointer}
   .pad button:active{background:rgba(232,93,132,.4)}
+  .bio-btn{margin-top:22px;background:rgba(255,255,255,.1);border:1px solid rgba(247,198,211,.35);color:#fff;border-radius:999px;padding:11px 20px;font:800 15px 'Nunito';cursor:pointer}
+  .bio-btn[hidden]{display:none}
   .pad .ghost{background:none;border:0;font-size:22px}
   body.locked{overflow:hidden}
   /* Ábrela cuando */
@@ -859,6 +861,7 @@
   <div class="pin-dots" id="pinDots"><i></i><i></i><i></i><i></i></div>
   <div class="pin-msg" id="pinMsg"></div>
   <div class="pad" id="pad"></div>
+  <button class="bio-btn" id="bioBtn" hidden>👆 Entrar con huella</button>
 </div>
 <div class="secret" id="secret"><div class="paper"><button class="x" id="secretX" aria-label="Cerrar">×</button><p style="font-size:30px">🤫💗</p><p>¡Encontraste el mensaje secreto!</p><p id="secretTxt"></p><p class="sign"></p></div></div>
 <div class="hoy-ov" id="hoyOv" role="dialog" aria-label="Mensaje de hoy"><div class="hoy-card">
@@ -1761,10 +1764,7 @@ galRender();
   }
   function test(){
     if(v===CODE){
-      set('pin-fails','0');
-      document.getElementById('lockIco').textContent='🔓'; msg.textContent=VIEWER()==='yo'?'Bienvenido, '+C.yo+' 💙':'Bienvenida, mi amor ♥';
-      setTimeout(()=>{lock.classList.add('out');document.body.classList.remove('locked');burst(45);open=true;last=Date.now();window.dispatchEvent(new Event('unlocked'))},600);
-      setTimeout(()=>{if(open)lock.style.display='none'},1500);
+      ok();
     }else{
       const d=document.getElementById('pinDots'); d.classList.remove('err'); void d.offsetWidth; d.classList.add('err');
       const n=(+get('pin-fails')||0)+1; v=''; setTimeout(paint,300);
@@ -1774,12 +1774,24 @@ galRender();
       setTimeout(()=>{if(!v&&!lockedFor())msg.textContent=''},2500);
     }
   }
+  function ok(){
+    set('pin-fails','0');
+    document.getElementById('lockIco').textContent='🔓'; msg.textContent=VIEWER()==='yo'?'Bienvenido, '+C.yo+' 💙':'Bienvenida, mi amor ♥';
+    setTimeout(()=>{lock.classList.add('out');document.body.classList.remove('locked');burst(45);open=true;last=Date.now();window.dispatchEvent(new Event('unlocked'))},600);
+    setTimeout(()=>{if(open)lock.style.display='none'},1500);
+  }
+  /* ---- Huella (solo dentro de la app de Android) ---- */
+  const bioB=document.getElementById('bioBtn');
+  const hasBio=()=>{try{return !!(window.AndroidApp&&AndroidApp.hasBio&&AndroidApp.hasBio())}catch(e){return false}};
+  const askBio=()=>{if(open||lockedFor()>0||!hasBio())return;try{AndroidApp.bio()}catch(e){}};
+  window.__bioOk=()=>{if(!open){v='';paint();ok()}};
+  if(hasBio()){bioB.hidden=false;bioB.onclick=askBio;setTimeout(askBio,500)}
   /* ---- Volver a bloquear si se deja sin usar o al regresar de otra app ---- */
   function relock(){
     if(!open||!document.getElementById('lock'))return; open=false; v=''; paint();
     document.querySelectorAll('.lb.open,.modal.open,.secret.open,.credits.open').forEach(e=>e.classList.remove('open'));
     document.getElementById('lockIco').textContent='🔒'; msg.textContent='';
-    lock.style.display=''; void lock.offsetWidth; lock.classList.remove('out'); document.body.classList.add('locked'); checkWait();
+    lock.style.display=''; void lock.offsetWidth; lock.classList.remove('out'); document.body.classList.add('locked'); checkWait(); setTimeout(askBio,400);
   }
   let last=Date.now(), hiddenAt=0;
   ['pointerdown','keydown','scroll','touchstart'].forEach(ev=>window.addEventListener(ev,()=>{last=Date.now()},{passive:true,capture:true}));
