@@ -383,9 +383,13 @@
   .nb-who{text-align:center;margin:-2px 0 10px;font-size:14px}
   .nb-who button{margin:6px 4px 0;border:1px solid rgba(247,198,211,.4);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:9px 16px;font:700 14px 'Nunito';cursor:pointer}
   .hoy-new[hidden],.nb-pill[hidden]{display:none!important}
+  .hoy-pend{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:10px}
+  .hoy-pend button{background:rgba(255,255,255,.12);border:1px solid rgba(247,198,211,.4);color:#fff;border-radius:999px;padding:9px 16px;font:800 14px 'Nunito';cursor:pointer}
   .hoy-new{margin:18px auto 0;display:block;background:rgba(255,255,255,.12);border:1px solid var(--gold);color:#fff;border-radius:999px;padding:11px 18px;font:800 15px 'Nunito';cursor:pointer;animation:beat 1.6s ease-in-out infinite}
   .nb-pill{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:45;background:linear-gradient(135deg,var(--rose),#b3204f);color:#fff;border:0;border-radius:999px;padding:10px 16px;font:800 14px 'Nunito';box-shadow:0 10px 24px rgba(0,0,0,.4);cursor:pointer;animation:pop .5s cubic-bezier(.2,.9,.3,1.3);white-space:nowrap}
   body.editing .nb-pill{top:44px}
+  body.locked .ed-bar,body.locked .ed-fab,body.locked .ed-panel{display:none!important}
+  body:has(#hoyOv.open) .ed-bar,body:has(#hoyOv.open) .ed-fab{display:none!important}
   body.ed-inactiva .ed-bar{background:#9b2c3c!important}
   body.ed-inactiva .ed-bar::after{content:' · 💤 PÁGINA INACTIVA PARA ELLA'}
   .nb-m.new{box-shadow:0 0 0 3px var(--gold)}
@@ -769,6 +773,7 @@
   <div class="hoy-sep">♥</div>
   <div class="hoy-fix" id="hoyFix"></div>
   <button class="hoy-new" id="hoyNew" hidden></button>
+  <div class="hoy-pend" id="hoyPend"></div>
   <div class="hoy-sign" id="hoySign"></div>
   <button class="btn" id="hoyBtn">Continuar ♥</button>
 </div></div>
@@ -1633,7 +1638,7 @@ galRender();
   function test(){
     if(v===CODE){
       set('pin-fails','0');
-      document.getElementById('lockIco').textContent='🔓'; msg.textContent='Bienvenida, mi amor ♥';
+      document.getElementById('lockIco').textContent='🔓'; msg.textContent=VIEWER()==='yo'?'Bienvenido, '+C.yo+' 💙':'Bienvenida, mi amor ♥';
       setTimeout(()=>{lock.classList.add('out');document.body.classList.remove('locked');burst(45);open=true;last=Date.now();window.dispatchEvent(new Event('unlocked'))},600);
       setTimeout(()=>{if(open)lock.style.display='none'},1500);
     }else{
@@ -2741,10 +2746,18 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
   function todayMsg(){const L=live('msg');return L.length?L[doy()%L.length]:null}
   /* el mensaje del día de Jon lo escribe Ale */
   function jonDaily(){
-    if(!soyJon())return; const m=todayMsg(); if(!m)return;
+    if(!soyJon())return; pending(); const m=todayMsg();
+    $('hoyFix').style.display='none'; $('hoyFix').previousElementSibling.style.display='none';
+    if(!m){$('hoyMsg').textContent='Que tengas un día bonito, '+C.yo+' 💙';$('hoySign').textContent='';return}
     $('hoyMsg').textContent=m.t; $('daily').textContent=m.t;
-    $('hoyFix').textContent='Te amo mucho '+C.yo+' 💙'; $('hoySign').textContent='— '+C.ella+' 💙';
+    $('hoySign').textContent='— '+C.ella+' 💙';
     $('dailyL').textContent='Mensaje de '+C.ella+' para ti · '+MXD().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+  }
+  function pending(){
+    const P=$('hoyPend'); if(!P)return; P.innerHTML='';
+    const c=live('carta').filter(x=>!x.o).length, v=live('vale').filter(x=>!x.c).length, r=Math.max(0,live('ticket').length-live('win').length);
+    [[c,c===1?'📬 1 carta de '+C.ella+' sin abrir':'📬 '+c+' cartas de '+C.ella+' sin abrir','carta'],[v,v===1?'🎟️ 1 vale por canjear':'🎟️ '+v+' vales por canjear','vale'],[r,r===1?'🌠 1 rasca y gana por raspar':'🌠 '+r+' rasca y gana por raspar','rasca']]
+      .forEach(([n,t,k])=>{if(!n)return;const b=document.createElement('button');b.textContent=t+' →';b.onclick=()=>{tab=k;document.getElementById('hoyBtn').click();setTimeout(()=>{render();sec.scrollIntoView({behavior:'smooth'})},520)};P.append(b)});
   }
   function form(fields,btnTxt,onSave){
     const f=document.createElement('form'); f.className='di-add card pj-f'; f.autocomplete='off';
@@ -3259,7 +3272,6 @@ let CUR=null;
   if(CUR.inactiva&&!EDIT){inactiveScreen(CUR);return}
   try{boot(VIEW)}catch(e){console.error(e);slowScreen('Algo falló al abrir la página ('+String(e&&e.message||e).slice(0,80)+').');throw e}
   if(EDIT){
-    const l=document.getElementById('lock'); if(l) l.remove(); document.body.classList.remove('locked');
     initEditor();
   }
 })();
