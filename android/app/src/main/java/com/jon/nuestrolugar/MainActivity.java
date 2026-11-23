@@ -103,7 +103,9 @@ public class MainActivity extends Activity {
         super.onNewIntent(i);
         setIntent(i);
         handleIntent(i);
-        deliver();
+        // si al volver se va a recargar la página, se entrega después de recargar (si no, se pierde)
+        boolean reload = wv != null && pausedAt > 0 && System.currentTimeMillis() - pausedAt > 2 * 60 * 1000L;
+        if (!reload) deliver();
     }
 
     void setupShortcuts() {
@@ -367,6 +369,7 @@ public class MainActivity extends Activity {
                 dl("terminó de cargar");
                 pageReady = true;
                 v.postDelayed(MainActivity.this::deliver, 1500);
+                v.postDelayed(MainActivity.this::deliver, 4000);
                 String w = sp.getString("who", "");
                 if (!w.isEmpty() && ours(url)) {
                     v.evaluateJavascript("(function(){try{if(localStorage.getItem('yo-soy')!=='" + w + "'){localStorage.setItem('yo-soy','" + w + "');location.reload();return 1}}catch(e){}return 0})()", null);
