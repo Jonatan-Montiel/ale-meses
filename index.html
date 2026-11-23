@@ -384,7 +384,11 @@
   .nb-who{text-align:center;margin:-2px 0 10px;font-size:14px}
   .nb-who button{margin:6px 4px 0;border:1px solid rgba(247,198,211,.4);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:9px 16px;font:700 14px 'Nunito';cursor:pointer}
   .hoy-new[hidden],.nb-pill[hidden]{display:none!important}
-  .pend-pill{position:fixed;right:14px;bottom:86px;z-index:45;border:0;border-radius:999px;padding:10px 15px;font:800 14px 'Nunito';color:#fff;background:linear-gradient(135deg,var(--gold),var(--rose));box-shadow:0 10px 22px -6px rgba(0,0,0,.5);cursor:pointer;animation:pop .5s cubic-bezier(.2,.9,.3,1.3)}
+  .bell{position:fixed;top:12px;left:12px;z-index:44;width:44px;height:44px;border-radius:50%;border:1px solid rgba(247,198,211,.3);background:rgba(30,6,16,.65);font-size:20px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+  .bell b{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:999px;background:var(--rose);color:#fff;font:800 11.5px/20px 'Nunito';padding:0 5px;display:none}
+  .bell.has b{display:block}.bell.has{animation:beat 2.4s ease-in-out infinite}
+  body.locked .bell,body:has(#hoyOv.open) .bell,body:has(.an-ov) .bell{display:none}
+  body.light .bell{background:#fff;border-color:rgba(120,40,70,.15)}
   .hoy-pend{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:10px}
   .hoy-pend button{background:rgba(255,255,255,.12);border:1px solid rgba(247,198,211,.4);color:#fff;border-radius:999px;padding:9px 16px;font:800 14px 'Nunito';cursor:pointer}
   .hoy-new{margin:18px auto 0;display:block;background:rgba(255,255,255,.12);border:1px solid var(--gold);color:#fff;border-radius:999px;padding:11px 18px;font:800 15px 'Nunito';cursor:pointer;animation:beat 1.6s ease-in-out infinite}
@@ -1816,13 +1820,11 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   document.getElementById('hoyFix').textContent=FILL(C.mensajeFijo||'Te amo mucho {ella}, y siempre estaré para ti en todo momento.');
   document.getElementById('hoySign').textContent=SIGN;
   let shown=false;
-  const close=()=>{if(!ov.classList.contains('open'))return;ov.classList.add('out');setTimeout(()=>{ov.classList.remove('open','out');window.dispatchEvent(new Event('hoyClosed'))},480)};
+  const close=()=>{if(!ov.classList.contains('open'))return;ov.classList.add('out');setTimeout(()=>{ov.classList.remove('open','out');if(ov.dataset.bell){delete ov.dataset.bell;window.dispatchEvent(new Event('bellClosed'))}else window.dispatchEvent(new Event('hoyClosed'))},480)};
   window.addEventListener('unlocked',()=>{if(VIEWER()!=='yo')avisar(`👀 ${C.ella} entró a nuestra app`,'entrada');if(shown)return;shown=true;
     // la pantalla del mensaje sale solo la primera vez de cada día
     const k=DK(MXD()); let seen=''; try{seen=localStorage.getItem('hoy-visto')||''}catch(e){}
-    if(seen===k){setTimeout(()=>{const n=(window.PEND?PEND.all().length:0)+(document.getElementById('hoyNew').hidden?0:1);if(!n)return;
-      const p=document.createElement('button');p.className='pend-pill';p.textContent='🔔 '+(n===1?'Tienes 1 pendiente':'Tienes '+n+' pendientes');
-      p.onclick=()=>{p.remove();ov.classList.add('open')};document.body.append(p)},900);return}
+    if(seen===k)return;
     try{localStorage.setItem('hoy-visto',k)}catch(e){}
     setTimeout(()=>{ov.classList.add('open');burst(35)},500)});
   document.getElementById('hoyBtn').onclick=close;
@@ -2981,9 +2983,14 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
   ELLA_PREF.on(render); render();
 })();
 
-/* ====== Pendientes en la pantalla del mensaje ====== */
+/* ====== Pendientes en la pantalla del mensaje + campana ====== */
 (function(){
-  const P=document.getElementById('hoyPend');
+  const P=document.getElementById('hoyPend'), ov=document.getElementById('hoyOv');
+  const bell=document.createElement('button'); bell.className='bell'; bell.setAttribute('aria-label','Pendientes'); bell.innerHTML='🔔<b></b>'; document.body.append(bell);
+  bell.onclick=()=>{ov.dataset.bell=1;ov.classList.add('open')};
+  window.addEventListener('bellClosed',count);
+  function count(){const n=PEND.all().length+(document.getElementById('hoyNew').hidden?0:1);bell.querySelector('b').textContent=n||'';bell.classList.toggle('has',n>0)}
+  setInterval(count,2000); window.addEventListener('hoyClosed',count); window.addEventListener('unlocked',()=>setTimeout(count,800));
   function render(){
     if(!P)return; P.innerHTML='';
     PEND.all().forEach(v=>{const b=document.createElement('button');b.textContent=v.t+' →';
