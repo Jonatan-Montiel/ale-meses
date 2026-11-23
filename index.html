@@ -1410,6 +1410,11 @@ function avisar(txt,tipo){
   fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
 }
 const VIEWER=()=>{if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
+/* textos en masculino cuando es Jon */
+const MASC=(()=>{const W={enamorada:'enamorado',cansada:'cansado',estresada:'estresado',enojada:'enojado',querida:'querido',contenta:'contento',emocionada:'emocionado',nerviosa:'nervioso',preocupada:'preocupado',aburrida:'aburrido',agradecida:'agradecido',tranquila:'tranquilo',sola:'solo',lista:'listo',consentida:'consentido',ilusionada:'ilusionado',orgullosa:'orgulloso',enferma:'enfermo',relajada:'relajado',motivada:'motivado',celosa:'celoso',apapachada:'apapachado',amada:'amado',bonita:'guapo',hermosa:'guapo'};
+  const re=new RegExp('\\b('+Object.keys(W).join('|')+')\\b','gi');
+  return t=>String(t||'').replace(re,m=>{const r=W[m.toLowerCase()];return m[0]===m[0].toUpperCase()?r[0].toUpperCase()+r.slice(1):r})})();
+const GEN=(t,w)=>(w||VIEWER())==='yo'?MASC(t):String(t||'');
 const MXD=t=>new Date(new Date(t==null?Date.now():t).toLocaleString('en-US',{timeZone:'America/Mexico_City'}));
 const DK=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const UID=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -2379,8 +2384,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const mine=lastOf(yo());
     $('anSub').textContent=yo()==='yo'?'¿y tú cómo te sientes hoy?':'toca una carita y cuéntame';
     grid.innerHTML='';
-    M.forEach(m=>{const b=document.createElement('button');b.className='an-b'+(mine&&mine.m===m.e?' sel':'');b.innerHTML=`<span>${esc(m.e)}</span>${esc(m.n)}`;b.onclick=()=>pick(m);grid.append(b)});
-    const L=[['ella',C.ella],['yo',C.yo]].map(([w,nm])=>{const x=lastOf(w);return x?`Hoy ${esc(nm)} se siente ${esc(x.m)} ${esc((x.n||'').toLowerCase())} <span style="opacity:.6">· ${fmtHora(x.a)}</span>`:''}).filter(Boolean);
+    M.forEach(m=>{const b=document.createElement('button');b.className='an-b'+(mine&&mine.m===m.e?' sel':'');b.innerHTML=`<span>${esc(m.e)}</span>${esc(GEN(m.n))}`;b.onclick=()=>pick(m);grid.append(b)});
+    const L=[['ella',C.ella],['yo',C.yo]].map(([w,nm])=>{const x=lastOf(w);return x?`Hoy ${esc(nm)} se siente ${esc(x.m)} ${esc(GEN(x.n||'',w).toLowerCase())} <span style="opacity:.6">· ${fmtHora(x.a)}</span>`:''}).filter(Boolean);
     hoy.innerHTML=L.join('<br>');
     if(mine&&!shown){shown=true;respond(M.find(m=>m.e===mine.m),false)}
   }
@@ -2388,13 +2393,13 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     if(!m){res.hidden=true;return}
     res.hidden=false;
     if(yo()==='ella')res.innerHTML=`<div class="daily-l">${esc(m.e)} ${esc(m.n)}</div><div class="daily">${esc(m.r)}</div><div class="sg">${esc(SIGN)}</div>`;
-    else res.innerHTML=`<div class="daily-l">${esc(m.e)} ${esc(m.n)}</div><div class="daily">Listo, ${esc(C.ella)} va a ver cómo te sientes hoy 💗</div>`;
+    else res.innerHTML=`<div class="daily-l">${esc(m.e)} ${esc(GEN(m.n))}</div><div class="daily">Listo, ${esc(C.ella)} va a ver cómo te sientes hoy 💗</div>`;
     if(fresh){res.style.animation='none';void res.offsetWidth;res.style.animation=''}
   }
   function pick(m){
     S.add({id:UID(),w:yo(),m:m.e,n:m.n,a:Date.now(),u:Date.now()});
     respond(m,true); burst(12);
-    avisar(`🌤️ ${C.ella} se siente ${m.e} ${m.n.toLowerCase()} hoy`,'animo');
+    avisar(`🌤️ ${C.ella} se siente ${m.e} ${GEN(m.n).toLowerCase()} hoy`,'animo');
   }
   render();
 })();
@@ -2413,7 +2418,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   function render(){
     const k=DK(MXD()), q=Q[idxOf(k)], mine=ans(k,me()), his=ans(k,other());
     const [y,m,d]=k.split('-').map(Number);
-    let h=`<div class="card pq"><div class="daily-l">Pregunta del día · ${d} de ${MESN[m-1]}</div><div class="daily">${esc(q)}</div>`;
+    let h=`<div class="card pq"><div class="daily-l">Pregunta del día · ${d} de ${MESN[m-1]}</div><div class="daily">${esc(GEN(q))}</div>`;
     if(!mine||editing){
       h+=`<textarea id="pqIn" class="pq-in" maxlength="500" rows="3" placeholder="Escribe tu respuesta…">${mine?esc(mine.t):''}</textarea><button class="btn small" id="pqSend">💌 ${mine?'Guardar':'Responder'}</button>`;
       h+=`<div class="pq-st">${his?'💌 '+esc(nm(other()))+' ya contestó · responde para ver su respuesta':esc(nm(other()))+' todavía no contesta'}</div>`;
@@ -2434,7 +2439,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const days=[...new Set(S.all().filter(x=>!x.x&&NEWER(x,'rpr')&&x.d!==k&&x.w===me()).map(x=>x.d))].sort().reverse().slice(0,60);
     hb.hidden=!days.length; hb.textContent=showH?'Ocultar respuestas anteriores':`📖 Ver respuestas anteriores (${days.length})`;
     hist.innerHTML=showH?days.map(dk=>{const [yy,mm,dd]=dk.split('-').map(Number),a1=ans(dk,me()),a2=ans(dk,other());
-      return `<div class="card pq old"><div class="daily-l">${dd} de ${MESN[mm-1]}</div><div class="pq-q">${esc(Q[idxOf(dk)])}</div>${bub(me(),a1.t)}${a2?bub(other(),a2.t):`<div class="pq-st">${esc(nm(other()))} no contestó ese día</div>`}</div>`}).join(''):'';
+      return `<div class="card pq old"><div class="daily-l">${dd} de ${MESN[mm-1]}</div><div class="pq-q">${esc(GEN(Q[idxOf(dk)]))}</div>${bub(me(),a1.t)}${a2?bub(other(),a2.t):`<div class="pq-st">${esc(nm(other()))} no contestó ese día</div>`}</div>`}).join(''):'';
   }
   hb.onclick=()=>{showH=!showH;render()};
   render();
