@@ -25,7 +25,7 @@ class Updater {
     static void check(final Activity a) {
         final SharedPreferences sp = a.getSharedPreferences("nl", Activity.MODE_PRIVATE);
         long last = sp.getLong("upd-check", 0);
-        if (System.currentTimeMillis() - last < 30 * 60 * 1000L) return; // máximo cada 30 min
+        if (System.currentTimeMillis() - last < 20 * 60 * 1000L) return; // máximo cada 20 min
         new Thread(() -> {
             try {
                 HttpURLConnection h = (HttpURLConnection) new URL(API).openConnection();

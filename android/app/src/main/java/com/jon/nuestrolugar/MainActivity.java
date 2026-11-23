@@ -243,6 +243,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         Notif.appVisible = true; // lo que llegue mientras la ve, ya lo ve en la página
+        Updater.check(this); // cada vez que la abre (máximo cada 30 min) revisa si hay versión nueva
         // Si estuvo cerrada un rato, carga la versión más nueva de la página.
         if (wv != null && pausedAt > 0 && System.currentTimeMillis() - pausedAt > 2 * 60 * 1000L) { loadedAt = System.currentTimeMillis(); loadHome(null); }
     }
