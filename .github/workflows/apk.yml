@@ -25,16 +25,20 @@ jobs:
         working-directory: android
         env:
           VC: ${{ github.run_number }}
-        run: gradle assembleRelease --no-daemon --stacktrace 2>&1 | tee build.log
+        run: gradle assembleAleRelease assembleJonRelease --no-daemon --stacktrace 2>&1 | tee build.log
       - name: Preparar archivo
-        run: cp android/app/build/outputs/apk/release/app-release.apk nuestro-lugar.apk
+        run: |
+          cp android/app/build/outputs/apk/ale/release/app-ale-release.apk nuestro-lugar.apk
+          cp android/app/build/outputs/apk/jon/release/app-jon-release.apk nuestro-lugar-jon.apk
       - name: Publicar descarga
         uses: softprops/action-gh-release@v2
         with:
           tag_name: apk
           name: Nuestro lugar (Android)
-          body: App de Android de nuestro lugar 💗
-          files: nuestro-lugar.apk
+          body: "App de Android de nuestro lugar 💗 (vc=${{ github.run_number }})"
+          files: |
+            nuestro-lugar.apk
+            nuestro-lugar-jon.apk
           make_latest: true
       - name: Activar KVM para el emulador
         run: |

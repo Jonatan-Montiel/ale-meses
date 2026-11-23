@@ -12,6 +12,12 @@ android {
   signingConfigs {
     rel { storeFile file('../keystore.jks'); storePassword 'nuestrolugar'; keyAlias 'nl'; keyPassword 'nuestrolugar' }
   }
+  buildFeatures { buildConfig true }
+  flavorDimensions 'rol'
+  productFlavors {
+    ale { dimension 'rol'; buildConfigField 'String', 'WHO', '"ella"'; resValue 'string', 'app_name', 'Nuestro lugar' }
+    jon { dimension 'rol'; applicationIdSuffix '.jon'; buildConfigField 'String', 'WHO', '"yo"'; resValue 'string', 'app_name', 'Nuestro lugar · Jon' }
+  }
   buildTypes { release { minifyEnabled false; signingConfig signingConfigs.rel } }
   compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
   lint { abortOnError false; checkReleaseBuilds false }
