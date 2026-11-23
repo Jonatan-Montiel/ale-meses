@@ -22,6 +22,7 @@ sleep 1
 adb shell input keyevent 66
 sleep 15
 adb exec-out screencap -p > $OUT/2-pagina.png
+adb shell uiautomator dump /sdcard/u2.xml >/dev/null 2>&1; adb pull /sdcard/u2.xml $OUT/u2.xml >/dev/null 2>&1
 # teclear el código del candado de prueba no aplica (clave falsa): solo vemos que cargue la página
 adb shell input keyevent 4
 sleep 2

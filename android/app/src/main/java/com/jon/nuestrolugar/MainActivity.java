@@ -109,6 +109,7 @@ public class MainActivity extends Activity {
         row.setGravity(Gravity.CENTER);
         row.setPadding(0, 10, 0, 20);
         final Button bA = new Button(this), bJ = new Button(this);
+        bA.setAllCaps(false); bJ.setAllCaps(false); btn.setAllCaps(false);
         bA.setText("Soy Ale");
         bJ.setText("Soy Jon");
         Runnable paint = () -> {
