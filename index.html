@@ -2270,6 +2270,8 @@ makeBoard({avTipo:'aprender',avNew:'📚 '+C.ella+' quiere que aprendamos:',avDo
   }
   const N=String(W.numero||'').replace(/\D/g,''), M=(W.mensajes||[]).map(o=>[o.emoji,FILL(o.boton),FILL(o.mensaje)]);
   M.forEach(([e,l,t])=>{const a=document.createElement('a');a.href=`https://wa.me/${N}?text=${encodeURIComponent(t)}`;a.target='_blank';a.rel='noopener';a.textContent=`${e} ${l}`;w.appendChild(a)});
+  if(N){const f=document.createElement('form');f.className='wa-free';f.innerHTML='<input class="pq-in" maxlength="500" placeholder="O escribe tu propio mensaje…"><button aria-label="Enviar">➤</button>';
+    f.onsubmit=e=>{e.preventDefault();const t=f.querySelector('input').value.trim();if(!t)return;const a=document.createElement('a');a.href=link(N,t);a.target='_blank';a.rel='noopener';document.body.append(a);a.click();a.remove();f.reset()};w.append(f)}
 })();
 
 /* ====== Saludo según la hora ====== */
