@@ -437,6 +437,33 @@
   .nite b{font-family:'Fraunces',serif;font-size:18px;display:block}
   .nite p{font-size:14px;opacity:.9;margin-top:4px}
   .nite button{margin-top:8px;background:none;border:1px solid rgba(207,200,255,.35);color:inherit;border-radius:999px;padding:5px 12px;font:700 11.5px 'Nunito';cursor:pointer}
+  .tm{text-align:center;padding:18px 18px 14px}
+  .tm-e{font-size:48px;line-height:1}
+  .tm-v{font:800 30px 'Nunito';margin:6px 0 10px}
+  .tm input[type=range]{width:100%;accent-color:var(--rose);height:28px}
+  .tm-st{font-size:12.5px;opacity:.7;min-height:16px;margin-top:4px}
+  .tm-o{margin-top:12px;text-align:center;padding:14px}
+  .tm-o .bar{height:10px;border-radius:10px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:8px}
+  .tm-o .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--rose));border-radius:10px}
+  .dt-hoy{background:linear-gradient(160deg,rgba(233,184,114,.22),rgba(232,93,132,.16));border:1px solid rgba(233,184,114,.45);border-radius:20px;padding:14px 16px;margin-bottom:12px;text-align:center}
+  .dt-hoy small{display:block;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.75}
+  .dt-hoy b{display:block;font-family:'Fraunces',serif;font-size:19px;margin-top:4px}
+  .dt-hoy p{font-size:14px;opacity:.9;margin-top:4px}
+  .dt-a{display:inline-block;margin-top:8px;background:var(--rose);color:#fff;text-decoration:none;border-radius:999px;padding:7px 14px;font:800 13px 'Nunito'}
+  .dt-ph{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .dt-ph figure{margin:0;background:var(--cream);color:var(--ink);border-radius:12px;padding:6px 6px 8px;box-shadow:0 6px 14px rgba(0,0,0,.25)}
+  .dt-ph img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:block;background:#eee}
+  .dt-ph figcaption{font-size:12.5px;margin-top:6px;line-height:1.3}
+  .dt-ph figure .ds-b{margin-top:6px}
+  .dt-r{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .dt-r button{border:0;border-radius:999px;padding:7px 12px;font:800 12.5px 'Nunito';cursor:pointer;background:#f3e3df;color:#7a2a45}
+  .dt-r button.on{background:var(--rose);color:#fff}
+  .dt-pick{display:block;text-align:center;border:1px dashed rgba(247,198,211,.5);border-radius:14px;padding:12px;cursor:pointer;font-weight:700}
+  .vz-when{display:grid;gap:8px;margin:8px 0}
+  .vz-m.lock .vz-play{opacity:.6}
+  .hoy-extra{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:12px}
+  .hoy-extra a,.hoy-extra div{font-size:13.5px;color:inherit}
+  .hoy-extra img{width:120px;height:120px;object-fit:cover;border-radius:12px;border:3px solid #fff;box-shadow:0 8px 18px rgba(0,0,0,.35);transform:rotate(-2deg)}
   .bell{position:fixed;top:12px;left:12px;z-index:44;width:44px;height:44px;border-radius:50%;border:1px solid rgba(247,198,211,.3);background:rgba(30,6,16,.65);font-size:20px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35)}
   .bell b{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:999px;background:var(--rose);color:#fff;font:800 11.5px/20px 'Nunito';padding:0 5px;display:none}
   .bell.has b{display:block}.bell.has{animation:beat 2.4s ease-in-out infinite}
@@ -820,7 +847,7 @@
   main section{padding:62px 0 26px}
   main section>h2{font-size:31px;letter-spacing:-.2px;line-height:1.15}
   main section>h2::before{display:grid;place-items:center;width:46px;height:46px;margin:0 auto 12px;border-radius:50%;font-size:22px;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.22);box-shadow:0 6px 16px -6px rgba(0,0,0,.45)}
-  #contador>h2::before{content:'💞'} #racha>h2::before{content:'🔥'} #insignias>h2::before{content:'🏅'} #animo>h2::before{content:'🌤️'} #pregunta>h2::before{content:'💭'}
+  #contador>h2::before{content:'💞'} #racha>h2::before{content:'🔥'} #termo>h2::before{content:'🌡️'} #detalles>h2::before{content:'💝'} #insignias>h2::before{content:'🏅'} #animo>h2::before{content:'🌤️'} #pregunta>h2::before{content:'💭'}
   #cancion>h2::before{content:'🎵'} #carta>h2::before{content:'💌'} #cartames>h2::before{content:'✉️'} #abrela>h2::before{content:'📬'}
   #buzon>h2::before{content:'📮'} #voz>h2::before{content:'🎙️'} #escribir>h2::before{content:'✍️'} #momentos>h2::before{content:'📸'}
   #polaroid>h2::before{content:'🖼️'} #razones>h2::before{content:'🫙'} #galleta>h2::before{content:'🥠'} #medidor>h2::before{content:'💗'}
@@ -896,6 +923,7 @@
   <div class="hoy-sep">♥</div>
   <div class="hoy-fix" id="hoyFix"></div>
   <button class="hoy-new" id="hoyNew" hidden></button>
+  <div class="hoy-extra" id="hoyExtra"></div>
   <div class="hoy-pend" id="hoyPend"></div>
   <div class="hoy-sign" id="hoySign"></div>
   <button class="btn" id="hoyBtn">Continuar ♥</button>
@@ -1002,6 +1030,19 @@
     <div class="an-hoy" id="anHoy"></div>
   </section>
 
+  <!-- TERMÓMETRO -->
+  <section id="termo">
+    <h2>¿Cuánto me extrañas hoy?</h2>
+    <div class="sub">desliza y le llega al instante 🌡️</div>
+    <div class="card tm">
+      <div class="tm-e" id="tmE">🙂</div>
+      <div class="tm-v"><b id="tmV">50</b>%</div>
+      <input type="range" id="tmR" min="0" max="100" step="5" value="50" aria-label="Cuánto extrañas">
+      <div class="tm-st" id="tmSt"></div>
+    </div>
+    <div class="card tm-o" id="tmO" hidden></div>
+  </section>
+
   <!-- PREGUNTA DEL DÍA -->
   <section id="pregunta">
     <h2>Pregunta del día</h2>
@@ -1012,6 +1053,15 @@
   </section>
 
   <!-- CANCIÓN -->
+  <section id="detalles">
+    <h2>Detalles</h2>
+    <div class="sub" id="dtSub">cositas que nos dejamos el uno al otro 💝</div>
+    <div class="cm-chips" id="dtWho"></div>
+    <div class="cm-chips pj-tabs" id="dtTabs"></div>
+    <div id="dtBox" style="margin-top:14px"></div>
+    <div class="kb-st" id="dtSt"></div>
+  </section>
+
   <section id="cancion">
     <h2>Nuestra canción</h2>
     <div class="sub">dale play, mi amor</div>
@@ -1093,7 +1143,9 @@
     <div class="vz-list" id="vzList"></div>
     <div class="vz-rec">
       <button class="btn" id="vzBtn">🎙️ Grabar mensaje</button>
-      <div class="vz-prev" id="vzPrev" hidden><audio id="vzAud" controls></audio><div><button class="btn small" id="vzSend">💌 Enviar</button> <button class="btn small alt" id="vzDel">🗑️ Borrar</button></div></div>
+      <div class="vz-prev" id="vzPrev" hidden><audio id="vzAud" controls></audio>
+        <div class="vz-when"><select id="vzWhen" class="pq-in"><option value="">🎧 Que lo escuche ya</option><option value="m8">⏰ Mañana a las 8 am</option><option value="n">🌙 Hoy en la noche (10 pm)</option><option value="f">📅 Elegir fecha y hora…</option></select>
+        <input type="datetime-local" id="vzAt" class="pq-in" hidden></div><div><button class="btn small" id="vzSend">💌 Enviar</button> <button class="btn small alt" id="vzDel">🗑️ Borrar</button></div></div>
     </div>
     <div class="kb-st" id="vzSt"></div>
   </section>
@@ -1573,7 +1625,7 @@ const AV=C.avisos||{};
 const AV_TIPOS=window.AV_TIPOS=[['vale','🎟️ Canjea un vale'],['nota','💌 Te deja una notita en el buzón'],['ruleta','🎡 Gira la ruleta de citas'],['abrela','💌 Abre una carta «Ábrela cuando…»'],
   ['abrazo','🤗 Te manda un abrazo (corazón presionado)'],['rasca','🌠 Raspa el rasca y gana'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Agrega o aprende algo nuevo'],
   ['evento','🗓️ Agrega algo a «Lo que viene»'],['foto','📷 Sube fotos al carrusel'],['recuerdo','📷 Guarda un recuerdo de algo que hicieron'],['sorpresa','🎁 Abre la sorpresa del mes'],
-  ['capsula','⏳ Abre la cápsula del tiempo'],['racha','🔥 Desbloquea un premio de su racha'],['insignia','🏅 Desbloquean una insignia'],['animo','🌤️ Dice cómo se siente'],['voz','🎙️ Te manda un mensaje de voz'],['cartames','✉️ Abre la carta del mes'],['comida','🍽️ Gira la rueda de la comida'],['pregunta','💭 Responde la pregunta del día'],['deseo','🎁 Agrega algo a su lista de deseos'],['diario','📔 Guarda un momento en el diario'],['reto','🎯 Cumplen el reto de la semana'],['extrano','🥺 Te dice que te extraña'],['receta','🍳 Agrega una receta'],['adivina','🔍 Adivina una foto'],['like','❤️ Le da like a tus notitas o audios'],['cumple','🎂 Abre su carta de cumpleaños'],['especial','💝 Fechas especiales (San Valentín, aniversario)'],['parajon','💙 Lo que te deja en «Para Jon» (vales, cartas, rasca…)'],['peli','🍿 Agrega, ve o califica una peli o serie'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (cada vez que entra)']];
+  ['capsula','⏳ Abre la cápsula del tiempo'],['racha','🔥 Desbloquea un premio de su racha'],['insignia','🏅 Desbloquean una insignia'],['detalle','💝 Te deja un detalle (canción, reto, foto o antojo)'],['termo','🌡️ Te dice cuánto te extraña'],['animo','🌤️ Dice cómo se siente'],['voz','🎙️ Te manda un mensaje de voz'],['cartames','✉️ Abre la carta del mes'],['comida','🍽️ Gira la rueda de la comida'],['pregunta','💭 Responde la pregunta del día'],['deseo','🎁 Agrega algo a su lista de deseos'],['diario','📔 Guarda un momento en el diario'],['reto','🎯 Cumplen el reto de la semana'],['extrano','🥺 Te dice que te extraña'],['receta','🍳 Agrega una receta'],['adivina','🔍 Adivina una foto'],['like','❤️ Le da like a tus notitas o audios'],['cumple','🎂 Abre su carta de cumpleaños'],['especial','💝 Fechas especiales (San Valentín, aniversario)'],['parajon','💙 Lo que te deja en «Para Jon» (vales, cartas, rasca…)'],['peli','🍿 Agrega, ve o califica una peli o serie'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (cada vez que entra)']];
 const AV_OFF_DEF=window.AV_OFF_DEF={};
 const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'&&AV.notas===false)return false;return !off[t]};
 const AV_LAST={};
@@ -1586,7 +1638,7 @@ function avisarElla(txt,tipo){
   ACT_LOG(m,tipo,'yo');
   if(!AV.ntfyElla)return;
   try{if(ELLA_PREF.off()[tipo])return}catch(e){}
-  const title=({insignia:'🏅 ¡Nueva insignia!',nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo,deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',extrano:'🥺 '+C.yo+' te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ A '+C.yo+' le gustó',parajon:'💙 '+C.yo}[tipo])||'💗 '+C.yo;
+  const title=({insignia:'🏅 ¡Nueva insignia!',detalle:'💝 Un detalle de '+C.yo,termo:'🌡️ ¿Cuánto te extraña '+C.yo+'?',nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo,deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',extrano:'🥺 '+C.yo+' te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ A '+C.yo+' le gustó',parajon:'💙 '+C.yo}[tipo])||'💗 '+C.yo;
   fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfyElla.trim(),title,message:m,tags:['love_letter'],priority:4})}).catch(()=>{});
 }
 function avisar(txt,tipo){
@@ -1599,7 +1651,7 @@ function avisar(txt,tipo){
   try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
   const quien=soyYo?C.yo:C.ella;
   if(soyYo){ txt=txt.split(C.ella+' ').join(C.yo+' ').replace(/ te (dejó|mandó)/,' le $1'); }
-  const title=({insignia:'🏅 ¡Nueva insignia!',vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',especial:'💝 Fecha especial',parajon:'💙 Para '+C.yo,extrano:'🥺 Te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ Le gustó',cumple:'🎂 Cumpleaños',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
+  const title=({insignia:'🏅 ¡Nueva insignia!',detalle:'💝 Un detalle para ti',termo:'🌡️ ¿Cuánto te extraña?',vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',especial:'💝 Fecha especial',parajon:'💙 Para '+C.yo,extrano:'🥺 Te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ Le gustó',cumple:'🎂 Cumpleaños',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
   fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
 }
 const VIEWER=()=>{if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
@@ -1853,7 +1905,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|data-cache|pend-quitados|actividad-cache|act-visto|act-desde|insignias-cache|insig-init|hoy-visto|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|data-cache|detalles-cache|pend-quitados|actividad-cache|act-visto|act-desde|insignias-cache|insig-init|hoy-visto|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     try{if(window.AndroidApp){window.AndroidApp.relink();return}}catch(e){}
     location.replace(location.pathname);
@@ -2667,6 +2719,114 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   apply(); setInterval(apply,60000); document.addEventListener('visibilitychange',()=>{if(!document.hidden)apply()});
 })();
 
+/* ====== Termómetro: ¿cuánto me extrañas hoy? ====== */
+(function(){
+  const $=id=>document.getElementById(id), me=VIEWER(), oth=me==='yo'?'ella':'yo', nm=w=>w==='yo'?C.yo:C.ella;
+  const S=SHARED('detalles.bin','d','detalles-cache',400,()=>{window.dispatchEvent(new Event('detalles'))});
+  window.DET=S;
+  const E=v=>v>=90?'🥺':v>=70?'😩':v>=50?'🥹':v>=30?'🙂':v>=10?'😌':'😎';
+  const today=w=>S.all().find(x=>x.id==='tm:'+w+':'+DK(MXD())&&!x.x);
+  function render(){
+    const mine=today(me), o=today(oth), r=$('tmR');
+    if(document.activeElement!==r&&mine)r.value=mine.v;
+    $('tmV').textContent=r.value; $('tmE').textContent=E(+r.value);
+    $('tmSt').textContent=mine?`le dijiste a ${nm(oth)} que lo extrañas ${mine.v}% hoy`.replace('lo extrañas',me==='yo'?'la extrañas':'lo extrañas'):'todavía no le has dicho hoy';
+    const box=$('tmO'); box.hidden=!o;
+    if(o)box.innerHTML=`<b>${E(o.v)} Hoy ${esc(nm(oth))} te extraña ${o.v}%</b><div class="bar"><i style="width:${o.v}%"></i></div><div style="font-size:12px;opacity:.65;margin-top:6px">${fmtHora(o.u||o.a)}</div>`;
+  }
+  $('tmR').addEventListener('input',()=>{$('tmV').textContent=$('tmR').value;$('tmE').textContent=E(+$('tmR').value)});
+  $('tmR').addEventListener('change',()=>{const v=+$('tmR').value,id='tm:'+me+':'+DK(MXD()),ex=S.all().find(x=>x.id===id);
+    if(ex){ex.v=v;ex.x=0;ex.u=Date.now();S.save()}else S.add({id,k:'termo',w:me,v,a:Date.now(),u:Date.now()});
+    if(v>=70)burst(10); avisar(`🌡️ ${C.ella} te extraña ${v}% hoy ${E(v)}`,'termo'); render()});
+  window.addEventListener('detalles',render); render(); setInterval(render,60000);
+})();
+
+/* ====== Detalles el uno para el otro: playlist, retos, fotos favoritas y antojos ====== */
+(function(){
+  const $=id=>document.getElementById(id), S=window.DET, me=VIEWER(), oth=me==='yo'?'ella':'yo', nm=w=>w==='yo'?C.yo:C.ella;
+  const box=$('dtBox'), st=$('dtSt');
+  const live=(k,w)=>S.all().filter(x=>!x.x&&x.k===k&&x.w===w).sort((a,b)=>a.a-b.a);
+  const add=o=>S.add(Object.assign({id:UID(),w:me,a:Date.now(),u:Date.now()},o));
+  const upd=(x,o)=>{Object.assign(x,o,{u:Date.now()});S.save()};
+  const del=(b,x)=>{let armed=false;b.onclick=()=>{if(!armed){armed=true;b.textContent='¿Borrar?';setTimeout(()=>{armed=false;b.textContent='✕'},2500);return}upd(x,{x:1})}};
+  const doy=()=>{const n=MXD();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)};
+  const el=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild};
+  const okL=u=>/^https:\/\/[^\s]+$/i.test(u||'');
+  const T=[['song','🎵 Playlist'],['reto','🎯 Retos'],['foto','📸 Fotos'],['antojo','🍕 Antojos']];
+  let who='mi', tab='song';
+  const R={si:'💗 ¡Sí!',no:'🙈 Hoy no',otro:'🗓️ Otro día'};
+  function songOfDay(w){const L=live('song',w);return L.length?L[doy()%L.length]:null}
+  function chips(){
+    const W=$('dtWho'); W.innerHTML='';
+    [['mi','💝 Para mí'],['dar','✍️ Para '+nm(oth)]].forEach(([k,l])=>{const b=document.createElement('button');b.textContent=l;b.className=who===k?'cur':'';b.onclick=()=>{who=k;render()};W.append(b)});
+    const t=$('dtTabs'); t.innerHTML='';
+    T.forEach(([k,l])=>{const b=document.createElement('button');b.textContent=l;b.className=tab===k?'cur':'';b.onclick=()=>{tab=k;render()};t.append(b)});
+  }
+  function form(fields,txt,onSave){
+    const f=document.createElement('form');f.className='di-add card pj-f';f.autocomplete='off';
+    fields.forEach(([k,ph,max])=>{const i=document.createElement(max>200?'textarea':'input');i.className='pq-in';i.name=k;i.placeholder=ph;i.maxLength=max||160;if(max>200)i.rows=2;f.append(i)});
+    const b=document.createElement('button');b.className='btn small';b.textContent=txt;f.append(b);
+    f.onsubmit=e=>{e.preventDefault();if(!GG.on){st.textContent='Activa el guardado compartido en el editor para usar esto';return}
+      const v={};fields.forEach(([k])=>v[k]=f.elements[k].value.trim());if(!v[fields[0][0]])return f.elements[fields[0][0]].focus();onSave(v);f.reset();burst(10);st.textContent='💌 Listo, ya le llegó'};
+    return f;
+  }
+  const empty=t=>el(`<div class="kb-empty">${t}</div>`);
+  function item(x,html,mine){const r=el(`<div class="ds-i"><div class="ds-t">${html}</div><div class="ds-f"><span>${fmtDia(x.a)}</span></div></div>`);
+    if(mine){const d=document.createElement('button');d.className='ds-b';d.textContent='✕';del(d,x);r.querySelector('.ds-f').append(d)}return r}
+  function songHTML(x){return `<b>🎵 ${esc(x.t)}</b>${x.ar?' · '+esc(x.ar):''}${x.why?`<div style="margin-top:4px;font-style:italic">“${esc(x.why)}”</div>`:''}${okL(x.l)?`<div><a class="dt-a" href="${esc(x.l)}" target="_blank" rel="noopener">▶ Escuchar</a></div>`:''}`}
+  async function photoInto(img,x){try{img.src=await GG.photo(x.g)}catch(e){img.alt='No se pudo cargar'}}
+  function render(){
+    chips(); box.innerHTML=''; pending();
+    const from=who==='mi'?oth:me, mine=who==='dar', L=live(tab,from);
+    $('dtSub').textContent=mine?`lo que le dejas a ${nm(oth)} 💝`:`lo que ${nm(oth)} te dejó 💝`;
+    if(tab==='song'){
+      if(mine)box.append(form([['t','Canción',120],['ar','Artista (opcional)',80],['l','Link de Spotify o YouTube (opcional)',400],['why','¿Por qué te recuerda a mí? (opcional)',300]],'🎵 Agregar a su playlist',v=>{add({k:'song',t:v.t,ar:v.ar,l:okL(v.l)?v.l:'',why:v.why});avisar(`🎵 ${C.ella} agregó una canción a tu playlist: ${v.t}`,'detalle')}));
+      else{const s=songOfDay(oth);if(s)box.append(el(`<div class="dt-hoy"><small>la canción de hoy</small>${songHTML(s).replace('<b>🎵 ','<b>')}</div>`))}
+      const l=el('<div class="pj-l"></div>');if(!L.length)l.append(empty(mine?'agrega canciones que te recuerden a '+esc(nm(oth))+' 🎶':'todavía no hay canciones aquí 🎶'));
+      L.slice().reverse().forEach(x=>l.append(item(x,songHTML(x),mine)));box.append(l);
+    }
+    if(tab==='reto'){
+      if(mine)box.append(form([['t','Ej. Hoy mándame una selfie 🤳',160]],'🎯 Dejarle un reto',v=>{add({k:'reto',t:v.t});avisar(`🎯 ${C.ella} te dejó un reto: ${v.t}`,'detalle')}));
+      const l=el('<div class="pj-l"></div>');if(!L.length)l.append(empty(mine?'déjale un retito divertido 🎯':'no tienes retos por ahora 🎯'));
+      L.slice().sort((a,b)=>(!!a.done-!!b.done)||b.a-a.a).forEach(x=>{const r=item(x,`${x.done?'✅':'🎯'} ${esc(x.t)}${x.done?`<div style="font-size:12px;opacity:.7;margin-top:3px">cumplido el ${fmtDia(x.done)}</div>`:''}`,mine);
+        if(!mine&&!x.done){const b=document.createElement('button');b.className='ds-b';b.textContent='✅ ¡Cumplido!';b.onclick=()=>{upd(x,{done:Date.now()});burst(20);avisar(`🎯 ${C.ella} cumplió tu reto: ${x.t}`,'detalle')};r.querySelector('.ds-f').append(b)}
+        l.append(r)});box.append(l);
+    }
+    if(tab==='foto'){
+      if(mine){const f=el(`<form class="di-add card pj-f"><label class="dt-pick"><input type="file" accept="image/*" hidden>📷 Elegir una foto de ${esc(nm(oth))}</label><input class="pq-in" maxlength="160" placeholder="¿Por qué te encanta esta foto?"><button class="btn small">📸 Guardar foto</button></form>`);
+        const fi=f.querySelector('input[type=file]'),lb=f.querySelector('.dt-pick');fi.onchange=()=>{if(fi.files[0])lb.textContent='✅ '+fi.files[0].name.slice(0,30)};
+        f.onsubmit=async e=>{e.preventDefault();if(!GG.on){st.textContent='Activa el guardado compartido en el editor para usar esto';return}if(!fi.files[0]){lb.click();return}
+          const b=f.querySelector('.btn');b.disabled=true;st.textContent='Subiendo foto… 📷';
+          try{const blob=await GG.shrink(fi.files[0]),g=await GG.newPhoto(blob);add({k:'foto',g,c:f.querySelector('.pq-in').value.trim()});avisar(`📸 ${C.ella} guardó una foto tuya que le encanta`,'detalle');st.textContent='💌 Guardada';burst(12)}
+          catch(err){st.textContent='No se pudo subir la foto, intenta otra vez'}b.disabled=false};box.append(f)}
+      const g=el('<div class="dt-ph"></div>');if(!L.length)box.append(empty(mine?'sube fotos de '+esc(nm(oth))+' que te encanten 📸':'todavía no hay fotos aquí 📸'));
+      L.slice().reverse().forEach(x=>{const fg=el(`<figure><img alt=""><figcaption>${x.c?esc(x.c):''}<div style="font-size:11px;opacity:.6">${fmtDia(x.a)}</div></figcaption></figure>`);photoInto(fg.querySelector('img'),x);
+        if(mine){const d=document.createElement('button');d.className='ds-b';d.textContent='✕';del(d,x);fg.append(d)}g.append(fg)});box.append(g);
+    }
+    if(tab==='antojo'){
+      if(mine)box.append(form([['t','Ej. Hoy se me antojan unos tacos 🌮 / ¿Vamos al cine?',160]],'🍕 Proponer',v=>{add({k:'antojo',t:v.t});avisar(`🍕 ${C.ella} te propone: ${v.t}`,'detalle')}));
+      const l=el('<div class="pj-l"></div>');if(!L.length)l.append(empty(mine?'¿qué se te antoja hacer con '+esc(nm(oth))+'? 🍕':'no hay antojos por ahora 🍕'));
+      L.slice().reverse().forEach(x=>{const r=item(x,`🍕 ${esc(x.t)}${x.r?`<div style="font-size:13px;margin-top:4px"><b>${mine?esc(nm(oth))+' dijo: ':'Tú dijiste: '}${R[x.r]}</b></div>`:(mine?'<div style="font-size:12px;opacity:.6;margin-top:3px">esperando respuesta…</div>':'')}`,mine);
+        if(!mine){const rr=document.createElement('div');rr.className='dt-r';Object.entries(R).forEach(([k,t])=>{const b=document.createElement('button');b.textContent=t;b.className=x.r===k?'on':'';
+          b.onclick=()=>{if(x.r===k)return;upd(x,{r:k});if(k==='si')burst(16);avisar(`🍕 ${C.ella} respondió a «${x.t}»: ${t}`,'detalle')};rr.append(b)});r.querySelector('.ds-t').append(rr)}
+        l.append(r)});box.append(l);
+    }
+  }
+  function pending(){
+    const r=live('reto',oth).filter(x=>!x.done).length, a=live('antojo',oth).filter(x=>!x.r).length;
+    const go=(t)=>()=>{who='mi';tab=t;render();GOTO('detalles')};
+    PEND.set('dt-reto',{n:r,t:r===1?'🎯 '+nm(oth)+' te dejó un reto':'🎯 '+nm(oth)+' te dejó '+r+' retos',go:go('reto')});
+    PEND.set('dt-antojo',{n:a,t:a===1?'🍕 '+nm(oth)+' te propone algo':'🍕 '+nm(oth)+' te propone '+a+' cosas',go:go('antojo')});
+  }
+  // en la pantalla del mensaje del día: su canción de hoy y una foto tuya que le encanta
+  async function extra(){
+    const x=$('hoyExtra'); if(!x)return; x.innerHTML='';
+    const s=songOfDay(oth); if(s){const a=el(`<${okL(s.l)?'a':'div'} ${okL(s.l)?`href="${esc(s.l)}" target="_blank" rel="noopener"`:''}>🎵 ${esc(nm(oth))} te dedica hoy: <b>${esc(s.t)}</b>${s.ar?' · '+esc(s.ar):''}</${okL(s.l)?'a':'div'}>`);x.append(a)}
+    const F=live('foto',oth); if(F.length){const f=F[(doy()*7)%F.length];const w=el(`<div><img alt=""><div style="margin-top:6px">${f.c?'“'+esc(f.c)+'”':'📸 una foto tuya que le encanta a '+esc(nm(oth))}</div></div>`);x.append(w);photoInto(w.querySelector('img'),f)}
+  }
+  window.addEventListener('detalles',()=>{render();extra()}); render(); extra();
+})();
+
 /* ====== ¿Cómo te sientes hoy? ====== */
 (function(){
   const M=(C.animo||[]).filter(o=>o.emoji).map(o=>({e:o.emoji,n:FILL(o.nombre),r:FILL(o.respuesta)}));
@@ -3148,7 +3308,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   if(VIEWER()!=='ella'){sec.remove();return}
   const LIST=[['nota','💌 Te deja una notita'],['voz','🎙️ Te manda un mensaje de voz'],['like','❤️ Le da like a lo tuyo'],['extrano','🥺 Te dice que te extraña'],['pregunta','💭 Contesta la pregunta del día'],
     ['animo','🌤️ Dice cómo se siente'],['diario','📔 Guarda un momento en el diario'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Cosas que aprender'],['peli','🍿 Pelis y series'],
-    ['evento','🗓️ Agrega algo a «Lo que viene»'],['deseo','🎁 Lista de deseos'],['receta','🍳 Agrega una receta'],['reto','🎯 Reto de la semana'],['insignia','🏅 Desbloquean una insignia'],['foto','📷 Sube fotos'],['recuerdo','📷 Guarda un recuerdo'],['parajon','💙 Usa lo que le dejas en «Para Jon»']];
+    ['evento','🗓️ Agrega algo a «Lo que viene»'],['deseo','🎁 Lista de deseos'],['receta','🍳 Agrega una receta'],['reto','🎯 Reto de la semana'],['insignia','🏅 Desbloquean una insignia'],['detalle','💝 Te deja un detalle (canción, reto, foto o antojo)'],['termo','🌡️ Te dice cuánto te extraña'],['foto','📷 Sube fotos'],['recuerdo','📷 Guarda un recuerdo'],['parajon','💙 Usa lo que le dejas en «Para Jon»']];
   function render(){
     const off=ELLA_PREF.off(); box.innerHTML='';
     LIST.forEach(([k,l])=>{const r=document.createElement('label');r.className='ma-r';
@@ -3164,13 +3324,13 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const S=window.ACT=SHARED('actividad.bin','e','actividad-cache',150,()=>show());
   window.ACT_PUT=(t,k,w)=>{const now=Date.now();
     if(k==='entrada'){const id='in:'+DK(MXD()),ex=S.all().find(x=>x.id===id);if(ex){ex.n=(ex.n||1)+1;ex.a=ex.u=now;S.save()}else S.add({id,k,w,n:1,t,a:now,u:now});return}
-    if(k==='animo'){const id='an:'+w+':'+DK(MXD()),ex=S.all().find(x=>x.id===id);if(ex){ex.t=t;ex.a=ex.u=now;S.save()}else S.add({id,k,w,t,a:now,u:now});return}
+    if(k==='animo'||k==='termo'){const id=k.slice(0,2)+':'+w+':'+DK(MXD()),ex=S.all().find(x=>x.id===id);if(ex){ex.t=t;ex.a=ex.u=now;S.save()}else S.add({id,k,w,t,a:now,u:now});return}
     S.add({id:UID(),t,k,w,a:now,u:now})};
   ACT_Q.splice(0).forEach(x=>ACT_PUT(...x));
   const ELLA=VIEWER()==='ella', fromOther=x=>ELLA?x.w!=='ella':x.w==='ella';
   // lo que ya tiene su propio pendiente en la campana no se repite
-  const DUP=x=>x.k==='nota'||x.k==='voz'||x.k==='pregunta'||(x.k==='like'&&/notita/.test(x.t||''));
-  const SEC={plan:'planes',aprender:'aprender',peli:'pelis',evento:'viene',foto:'momentos',recuerdo:'momentos',deseo:'deseos',diario:'diario',reto:'reto',extrano:'extrano',receta:'recetas',animo:'animo',insignia:'insignias',abrazo:'abrazo',racha:'racha',cartames:'cartames',comida:'comida',adivina:'adivina',cumple:ELLA?'cumpleyo':'cumple',especial:'sanvalentin',parajon:'parajon',vale:'vales',ruleta:'ruleta',abrela:'abrela',rasca:'rasca',sorpresa:'sorpresas',capsula:'capsula',like:'voz',secreto:'final',entrada:'inicio'};
+  const DUP=x=>(x.k==='detalle'&&/te dejó un reto|te propone/.test(x.t||''))||x.k==='nota'||x.k==='voz'||x.k==='pregunta'||(x.k==='like'&&/notita/.test(x.t||''));
+  const SEC={plan:'planes',aprender:'aprender',peli:'pelis',evento:'viene',foto:'momentos',recuerdo:'momentos',deseo:'deseos',diario:'diario',reto:'reto',extrano:'extrano',receta:'recetas',animo:'animo',insignia:'insignias',abrazo:'abrazo',racha:'racha',cartames:'cartames',comida:'comida',adivina:'adivina',cumple:ELLA?'cumpleyo':'cumple',especial:'sanvalentin',parajon:'parajon',vale:'vales',ruleta:'ruleta',abrela:'abrela',rasca:'rasca',sorpresa:'sorpresas',capsula:'capsula',like:'voz',secreto:'final',entrada:'inicio',detalle:'detalles',termo:'termo'};
   let seen=new Set(); try{seen=new Set(JSON.parse(localStorage.getItem('act-visto')||'[]'))}catch(e){}
   let since=+(localStorage.getItem('act-desde')||0); if(!since){since=Date.now();try{localStorage.setItem('act-desde',String(since))}catch(e){}}
   const save=()=>{try{localStorage.setItem('act-visto',JSON.stringify([...seen].slice(-300)))}catch(e){}};
@@ -3369,8 +3529,8 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
 /* ====== Pestañas ====== */
 (function(){
   const J=VIEWER()==='yo';
-  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','insignias','animo','pregunta','extrano','misavisos','final']],
-    ['nosotros','💑','Nosotros',['cancion','momentos','polaroid','diario','cielo','constelacion','arbol','sorpresas','capsula']],
+  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','insignias','animo','termo','pregunta','extrano','misavisos','final']],
+    ['nosotros','💑','Nosotros',['detalles','cancion','momentos','polaroid','diario','cielo','constelacion','arbol','sorpresas','capsula']],
     ['cartas','💌','Cartas',['carta','cartames','abrela','buzon','voz','escribir','razones','galleta','medidor','abrazo']],
     ['juegos','🎮','Juegos',['rasca','vales','memorama','rompecabezas','adivina','ruleta','comida']],
     ['planes','📝','Planes',['planes','aprender','pelis','recetas','reto','deseos','viene']],
@@ -3439,14 +3599,16 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   player.addEventListener('ended',()=>{const el=list.querySelector(`[data-id="${playing}"]`);if(el){el.querySelector('.vz-play').textContent='▶';el.querySelector('.vz-bar i').style.width='0'}playing=null});
   function render(){
     const live=S.all().filter(x=>!x.x&&NEWER(x,'rvz')).sort((a,b)=>a.a-b.a), me=VIEWER();
-    {let seen=0;try{seen=+(localStorage.getItem('voz-visto')||0)}catch(e){}const n=live.filter(x=>x.w!==me&&x.a>seen).length;
+    {let seen=0;try{seen=+(localStorage.getItem('voz-visto')||0)}catch(e){}const now=Date.now(),n=live.filter(x=>x.w!==me&&(x.at||x.a)>seen&&!(x.at>now)).length;
       PEND.set('voz',{n,t:n===1?'🎙️ 1 mensaje de voz nuevo':'🎙️ '+n+' mensajes de voz nuevos',go:()=>GOTO('voz')})}
     list.innerHTML=live.length?'':'<div class="nb-empty">aún no hay mensajes de voz… ¡graba el primero! 🎙️</div>';
     live.forEach(x=>{
-      const d=document.createElement('div');d.className='vz-m '+(x.w===me?'me':'them');d.dataset.id=x.id;
+      const locked=x.at&&x.at>Date.now()&&x.w!==me;
+      const d=document.createElement('div');d.className='vz-m '+(x.w===me?'me':'them')+(locked?' lock':'');d.dataset.id=x.id;
       const pl=document.createElement('button');pl.className='vz-play';pl.textContent=playing===x.id?'⏸':'▶';pl.setAttribute('aria-label','Escuchar');
       const bd=document.createElement('div');bd.className='vz-body';
-      bd.innerHTML=`<div class="vz-bar"><i></i></div><div class="vz-meta"><span>${esc(x.w==='yo'?C.yo:C.ella)} · ${fmtDia(x.a)} ${fmtHora(x.a)}</span><span>${fmtT(x.d)}</span></div>`;
+      bd.innerHTML=`<div class="vz-bar"><i></i></div><div class="vz-meta"><span>${esc(x.w==='yo'?C.yo:C.ella)} · ${fmtDia(x.a)} ${fmtHora(x.a)}${x.at&&x.at>Date.now()?` · ⏰ se abre el ${fmtDia(x.at)} ${fmtHora(x.at)}`:''}</span><span>${fmtT(x.d)}</span></div>`;
+      if(locked){pl.textContent='🔒';pl.onclick=()=>{st.textContent=`🔒 Este mensaje se abre el ${fmtDia(x.at)} a las ${fmtHora(x.at)}`};d.append(pl,bd);list.append(d);return}
       pl.onclick=async()=>{
         if(playing===x.id){player.pause();playing=null;pl.textContent='▶';return}
         list.querySelectorAll('.vz-play').forEach(b=>b.textContent='▶'); pl.textContent='⏳';
@@ -3463,8 +3625,14 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     });
     list.scrollTop=list.scrollHeight;
   }
-  render();
+  render(); setInterval(()=>{if(S.all().some(x=>x.at&&x.at>Date.now()-70000&&x.at<=Date.now()))render()},60000);
   new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&!document.body.classList.contains('locked'))setTimeout(()=>{try{localStorage.setItem('voz-visto',String(Date.now()))}catch(_){}PEND.set('voz',null)},1500)}),{threshold:.3}).observe(list);
+  {const w=$('vzWhen'),at=$('vzAt');w.onchange=()=>{at.hidden=w.value!=='f';if(w.value==='f'){const d=new Date(Date.now()+864e5);d.setMinutes(0);at.value=new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,16)}}}
+  function whenTs(){const v=$('vzWhen').value,d=new Date();
+    if(v==='m8'){d.setDate(d.getDate()+1);d.setHours(8,0,0,0);return +d}
+    if(v==='n'){d.setHours(22,0,0,0);return +d>Date.now()?+d:0}
+    if(v==='f'){const t=new Date($('vzAt').value).getTime();return t>Date.now()?t:0}
+    return 0}
   if(!GG.on){btn.hidden=true;st.textContent='Los mensajes de voz necesitan el guardado compartido activado';return}
   if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder)){btn.hidden=true;st.textContent='Este celular no deja grabar audio desde aquí';return}
   let rec=null, chunks=[], t0=0, tick=null, blob=null, secs=0, stream=null;
@@ -3485,9 +3653,10 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   $('vzDel').onclick=()=>{blob=null;prev.hidden=true;aud.removeAttribute('src');btn.textContent='🎙️ Grabar mensaje'};
   $('vzSend').onclick=async()=>{
     if(!blob)return; const sb=$('vzSend'); sb.disabled=true; st.textContent='Enviando…';
-    try{const g=await GG.newPhoto(blob);
-      S.add({id:UID(),w:VIEWER(),g,mt:blob.type,d:Math.round(secs),a:Date.now(),u:Date.now()});
-      avisar(`🎙️ ${C.ella} te mandó un mensaje de voz`,'voz');
+    try{const g=await GG.newPhoto(blob), at=whenTs();
+      S.add(Object.assign({id:UID(),w:VIEWER(),g,mt:blob.type,d:Math.round(secs),a:Date.now(),u:Date.now()},at?{at}:{}));
+      if(at)avisar(`🎙️ ${C.ella} te dejó un mensaje de voz que se abre el ${fmtDia(at)} a las ${fmtHora(at)} ⏰`,'voz');else avisar(`🎙️ ${C.ella} te mandó un mensaje de voz`,'voz');
+      $('vzWhen').value='';$('vzAt').hidden=true;
       blob=null;prev.hidden=true;btn.textContent='🎙️ Grabar mensaje';st.textContent='💌 Enviado';burst(14)}
     catch(e){st.textContent='No se pudo enviar, intenta de nuevo'}
     sb.disabled=false;
