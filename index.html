@@ -179,6 +179,9 @@
   .month.locked{background:rgba(255,255,255,.07);color:var(--cream);border:1px dashed rgba(247,198,211,.35);box-shadow:none;cursor:not-allowed}
   /* WhatsApp */
   .wa{display:grid;gap:10px;margin-top:6px}
+  .wa-set,.wa-free{display:flex;gap:8px;align-items:center}.wa-set .pq-in,.wa-free .pq-in{flex:1;min-width:0}.wa-set .btn{margin:0}
+  .wa-free button{flex:none;width:48px;height:46px;border:0;border-radius:14px;background:#25d366;color:#0b3d1f;font-size:20px;cursor:pointer}
+  .wa-chg{background:none;border:0;color:inherit;opacity:.55;font:600 12px 'Nunito';text-decoration:underline;cursor:pointer;margin:2px auto 0}
   .wa a{display:flex;align-items:center;justify-content:center;gap:8px;background:#25d366;color:#0b3d1f;text-decoration:none;border-radius:999px;padding:14px;font:800 15px 'Nunito';box-shadow:0 8px 20px rgba(37,211,102,.3)}
   /* Día / noche */
   body.morning{background:radial-gradient(120% 80% at 50% 0%, #d4577a 0%, #7a1d40 50%, #2a0a18 100%) fixed}
@@ -1480,7 +1483,7 @@
     <button class="btn" id="moreLove">Toca para un poquito más de amor</button>
     <div id="loveMsg"></div>
     <div><button class="btn" id="crBtn" style="background:linear-gradient(135deg,#222,#000);margin-top:14px">🎬 Ver los créditos</button></div>
-    <div class="card" style="margin-top:28px"><div class="daily-l">Estoy pensando en ti</div><div style="font-size:14px;opacity:.8">Toca uno y mándamelo cuando quieras</div>
+    <div class="card" style="margin-top:28px"><div class="daily-l" id="waT">Estoy pensando en ti</div><div style="font-size:14px;opacity:.8" id="waS">Toca uno y mándamelo cuando quieras</div>
       <div class="wa" id="wa"></div></div>
     <div><button class="logout" id="logoutBtn" style="display:none"></button></div>
   </section>
@@ -2240,8 +2243,32 @@ makeBoard({avTipo:'aprender',avNew:'📚 '+C.ella+' quiere que aprendamos:',avDo
 
 /* ====== WhatsApp ====== */
 (function(){
-  const N=String(C.whatsapp.numero||'').replace(/\D/g,''), M=C.whatsapp.mensajes.map(o=>[o.emoji,FILL(o.boton),FILL(o.mensaje)]);
-  const w=document.getElementById('wa');
+  const W=C.whatsapp||{}, w=document.getElementById('wa');
+  const link=(n,t)=>`https://wa.me/${n}?text=${encodeURIComponent(t)}`;
+  if(VIEWER()==='yo'){
+    /* para Jon: mandarle mensajes a Ale */
+    const DEF=[['💭','Pensando en ti','Estoy pensando en ti, mi amor 💭'],['🥺','Te extraño','Te extraño mucho, {ella} 🥺💗'],['😘','Un beso','Te mando un besote 😘'],['🤗','Un abrazo','Ya quiero abrazarte 🤗'],
+      ['☀️','Buenos días','Buenos días, preciosa ☀️ que tengas un día bonito'],['🌙','Buenas noches','Buenas noches, mi amor. Que descanses 🌙'],['💌','Revisa la app','Te dejé algo en nuestro lugar 💌 ábrelo cuando puedas']];
+    // los mismos mensajes que Ale le puede mandar a Jon, al revés (nombres y palabras en masculino)
+    const swap=t=>{const A=C.ella,J=C.yo;if(!A||!J)return t;return t.split(A).map(p=>p.split(J).join('\u0001')).join(J).split('\u0001').join(A)};
+    const M=((W.mensajes||[]).filter(o=>o&&o.mensaje).map(o=>[o.emoji||'💗',swap(MASC(FILL(o.boton||''))),swap(MASC(FILL(o.mensaje)))])); const L=M.length?M:DEF.map(([e,b,m])=>[e,b,FILL(m)]);
+    document.getElementById('waT').textContent='Mándale algo a '+C.ella+' 💬';
+    let num=String(W.numeroElla||'').replace(/\D/g,''); try{if(!num)num=localStorage.getItem('wa-ella')||''}catch(e){}
+    const fix=n=>{n=String(n).replace(/\D/g,'');if(n.length===10)n='52'+n;if(/^521\d{10}$/.test(n))n='52'+n.slice(3);return n};
+    function draw(){
+      w.innerHTML=''; num=fix(num);
+      if(!num){document.getElementById('waS').textContent='Escribe una vez el número de '+C.ella+'. Se guarda solo en tu celular y no se sube a ningún lado';
+        const f=document.createElement('form');f.className='wa-set';f.innerHTML='<input class="pq-in" inputmode="tel" placeholder="Ej. 55 1234 5678" maxlength="20"><button class="btn small">Guardar</button>';
+        f.onsubmit=e=>{e.preventDefault();const v=fix(f.querySelector('input').value);if(v.length<12)return f.querySelector('input').focus();num=v;try{localStorage.setItem('wa-ella',v)}catch(_){}draw()};w.append(f);return}
+      document.getElementById('waS').textContent='Toca uno y se abre WhatsApp con el mensaje listo para '+C.ella;
+      L.forEach(([e,l,t])=>{const a=document.createElement('a');a.href=link(num,t);a.target='_blank';a.rel='noopener';a.textContent=`${e} ${l}`;w.append(a)});
+      const f=document.createElement('form');f.className='wa-free';f.innerHTML='<input class="pq-in" maxlength="500" placeholder="O escribe tu propio mensaje…"><button aria-label="Enviar">➤</button>';
+      f.onsubmit=e=>{e.preventDefault();const t=f.querySelector('input').value.trim();if(!t)return;const a=document.createElement('a');a.href=link(num,t);a.target='_blank';a.rel='noopener';document.body.append(a);a.click();a.remove();f.reset()};w.append(f);
+      if(!W.numeroElla){const c=document.createElement('button');c.className='wa-chg';c.textContent='cambiar número';c.onclick=()=>{try{localStorage.removeItem('wa-ella')}catch(_){}num='';draw()};w.append(c)}
+    }
+    draw(); return;
+  }
+  const N=String(W.numero||'').replace(/\D/g,''), M=(W.mensajes||[]).map(o=>[o.emoji,FILL(o.boton),FILL(o.mensaje)]);
   M.forEach(([e,l,t])=>{const a=document.createElement('a');a.href=`https://wa.me/${N}?text=${encodeURIComponent(t)}`;a.target='_blank';a.rel='noopener';a.textContent=`${e} ${l}`;w.appendChild(a)});
 })();
 
@@ -4035,7 +4062,7 @@ const SCHEMA=[
   {t:'¿Cómo te sientes hoy?',f:[['animo','Caritas y lo que le respondes','objlist',[['emoji','Emoji','text'],['nombre','Cómo se siente','text'],['respuesta','Lo que le respondes','textarea',2]]]]},
   {t:'Pregunta del día',f:[['preguntas','Preguntas (sale una distinta cada día, en orden)','list']]},
   {t:'Frase final y mensajitos',f:[['fraseFinal','Frase final · *palabra* = cursiva rosa','textarea',3],['mensajitos','Mensajitos del botón «un poquito más de amor»','list']]},
-  {t:'WhatsApp',f:[['whatsapp.numero','Tu número (con lada, ej. 5255…)','text'],['whatsapp.mensajes','Botones','objlist',[['emoji','Emoji','text'],['boton','Texto del botón','text'],['mensaje','Mensaje que se envía','textarea',2]]]]},
+  {t:'WhatsApp',f:[['whatsapp.numero','Tu número (con lada, ej. 5255…)','text'],['whatsapp.numeroElla','Número de Ale (para que tú le mandes mensajes; con lada, ej. 5255…)','text'],['whatsapp.mensajes','Botones (los usan los dos: Ale te los manda a ti y tú se los mandas a ella)','objlist',[['emoji','Emoji','text'],['boton','Texto del botón','text'],['mensaje','Mensaje que se envía','textarea',2]]]]},
   {g:'💑 Nosotros'},
   {t:'Nuestra canción',f:[['cancion.titulo','Título','text'],['cancion.artista','Artista','text'],['cancion.link','Link (Spotify, YouTube…)','text']]},
   {t:'Fotos',f:[['fotos','Galería (también se usan en el memorama y los créditos)','photos'],['polaroidTexto','Texto al revelar la polaroid (la foto sale al azar)','text'],['fotoRompecabezas','Número de foto para el rompecabezas','number']]},
