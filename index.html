@@ -2457,7 +2457,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
 })();
 
 /* ====== App de Android: recibe su nombre secreto de avisos ====== */
-try{if(window.AndroidApp&&VIEWER()==='ella')window.AndroidApp.setTopic(AV.ntfyElla||'')}catch(e){}
+try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyElla||''):(AV.ntfy||''))}catch(e){}
 
 /* ====== Lista de deseos ====== */
 (function(){

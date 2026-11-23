@@ -48,6 +48,7 @@ public class MainActivity extends Activity {
         PollJob.schedule(this);
         StreamService.start(this);
         if (!sp.getBoolean("linked", false)) showLinkScreen();
+        else if (sp.getString("who", "").isEmpty()) showWhoScreen(null);
         else showWeb(null);
     }
 
@@ -75,7 +76,7 @@ public class MainActivity extends Activity {
         ico.setTextSize(54);
         ico.setGravity(Gravity.CENTER);
         TextView t = new TextView(this);
-        t.setText("Pega aquí el link especial que te mandó Jon");
+        t.setText("Bienvenidos a nuestro lugar 💗\nPega aquí el link especial");
         t.setTextColor(Color.WHITE);
         t.setTextSize(20);
         t.setGravity(Gravity.CENTER);
@@ -102,15 +103,42 @@ public class MainActivity extends Activity {
         err.setTextColor(Color.parseColor("#f7c6d3"));
         err.setGravity(Gravity.CENTER);
         err.setPadding(0, 24, 0, 0);
+        final String[] who = {sp.getString("who", "")};
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER);
+        row.setPadding(0, 10, 0, 20);
+        final Button bA = new Button(this), bJ = new Button(this);
+        bA.setText("Soy Ale");
+        bJ.setText("Soy Jon");
+        Runnable paint = () -> {
+            bA.setAlpha("ella".equals(who[0]) ? 1f : .55f);
+            bJ.setAlpha("yo".equals(who[0]) ? 1f : .55f);
+            bA.setText(("ella".equals(who[0]) ? "✓ " : "") + "Soy Ale");
+            bJ.setText(("yo".equals(who[0]) ? "✓ " : "") + "Soy Jon");
+        };
+        bA.setOnClickListener(v -> { who[0] = "ella"; paint.run(); });
+        bJ.setOnClickListener(v -> { who[0] = "yo"; paint.run(); });
+        paint.run();
+        row.addView(bA);
+        row.addView(bJ);
         btn.setOnClickListener(v -> {
             String s = e.getText().toString().trim();
             int i = s.indexOf("#k=");
+            if (who[0].isEmpty()) { err.setText("Primero toca «Soy Ale» o «Soy Jon» 💗"); return; }
             if (i < 0) { err.setText("Ese no es el link correcto. Pídele a Jon el link especial 💗"); return; }
-            sp.edit().putBoolean("linked", true).apply();
+            sp.edit().putBoolean("linked", true).putString("who", who[0]).apply();
             showWeb(BASE + s.substring(i));
         });
         l.addView(ico);
         l.addView(t);
+        TextView q = new TextView(this);
+        q.setText("¿Quién eres?");
+        q.setTextColor(Color.WHITE);
+        q.setTextSize(17);
+        q.setGravity(Gravity.CENTER);
+        l.addView(q);
+        l.addView(row);
         l.addView(e, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         l.addView(btn);
         l.addView(err);
@@ -120,6 +148,30 @@ public class MainActivity extends Activity {
         sv.setBackgroundColor(Color.parseColor("#3b0d1c"));
         sv.addView(l, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(sv);
+    }
+
+    void showWhoScreen(String url) {
+        wv = null;
+        LinearLayout l = new LinearLayout(this);
+        l.setOrientation(LinearLayout.VERTICAL);
+        l.setGravity(Gravity.CENTER);
+        l.setPadding(70, 70, 70, 70);
+        l.setBackgroundColor(Color.parseColor("#3b0d1c"));
+        TextView t = new TextView(this);
+        t.setText("💗\n¿Quién usa este celular?");
+        t.setTextColor(Color.WHITE);
+        t.setTextSize(22);
+        t.setGravity(Gravity.CENTER);
+        t.setPadding(0, 0, 0, 40);
+        Button bA = new Button(this), bJ = new Button(this);
+        bA.setText("Soy Ale");
+        bJ.setText("Soy Jon");
+        bA.setOnClickListener(v -> { sp.edit().putString("who", "ella").apply(); showWeb(url); });
+        bJ.setOnClickListener(v -> { sp.edit().putString("who", "yo").apply(); showWeb(url); });
+        l.addView(t);
+        l.addView(bA);
+        l.addView(bJ);
+        setContentView(l);
     }
 
     void showWeb(String url) {
@@ -143,6 +195,10 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageFinished(final WebView v, String url) {
+                String w = sp.getString("who", "");
+                if (!w.isEmpty() && url != null && url.startsWith(BASE)) {
+                    v.evaluateJavascript("(function(){try{if(localStorage.getItem('yo-soy')!=='" + w + "'){localStorage.setItem('yo-soy','" + w + "');location.reload();return 1}}catch(e){}return 0})()", null);
+                }
                 // Si el link pegado no era el correcto, regresa a la pantalla para pegarlo otra vez.
                 v.postDelayed(() -> {
                     if (wv != v) return;

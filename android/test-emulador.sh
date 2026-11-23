@@ -13,6 +13,8 @@ adb logcat -c
 adb shell am start -W -n com.jon.nuestrolugar/.MainActivity > $OUT/start.txt 2>&1
 sleep 8
 adb exec-out screencap -p > $OUT/1-pegar-link.png
+tap_res 'text="Soy Jon"'
+sleep 1
 tap_res 'class="android.widget.EditText"'
 sleep 1
 adb shell input text "https://jonatan-montiel.github.io/ale-meses/#k=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
