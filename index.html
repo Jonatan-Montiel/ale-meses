@@ -479,6 +479,7 @@
   .cu{text-align:center}.cu-e{font-size:46px}
   .cu-n b{display:block;font-family:'Fraunces',serif;font-size:52px;line-height:1;margin-top:6px}.cu-n span{font-size:13px;letter-spacing:1.3px;text-transform:uppercase;opacity:.75}
   .cu-t{font-family:'Caveat',cursive;font-size:23px;color:var(--blush);margin-top:6px}
+  .cu-x{font-size:13.5px;opacity:.8;margin-top:8px}
   .cu-h{font-family:'Fraunces',serif;font-size:26px;margin:4px 0}
   .cu.today{background:linear-gradient(160deg,rgba(233,184,114,.25),rgba(232,93,132,.25))!important}
   #adivina [hidden],#recetas [hidden]{display:none!important}
@@ -1444,6 +1445,10 @@ const MASC=(()=>{const W={enamorada:'enamorado',cansada:'cansado',estresada:'est
   const re=new RegExp('\\b('+Object.keys(W).join('|')+')\\b','gi');
   return t=>String(t||'').replace(re,m=>{const r=W[m.toLowerCase()];return m[0]===m[0].toUpperCase()?r[0].toUpperCase()+r.slice(1):r})})();
 const GEN=(t,w)=>(w||VIEWER())==='yo'?MASC(t):String(t||'');
+/* texto de cuenta regresiva de cumpleaños según los días que falten */
+const CUMPLE_TXT=(days,propio,heart)=>propio
+  ?(days===1?'¡Mañana es tu gran día! 🥳':days<=7?'¡Ya casi! esta semana es tu cumpleaños 🎈':days<=31?'falta menos de un mes para celebrarte 🎉':days<=90?'faltan unos meses, pero ya se siente cerca 🎂':'todavía falta, pero ya cuento los días '+heart)
+  :(days===1?'¡Mañana es su cumpleaños! ten todo listo 🥳':days<=7?'¡Ya casi! prepárale algo bonito 🎈':days<=31?'falta menos de un mes, ve pensando en su regalo 🎁':days<=90?'faltan unos meses, hay tiempo de planear algo especial 🎂':'todavía falta mucho, pero que no se te olvide 😉');
 const MXD=t=>new Date(new Date(t==null?Date.now():t).toLocaleString('en-US',{timeZone:'America/Mexico_City'}));
 const DK=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const UID=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -2618,7 +2623,7 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
   const fecha=`${dd} de ${MESN[mm-1]}`;
   if(!isB){
     box.innerHTML=`<div class="card cu"><div class="cu-e">${days<=7?'🎉':'🎂'}</div><div class="daily-l">${ella?'Tu cumpleaños':'El cumpleaños de '+esc(C.ella)} · ${fecha}</div>
-      <div class="cu-n"><b>${days}</b><span>${days===1?'día':'días'}</span></div><div class="cu-t">${days===1?'¡Mañana es el gran día! 🥳':days<=7?'¡Ya casi! prepárate para celebrar 🎈':'falta poquito para celebrarte 💗'}</div></div>`;
+      <div class="cu-n"><b>${days}</b><span>${days===1?'día':'días'}</span></div><div class="cu-t">${CUMPLE_TXT(days,ella,'💗')}</div></div>`;
     return;
   }
   document.body.classList.add('bday');
@@ -2843,7 +2848,7 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
     let h='';
     if(isB&&soyJon())h=`<div class="card cu today"><div class="cu-e">🎂</div><h3 class="cu-h">¡Feliz cumpleaños, ${esc(C.yo)}!</h3><div class="cu-t">hoy todo es para ti 💙🎁</div>${L?`<button class="btn small" id="cyBtn">${cyOpen?'💌 Guardar carta':'💌 Abrir la carta de '+esc(C.ella)}</button>`:''}</div>${cyOpen&&L?`<div class="paper">${esc(L.t).split(/\n\s*\n/).map(p=>'<p>'+p.replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(C.ella)} 💙</p></div>`:''}`;
     else h=`<div class="card cu${isB?' today':''}"><div class="cu-e">${isB?'🎂':days<=7?'🎉':'🎂'}</div><div class="daily-l">${soyJon()?'Tu cumpleaños':'El cumpleaños de '+esc(C.yo)} · ${fecha}</div>
-      ${isB?`<h3 class="cu-h">¡Hoy es el cumpleaños de ${esc(C.yo)}! 🎉</h3><div class="cu-t">no olvides felicitarlo 💙</div>`:`<div class="cu-n"><b>${days}</b><span>${days===1?'día':'días'}</span></div><div class="cu-t">${soyJon()?(L?esc(C.ella)+' te está preparando algo para ese día 🤫':'falta poquito para celebrarte 💙'):(days<=7?'¡Ya casi! prepárale algo bonito 🎈':'escríbele su carta y se la mostramos ese día 🤫')}</div>`}</div>`;
+      ${isB?`<h3 class="cu-h">¡Hoy es el cumpleaños de ${esc(C.yo)}! 🎉</h3><div class="cu-t">no olvides felicitarlo 💙</div>`:`<div class="cu-n"><b>${days}</b><span>${days===1?'día':'días'}</span></div><div class="cu-t">${CUMPLE_TXT(days,soyJon(),'💙')}</div>${soyJon()?(L?`<div class="cu-x">${esc(C.ella)} te está preparando algo para ese día 🤫</div>`:''):'<div class="cu-x">escríbele su carta abajo y se la mostramos ese día 🤫</div>'}`}</div>`;
     cb.innerHTML=h;
     if(!soyJon()){
       const f=document.createElement('div');f.className='di-add card pj-f';
