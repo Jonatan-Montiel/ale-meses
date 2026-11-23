@@ -37,13 +37,7 @@ public class Widget extends AppWidgetProvider {
                 Calendar s = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
                 s.set(Integer.parseInt(ini.substring(0, 4)), Integer.parseInt(ini.substring(5, 7)) - 1, Integer.parseInt(ini.substring(8, 10)), 0, 0, 0);
                 long days = (now.getTimeInMillis() - s.getTimeInMillis()) / 86400000L;
-                v.setTextViewText(R.id.wDias, days + " 💗");
-                v.setTextViewText(R.id.wSub, days == 1 ? "día juntos" : "días juntos");
-            }
-            JSONArray msgs = o.optJSONArray("msgs");
-            if (msgs != null && msgs.length() > 0) {
-                int doy = now.get(Calendar.DAY_OF_YEAR);
-                v.setTextViewText(R.id.wMsg, "“" + msgs.optString(doy % msgs.length()) + "”");
+                v.setTextViewText(R.id.wDias, days + (days == 1 ? " día juntos 💗" : " días juntos 💗"));
             }
         } catch (Exception ignored) { }
         Intent i = new Intent(c, MainActivity.class);
