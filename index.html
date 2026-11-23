@@ -613,6 +613,9 @@
   body.editing:not(.ed-inactiva) .ed-bar{display:none}
   body.editing:not(.ed-inactiva){padding-top:0}
   body.editing:not(.ed-inactiva) .ed-fab{top:12px}
+  body.ed-nav .ed-fab{display:none!important}
+  body.ed-nav nav.tabbar button{padding:6px 6px;font-size:10.5px}
+  nav.tabbar .tab-ed{color:var(--gold)!important;opacity:1}
   body.editing:not(.ed-inactiva) .nb-pill{top:12px}
   /* Fechas especiales */
   .esp-b{background:linear-gradient(135deg,#2e9d5b,#c0263f)}
@@ -3698,6 +3701,7 @@ function initEditor(){
       h('button',{class:'ed-x',onclick:()=>openPanel(false),'aria-label':'Cerrar'},'×')),
     body, h('div',{class:'ed-foot'},status,saveBtn));
   document.body.append(fab,panel);
+  {const nav=document.querySelector('nav'); if(nav){const eb=h('button',{class:'tab-ed','aria-label':'Editar',onclick:()=>openPanel(true)});eb.innerHTML='<span>✏️</span>Editar';nav.append(eb);document.body.classList.add('ed-nav')}}
   function openPanel(v){panel.classList.toggle('open',v);try{sessionStorage.setItem('ed-open',v?'1':'')}catch(e){}}
   const say=(t,kind)=>{status.textContent=t;status.className='ed-status '+(kind||'')};
   window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
