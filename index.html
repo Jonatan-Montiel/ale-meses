@@ -559,6 +559,8 @@
   .dw-g img{width:100%;aspect-ratio:1;border-radius:8px;display:block;background:#fff;object-fit:contain}
   .dw-g .x{position:absolute;top:4px;right:4px;border:0;background:rgba(0,0,0,.45);color:#fff;border-radius:999px;font-size:11px;padding:3px 7px;cursor:pointer}
   .dw-g figure.new{outline:3px solid var(--gold)}
+  .sh-btn{border:1px solid rgba(247,198,211,.4);background:rgba(255,255,255,.1);color:inherit;border-radius:999px;padding:8px 14px;font:800 13px 'Nunito';cursor:pointer}
+  body.light .sh-btn{background:#fff;color:#3d1f2a}
   .bell{position:fixed;top:12px;left:12px;z-index:44;width:44px;height:44px;border-radius:50%;border:1px solid rgba(247,198,211,.3);background:rgba(30,6,16,.65);font-size:20px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35)}
   .bell b{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:999px;background:var(--rose);color:#fff;font:800 11.5px/20px 'Nunito';padding:0 5px;display:none}
   .bell.has b{display:block}.bell.has{animation:beat 2.4s ease-in-out infinite}
@@ -2829,6 +2831,58 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   render(); window.addEventListener('unlocked',visit); if(EDIT)setTimeout(visit,1500); document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!document.body.classList.contains('locked'))visit()});
 })();
 
+/* ====== Compartir en WhatsApp, Facebook, Instagram… ====== */
+(function(){
+  const W=1080,H=1350;
+  function wrap(x,t,maxW){const words=String(t).split(' '),L=[];let cur='';words.forEach(w=>{const tt=cur?cur+' '+w:w;if(x.measureText(tt).width>maxW&&cur){L.push(cur);cur=w}else cur=tt});if(cur)L.push(cur);return L}
+  function bg(x){const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#7a1d40');g.addColorStop(.55,'#3b0d1c');g.addColorStop(1,'#1e0610');x.fillStyle=g;x.fillRect(0,0,W,H);
+    x.globalAlpha=.08;x.fillStyle='#fff';x.font='120px serif';[[90,180],[930,300],[160,1150],[900,1210],[520,90]].forEach(([a,b])=>x.fillText('♥',a,b));x.globalAlpha=1}
+  function foot(x){x.textAlign='center';x.fillStyle='rgba(255,247,240,.75)';x.font='600 34px Nunito, sans-serif';x.fillText((C.ella||'')+' & '+(C.yo||'')+' · nuestro lugar ♥',W/2,H-60)}
+  const done=cv=>new Promise(ok=>cv.toBlob(ok,'image/jpeg',.9));
+  async function card({emoji,title,big,sub}){
+    const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');bg(x);x.textAlign='center';
+    let y=360; if(emoji){x.font='200px serif';x.fillText(emoji,W/2,y);y+=110}
+    if(title){x.fillStyle='#f7c6d3';x.font='700 46px Nunito, sans-serif';wrap(x,title.toUpperCase(),900).forEach(l=>{x.fillText(l,W/2,y);y+=60});y+=20}
+    if(big){x.fillStyle='#fff7f0';x.font='italic 600 92px Fraunces, Georgia, serif';wrap(x,big,920).slice(0,5).forEach(l=>{y+=96;x.fillText(l,W/2,y)});y+=40}
+    if(sub){x.fillStyle='rgba(255,247,240,.85)';x.font='500 42px Nunito, sans-serif';wrap(x,sub,900).slice(0,6).forEach(l=>{y+=56;x.fillText(l,W/2,y)})}
+    foot(x); return done(cv);
+  }
+  const loadImg=src=>new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=src});
+  function cover(x,img,dx,dy,dw,dh){const r=Math.max(dw/img.width,dh/img.height),w=img.width*r,h=img.height*r;x.save();x.beginPath();x.rect(dx,dy,dw,dh);x.clip();x.drawImage(img,dx+(dw-w)/2,dy+(dh-h)/2,w,h);x.restore()}
+  async function photos(srcs,title){
+    const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');bg(x);
+    const imgs=await Promise.all(srcs.map(loadImg));
+    if(title){x.textAlign='center';x.fillStyle='#fff7f0';x.font='italic 600 64px Fraunces, Georgia, serif';wrap(x,title,960).slice(0,2).forEach((l,i)=>x.fillText(l,W/2,140+i*74))}
+    const top=title?260:110;
+    if(imgs.length===1){x.fillStyle='#fff7f0';x.fillRect(90,top,900,1000);cover(x,imgs[0],120,top+30,840,840)}
+    else imgs.slice(0,2).forEach((im,i)=>{const px=60+i*500;x.save();x.translate(px+230,top+300);x.rotate(i?.04:-.04);x.fillStyle='#fff7f0';x.fillRect(-230,-280,460,600);cover(x,im,-205,-255,410,450);x.restore()});
+    foot(x); return done(cv);
+  }
+  const b64=blob=>new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(String(r.result));r.readAsDataURL(blob)});
+  async function shareBlob(blob,text){
+    try{if(window.AndroidApp&&AndroidApp.shareImage){AndroidApp.shareImage(await b64(blob),text||'');return}}catch(e){}
+    const f=new File([blob],'nuestro-lugar.jpg',{type:'image/jpeg'});
+    try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:text||''});return}}catch(e){if(e&&e.name==='AbortError')return}
+    if(window.AndroidApp){alert('Actualiza la app (aviso «Hay una versión nueva») para poder compartir 💗');return}
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nuestro-lugar.jpg';document.body.append(a);a.click();a.remove();
+  }
+  async function shareText(text){
+    try{if(window.AndroidApp&&AndroidApp.shareText){AndroidApp.shareText(text);return}}catch(e){}
+    try{if(navigator.share){await navigator.share({text});return}}catch(e){if(e&&e.name==='AbortError')return}
+    const a=document.createElement('a');a.href='https://wa.me/?text='+encodeURIComponent(text);a.target='_blank';a.rel='noopener';document.body.append(a);a.click();a.remove();
+  }
+  const run=async(btn,fn)=>{const t=btn.textContent;btn.disabled=true;btn.textContent='⏳';try{await fn()}catch(e){console.error(e)}btn.disabled=false;btn.textContent=t};
+  window.SHARE={card,photos,blob:shareBlob,text:shareText,run,btn:(label,fn)=>{const b=document.createElement('button');b.className='sh-btn';b.textContent=label||'📤 Compartir';b.onclick=e=>{e.stopPropagation();run(b,fn)};return b}};
+
+  /* contador */
+  {const s=document.getElementById('contador');if(s){const d=Math.floor((Date.now()-new Date(C.inicio+'T00:00:00'))/864e5);
+    const b=SHARE.btn('📤 Compartir nuestro contador',async()=>{const n=Math.floor((Date.now()-new Date(C.inicio+'T00:00:00'))/864e5);
+      SHARE.blob(await card({emoji:'💞',title:C.ella+' & '+C.yo,big:n+' días juntos',sub:'desde el '+new Date(C.inicio+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+' y contando…'}))});
+    b.style.display='block';b.style.margin='14px auto 0';s.append(b)}}
+  /* foto del carrusel */
+  {const a=document.querySelector('#momentos .car-actions');if(a)a.append(SHARE.btn('📤 Compartir foto',async()=>{const it=GAL.items[carIdx];if(!it||!it.src)return;SHARE.blob(await photos([it.src]))}))}
+})();
+
 /* ====== Insignias ====== */
 (function(){
   const soyElla=VIEWER()==='ella', $=id=>document.getElementById(id);
@@ -2852,6 +2906,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const c=counts(), got={}; S.all().forEach(x=>got[x.id]=x);
     const n=B.filter(b=>got[b[0]]||c[b[1]]>=b[2]).length;
     $('insTop').textContent=`${n} de ${B.length} desbloqueadas`;
+    if(n&&window.SHARE&&!$('insTop').nextElementSibling.classList.contains('sh-btn')){const sb=SHARE.btn('📤 Compartir nuestras insignias',async()=>{const c=counts(),got={};S.all().forEach(x=>got[x.id]=x);const L=B.filter(b=>got[b[0]]||c[b[1]]>=b[2]);
+      SHARE.blob(await SHARE.card({emoji:'🏅',title:'Nuestras insignias',big:L.length+' de '+B.length,sub:L.map(b=>b[3]).join(' ')}))});sb.style.display='block';sb.style.margin='-4px auto 14px';$('insTop').after(sb)}
     const g=$('insGrid'); g.innerHTML='';
     B.forEach(([k,f,goal,e,t])=>{const ok=!!got[k]||c[f]>=goal, el=document.createElement('button'); el.className='ins '+(ok?'ok':'lock');
       const when=got[k]?new Date(got[k].a).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}):'';
@@ -2953,7 +3009,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const tag=mine=>mine?`<span class="dt-tag out">✍️ Tú → ${esc(nm(oth))}</span>`:`<span class="dt-tag in">💌 De ${esc(nm(oth))} para ti</span>`;
   function item(x,html,mine){const r=el(`<div class="ds-i"><div class="ds-t">${tag(mine)}<br>${html}</div><div class="ds-f"><span>${fmtDia(x.a)}</span></div></div>`);
     if(mine){const d=document.createElement('button');d.className='ds-b';d.textContent='✕';del(d,x);r.querySelector('.ds-f').append(d)}return r}
-  function songHTML(x){return `<b>🎵 ${esc(x.t)}</b>${x.ar?' · '+esc(x.ar):''}${x.why?`<div style="margin-top:4px;font-style:italic">“${esc(x.why)}”</div>`:''}${okL(x.l)?`<div><a class="dt-a" href="${esc(x.l)}" target="_blank" rel="noopener">▶ Escuchar</a></div>`:''}`}
+  function songHTML(x){return `<b>🎵 ${esc(x.t)}</b>${x.ar?' · '+esc(x.ar):''}${x.why?`<div style="margin-top:4px;font-style:italic">“${esc(x.why)}”</div>`:''}${okL(x.l)?`<div><a class="dt-a" href="${esc(x.l)}" target="_blank" rel="noopener">▶ Escuchar</a> <button class="sh-btn" data-song="${esc(x.id)}">📤</button></div>`:''}`}
+  box.addEventListener('click',e=>{const b=e.target.closest('[data-song]');if(!b||!window.SHARE)return;const x=S.all().find(y=>y.id===b.dataset.song);if(x)SHARE.text(`🎵 ${x.t}${x.ar?' – '+x.ar:''}${x.why?'\n“'+x.why+'”':''}\n${x.l}`)});
   async function photoInto(img,x){try{img.src=await GG.photo(x.g)}catch(e){img.alt='No se pudo cargar'}}
   function render(){
     chips(); box.innerHTML=''; pending();
@@ -3026,6 +3083,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const r=box.querySelector('.mp-r');
     if(!mine)r.innerHTML=his?`${esc(nm(oth))} ya votó 👀 · vota para ver qué dijo`:`vota y luego ve si ${esc(nm(oth))} piensa lo mismo`;
     else r.innerHTML=his?res(mine,his):`Votaste ✓ · esperando a que ${esc(nm(oth))} vote… 💭`;
+    if(mine&&his&&window.SHARE){const sb=SHARE.btn('📤 Compartir resultado',async()=>{const same=mine.v===his.v,who=v=>v==='yo'?C.yo:C.ella;
+      SHARE.blob(await SHARE.card({emoji:same?'🎉':'😅',title:'¿Quién es más probable que…',big:'…'+q+'?',sub:same?'Los dos dijimos: '+who(mine.v)+' 💞':C.ella+' dijo '+who((me==='ella'?mine:his).v)+' · '+C.yo+' dijo '+who((me==='yo'?mine:his).v)}))});sb.style.marginTop='12px';r.after(sb)}
     box.querySelectorAll('.mp-b button').forEach(b=>b.onclick=()=>{const v=b.dataset.v,id=d+':'+me,ex=S.all().find(x=>x.id===id);
       if(ex&&ex.v===v&&!ex.x)return; const first=!ex; if(ex){ex.v=v;ex.x=0;ex.u=Date.now();S.save()}else S.add({id,d,w:me,v,a:Date.now(),u:Date.now()});
       burst(8); if(first)avisar(`🤔 ${C.ella} ya votó en «¿Quién es más probable que ${q}?» · vota para ver qué dijo`,'probable')});
@@ -3129,6 +3188,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
         if(!ex)avisar(`📸 ${C.ella} subió su foto del reto «${theme(k)}»`,'fotoreto');burst(14)}catch(e){$('frSt').textContent='No se pudo subir la foto, intenta otra vez'}
       busy=false;render()};
     box.querySelector('.card').append(b,fi);
+    if(mine&&o&&window.SHARE){const sb=SHARE.btn('📤 Compartir',async()=>{const a=urls[mine.g]||(urls[mine.g]=await GG.photo(mine.g)),c=urls[o.g]||(urls[o.g]=await GG.photo(o.g));SHARE.blob(await SHARE.photos(me==='ella'?[a,c]:[c,a],'📸 '+theme(k)))});sb.style.margin='10px 0 0 8px';box.querySelector('.card').append(sb)}
     PEND.set('fotoreto',{n:o&&!mine?1:0,t:'📸 '+nm(oth)+' ya subió su foto del reto de la semana',go:()=>GOTO('fotoreto')});
     const past=[...new Set(S.all().filter(x=>!x.x&&x.wk!==k).map(x=>x.wk))].sort().reverse();
     const hb=$('frHistBtn'); hb.hidden=!past.length; hb.textContent=hist?'Ocultar semanas anteriores':`Ver semanas anteriores (${past.length})`; hb.onclick=()=>{hist=!hist;render()};
@@ -3208,6 +3268,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     L.slice(0,20).forEach(y=>{const f=document.createElement('figure');if(y.w===oth&&y.a>sn)f.className='new';f.innerHTML=`<img alt=""><figcaption>${y.w===me?'Tú':esc(nm(y.w))} · ${fmtDia(y.a)}</figcaption>`;
       (async()=>{try{f.querySelector('img').src=urls[y.g]||(urls[y.g]=await GG.photo(y.g))}catch(e){}})();
       if(y.w===me){const d=document.createElement('button');d.className='x';d.textContent='✕';let armed=false;d.onclick=()=>{if(!armed){armed=true;d.textContent='¿Borrar?';setTimeout(()=>{armed=false;d.textContent='✕'},2500);return}y.x=1;y.u=Date.now();S.save()};f.append(d)}
+      if(window.SHARE){const sb=SHARE.btn('📤',async()=>{const src=urls[y.g]||(urls[y.g]=await GG.photo(y.g));SHARE.blob(await SHARE.photos([src],'🎨 Un dibujito de '+(y.w==='yo'?C.yo:C.ella)))});sb.style.cssText='position:absolute;top:4px;left:4px;padding:3px 8px;font-size:12px';f.append(sb)}
       g.append(f)});
     const n=L.filter(y=>y.w===oth&&y.a>sn).length;
     PEND.set('dibujo',{n,t:n===1?'🎨 '+nm(oth)+' te mandó un dibujito':'🎨 '+nm(oth)+' te mandó '+n+' dibujitos',go:()=>GOTO('pizarra')});
