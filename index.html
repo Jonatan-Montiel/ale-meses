@@ -1840,7 +1840,7 @@ function avisarElla(txt,tipo){
   if(!AV.ntfyElla)return;
   try{if(ELLA_PREF.off()[tipo])return}catch(e){}
   const title=({botella:'🍾 Mensaje en una botella',debo:'😘 Me debes…',dibujo:'🎨 Un dibujito',corazones:'💗 Corazones escondidos',insignia:'🏅 ¡Nueva insignia!',fotoreto:'📸 Reto de fotos',sello:'🗓️ El sello del día',probable:'🤔 ¿Quién es más probable?',fotocom:'📸 Nuestras fotos',detalle:'💝 Un detalle de '+C.yo,termo:'🌡️ ¿Cuánto te extraña '+C.yo+'?',nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo,deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',extrano:'🥺 '+C.yo+' te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ A '+C.yo+' le gustó',parajon:'💙 '+C.yo}[tipo])||'💗 '+C.yo;
-  fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfyElla.trim(),title,message:m,tags:['love_letter'],priority:4})}).catch(()=>{});
+  fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfyElla.trim(),title,message:m,tags:['love_letter'],priority:4,click:location.origin+location.pathname+'?ir='+encodeURIComponent(tipo||'')})}).catch(()=>{});
 }
 function avisar(txt,tipo){
   let soyYo=EDIT; try{if(localStorage.getItem('yo-soy')==='yo')soyYo=true}catch(e){}
@@ -1853,7 +1853,7 @@ function avisar(txt,tipo){
   const quien=soyYo?C.yo:C.ella;
   if(soyYo){ txt=txt.split(C.ella+' ').join(C.yo+' ').replace(/ te (dejó|mandó)/,' le $1'); }
   const title=({botella:'🍾 Mensaje en una botella',debo:'😘 Me debes…',dibujo:'🎨 Un dibujito',corazones:'💗 Corazones escondidos',insignia:'🏅 ¡Nueva insignia!',fotoreto:'📸 Reto de fotos',sello:'🗓️ El sello del día',probable:'🤔 ¿Quién es más probable?',fotocom:'📸 Nuestras fotos',detalle:'💝 Un detalle para ti',termo:'🌡️ ¿Cuánto te extraña?',vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',especial:'💝 Fecha especial',parajon:'💙 Para '+C.yo,extrano:'🥺 Te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ Le gustó',cumple:'🎂 Cumpleaños',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
-  fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
+  fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname+'?ir='+encodeURIComponent(tipo||'')})}).catch(()=>{});
 }
 const VIEWER=()=>{if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
 /* textos en masculino cuando es Jon */
@@ -3366,7 +3366,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   }
   $('btForm').onsubmit=e=>{e.preventDefault();const i=$('btIn'),t=i.value.trim();if(!t)return;const at=when();
     S.add({id:UID(),w:me,t,at,a:Date.now(),u:Date.now()});i.value='';burst(10);$('btSt').textContent='🍾 ¡Al agua! Le va a llegar a una hora sorpresa';
-    const tp=topic(oth); if(tp)fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:tp.trim(),title:'🍾 Mensaje en una botella',message:'Te llegó un mensaje en una botella de '+nm(me)+' 💗 ábrelo en nuestro lugar',tags:['love_letter'],priority:4,delay:String(Math.round(at/1000))})}).catch(()=>{})};
+    const tp=topic(oth); if(tp)fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:tp.trim(),title:'🍾 Mensaje en una botella',message:'Te llegó un mensaje en una botella de '+nm(me)+' 💗 ábrelo en nuestro lugar',tags:['love_letter'],priority:4,click:location.origin+location.pathname+'?ir=botella',delay:String(Math.round(at/1000))})}).catch(()=>{})};
   render(); setInterval(float,30000); window.addEventListener('unlocked',()=>setTimeout(float,1500));
 })();
 
@@ -3963,12 +3963,16 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const ELLA=VIEWER()==='ella', fromOther=x=>ELLA?x.w!=='ella':x.w==='ella';
   // lo que ya tiene su propio pendiente en la campana no se repite
   const DUP=x=>x.k==='probable'||x.k==='dibujo'||x.k==='fotoreto'||(x.k==='fotocom'&&/comentó/.test(x.t||''))||(x.k==='detalle'&&/te dejó un reto|te propone/.test(x.t||''))||x.k==='nota'||x.k==='voz'||x.k==='pregunta'||(x.k==='like'&&/notita/.test(x.t||''));
-  const SEC={plan:'planes',aprender:'aprender',peli:'pelis',evento:'viene',foto:'momentos',recuerdo:'planes',deseo:'deseos',diario:'diario',reto:'reto',extrano:'extrano',receta:'recetas',animo:'animo',insignia:'insignias',abrazo:'abrazo',racha:'racha',cartames:'cartames',comida:'comida',adivina:'adivina',cumple:ELLA?'cumpleyo':'cumple',especial:'sanvalentin',parajon:'parajon',vale:'vales',ruleta:'ruleta',abrela:'abrela',rasca:'rasca',sorpresa:'sorpresas',capsula:'capsula',like:'voz',secreto:'final',entrada:'inicio',detalle:'detalles',termo:'termo',probable:'probable',fotocom:'momentos',fotoreto:'fotoreto',sello:'sello',dibujo:'pizarra',corazones:'corazones',botella:'botella',debo:'debo'};
+  const SEC={plan:'planes',aprender:'aprender',peli:'pelis',evento:'viene',foto:'momentos',recuerdo:'planes',deseo:'deseos',diario:'diario',reto:'reto',extrano:'extrano',receta:'recetas',animo:'animo',insignia:'insignias',abrazo:'abrazo',racha:'racha',cartames:'cartames',comida:'comida',adivina:'adivina',cumple:ELLA?'cumpleyo':'cumple',especial:'sanvalentin',parajon:'parajon',vale:'vales',ruleta:'ruleta',abrela:'abrela',rasca:'rasca',sorpresa:'sorpresas',capsula:'capsula',like:'voz',secreto:'final',entrada:'inicio',voz:'voz',pregunta:'pregunta',detalle:'detalles',termo:'termo',probable:'probable',fotocom:'momentos',fotoreto:'fotoreto',sello:'sello',dibujo:'pizarra',corazones:'corazones',botella:'botella',debo:'debo'};
   let seen=new Set(); try{seen=new Set(JSON.parse(localStorage.getItem('act-visto')||'[]'))}catch(e){}
   let since=+(localStorage.getItem('act-desde')||0); if(!since){since=Date.now();try{localStorage.setItem('act-desde',String(since))}catch(e){}}
   const save=()=>{try{localStorage.setItem('act-visto',JSON.stringify([...seen].slice(-300)))}catch(e){}};
   const sk=x=>x.id+'@'+(x.u||0);
+  // al tocar una notificación del celular la app manda «n:tipo\nmensaje»
+  window.GO_ANY=g=>{g=String(g||'');if(g.startsWith('n:')){const i=g.indexOf('\n');ir({k:g.slice(2,i<0?undefined:i),t:i<0?'':g.slice(i+1)})}else GOTO(g)};
   function ir(x){const t=x.t||'';
+    if(x.k==='like')return GOTO(/notita/.test(t)?'buzon':'voz');
+    if(x.k==='nota')return GOTO('buzon');
     if(x.k==='detalle'&&window.DT_GO){const tb=/canción|playlist/.test(t)?'song':/reto/.test(t)?'reto':/foto/.test(t)?'foto':/propone|respondió/.test(t)?'antojo':'song';
       const mine=/cumplió tu reto|respondió a/.test(t);return DT_GO(tb,mine?'dar':'mi')}
     if(x.k==='parajon'){const tb=/cumpleaños/.test(t)?null:/carta de los \d+ meses/.test(t)?'mes':/Ábrela cuando/.test(t)?'carta':/escribió una carta|abrió la carta que le/.test(t)?'cartaj':/vale/.test(t)?'vale':/rasca/.test(t)?'rasca':/razón|frasco/.test(t)?'razon':'msg';
@@ -4203,7 +4207,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   window.GOTO=id=>{const s=document.getElementById(id);if(s)s.scrollIntoView({behavior:'smooth'})};
   const after=()=>{const g=window.__goAfterUnlock,sh=window.__pendingShare;window.__goAfterUnlock=window.__pendingShare=null;if(!g&&!sh)return;
     const ov=document.getElementById('hoyOv');if(ov&&ov.classList.contains('open'))document.getElementById('hoyBtn').click();
-    setTimeout(()=>{if(sh&&window.__sharePhotos)__sharePhotos(sh);else if(g)GOTO(g)},ov&&ov.classList.contains('open')?600:100)};
+    setTimeout(()=>{if(sh&&window.__sharePhotos)__sharePhotos(sh);else if(g)(window.GO_ANY||GOTO)(g)},ov&&ov.classList.contains('open')?600:100)};
   window.addEventListener('unlocked',()=>setTimeout(after,900));
   const off=document.createElement('div');off.className='offline';off.textContent='📶 Sin conexión · lo que hagas se guardará cuando vuelva el internet';document.body.append(off);
   const net=()=>off.classList.toggle('on',navigator.onLine===false||!!window.__offline&&navigator.onLine===false);net();
