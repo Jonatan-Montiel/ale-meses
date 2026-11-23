@@ -418,6 +418,8 @@
   .nb-who{text-align:center;margin:-2px 0 10px;font-size:14px}
   .nb-who button{margin:6px 4px 0;border:1px solid rgba(247,198,211,.4);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:9px 16px;font:700 14px 'Nunito';cursor:pointer}
   .hoy-new[hidden],.nb-pill[hidden]{display:none!important}
+  .offline{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:45;background:#3a2a35;color:#fff;border-radius:999px;padding:8px 14px;font:700 12.5px 'Nunito';display:none;white-space:nowrap;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+  .offline.on{display:block}
   .bell{position:fixed;top:12px;left:12px;z-index:44;width:44px;height:44px;border-radius:50%;border:1px solid rgba(247,198,211,.3);background:rgba(30,6,16,.65);font-size:20px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35)}
   .bell b{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:999px;background:var(--rose);color:#fff;font:800 11.5px/20px 'Nunito';padding:0 5px;display:none}
   .bell.has b{display:block}.bell.has{animation:beat 2.4s ease-in-out infinite}
@@ -1585,12 +1587,17 @@ function SHARED(file,field,LK,max,onChange){
   let L=[]; try{L=JSON.parse(localStorage.getItem(LK)||'[]')||[]}catch(e){}
   const keep=()=>{L=L.sort((a,b)=>(a.a||0)-(b.a||0)).slice(-max);try{localStorage.setItem(LK,JSON.stringify(L))}catch(e){}};
   let busy=false,again=false;
-  async function sync(){ if(!GG.on)return; if(busy){again=true;return} busy=true;
-    try{const r=await GG.pull(file,true)||{}; L=GG.merge(L,r[field]); keep(); await GG.push(file,{[field]:L}); onChange()}catch(e){setTimeout(sync,15000)}
-    busy=false; if(again){again=false;sync()} }
+  let sync=async function(){ if(!GG.on)return; if(busy){again=true;return} busy=true;
+    try{const r=await GG.pull(file,true)||{}; L=GG.merge(L,r[field]); keep(); await GG.push(file,{[field]:L}); try{localStorage.removeItem(LK+'-pend')}catch(_){} onChange()}catch(e){setTimeout(sync,15000)}
+    busy=false; if(again){again=false;sync()} };
   async function refresh(){ if(!GG.on)return; try{const r=await GG.pull(file)||{}; const b=JSON.stringify(L); L=GG.merge(L,r[field]); keep(); if(JSON.stringify(L)!==b)onChange()}catch(e){} }
   setTimeout(refresh,400); document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
-  return {all:()=>L, add(x){L.push(x);keep();onChange();sync()}, save(){keep();onChange();sync()}};
+  const DK2=LK+'-pend', mark=v=>{try{v?localStorage.setItem(DK2,'1'):localStorage.removeItem(DK2)}catch(e){}};
+  const sync0=sync; sync=async function(){mark(1);await sync0();};
+  { let p=false; try{p=localStorage.getItem(DK2)==='1'}catch(e){} if(p)setTimeout(sync,900); }
+  const _keep=keep;
+  window.addEventListener('online',()=>{let p=false;try{p=localStorage.getItem(DK2)==='1'}catch(e){}if(p)sync()});
+  return {all:()=>L, add(x){L.push(x);keep();onChange();sync()}, save(){keep();onChange();sync()}, _ok:()=>mark(0)};
 }
 const PEND=window.PEND=(()=>{const m={},subs=[];return {set(k,v){if(v&&v.n)m[k]=Object.assign({k},v);else delete m[k];subs.forEach(f=>{try{f()}catch(e){}})},all:()=>Object.values(m),on:f=>subs.push(f)}})();
 const ELLA_PREF=(()=>{let off={};const subs=[];
@@ -1715,8 +1722,10 @@ galRender();
     return await new Promise(ok=>cv.toBlob(ok,'image/jpeg',.8));
   }
   add.onclick=()=>file.click();
-  file.onchange=async()=>{
-    const fs=[...file.files]; file.value=''; if(!fs.length)return; add.disabled=true;
+  file.onchange=()=>{const fs=[...file.files]; file.value=''; upFiles(fs)};
+  window.__sharePhotos=list=>{const fs=(list||[]).map(d=>{const b=atob(String(d).split(',')[1]||'');const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new Blob([u],{type:'image/jpeg'})});if(!fs.length)return;GOTO('momentos');setTimeout(()=>upFiles(fs),600)};
+  async function upFiles(fs){
+    if(!fs.length)return; add.disabled=true;
     let okN=0;
     for(let i=0;i<fs.length;i++){
       st.textContent=`Subiendo foto ${i+1} de ${fs.length}… 📷`;
@@ -1732,7 +1741,7 @@ galRender();
     }
     if(okN){avisar(`📷 ${C.ella} subió ${okN===1?'una foto':okN+' fotos'} al carrusel`,'foto');try{await pushIdx();st.textContent=okN===1?'¡Foto agregada! 💗':`¡${okN} fotos agregadas! 💗`;burst(25)}catch(e){st.textContent='Las fotos se subieron pero no se pudieron registrar. Intenta de nuevo.'}}
     add.disabled=false;
-  };
+  }
   pullIdx().then(r=>{idx=r;apply()}).catch(()=>{});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullIdx().then(r=>{const b=JSON.stringify(idx);idx=merge(idx,r);if(JSON.stringify(idx)!==b)apply()}).catch(()=>{})});
 })();
@@ -1811,7 +1820,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|hoy-visto|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|data-cache|hoy-visto|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     try{if(window.AndroidApp){window.AndroidApp.relink();return}}catch(e){}
     location.replace(location.pathname);
@@ -2542,6 +2551,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
       $('rchBar').style.width=Math.min(100,Math.round(cur/next.d*100))+'%';
       $('rchNext').textContent=cur?`Faltan ${next.d-cur} ${next.d-cur===1?'día':'días'} para desbloquear: ${next.e} ${next.t}`:(soyElla?'Entra mañana otra vez y empieza tu racha 🔥':`${C.ella} todavía no empieza una racha nueva`);}
     else{$('rchBar').style.width='100%';$('rchNext').textContent=PR.length?'¡Desbloqueaste todos los premios! 🏆':''}
+    try{if(window.AndroidApp&&AndroidApp.setRacha)AndroidApp.setRacha(soyElla?cur:stats('yo').cur)}catch(e){}
     {const o=stats('yo');$('rchOther').textContent=soyElla?`💙 Racha de ${C.yo}: ${o.cur} ${o.cur===1?'día seguido':'días seguidos'} 🔥`:`💙 Tu racha: ${o.cur} ${o.cur===1?'día seguido':'días seguidos'} 🔥`}
     const box=$('rchPrizes'); box.innerHTML='';
     PR.forEach(p=>{const ok=best>=p.d,b=document.createElement('button');b.className='rch-p '+(ok?'ok':'lock');
@@ -2652,7 +2662,11 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
 })();
 
 /* ====== App de Android: recibe su nombre secreto de avisos ====== */
-try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyElla||''):(AV.ntfy||''))}catch(e){}
+try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E?(AV.ntfyElla||''):(AV.ntfy||''));
+  if(AndroidApp.setOther)AndroidApp.setOther(E?(AV.ntfy||''):(AV.ntfyElla||''),E?C.ella:C.yo);
+  if(AndroidApp.setWidget&&E)AndroidApp.setWidget(JSON.stringify({inicio:C.inicio,msgs:(C.mensajesDia.length?C.mensajesDia:['Te quiero']).map(FILL)}));
+  window.addEventListener('unlocked',()=>{try{AndroidApp.visited&&AndroidApp.visited()}catch(e){}});
+  if(EDIT)try{AndroidApp.visited&&AndroidApp.visited()}catch(e){}}}catch(e){}
 
 /* ====== Lista de deseos ====== */
 (function(){
@@ -2810,6 +2824,7 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
   }
   btn.onclick=()=>{S.add({id:UID(),w:me(),a:Date.now(),u:Date.now()});burst(14);btn.classList.remove('pop');void btn.offsetWidth;btn.classList.add('pop');
     avisar(`🥺 ${C.ella} te extraña`,'extrano')};
+  try{if(window.AndroidApp&&AndroidApp.takeExtrano){const n=AndroidApp.takeExtrano();for(let i=0;i<n;i++)S.add({id:UID(),w:me(),a:Date.now()-i,u:Date.now()-i})}}catch(e){}
   render(); setInterval(render,60000);
 })();
 
@@ -2897,6 +2912,7 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
   /* el mensaje del día de Jon lo escribe Ale */
   function jonDaily(){
     if(!soyJon())return; pending(); const m=todayMsg();
+    try{if(window.AndroidApp&&AndroidApp.setWidget){const L=live('msg').map(x=>x.t);AndroidApp.setWidget(JSON.stringify({inicio:C.inicio,msgs:L.length?L:['Que tengas un día bonito, '+C.yo+' 💙']}))}}catch(e){}
     $('hoyFix').style.display='none'; $('hoyFix').previousElementSibling.style.display='none';
     if(!m){$('hoyMsg').textContent='Que tengas un día bonito, '+C.yo+' 💙';$('hoySign').textContent='';return}
     $('hoyMsg').textContent=m.t; $('daily').textContent=m.t;
@@ -3221,6 +3237,13 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
   const orig=Element.prototype.scrollIntoView;
   Element.prototype.scrollIntoView=function(...a){try{const s=this.closest&&this.closest('main section');if(s&&s.dataset.tab&&s.dataset.tab!==cur)setTab(s.dataset.tab,true)}catch(e){}return orig.apply(this,a)};
   window.GOTO=id=>{const s=document.getElementById(id);if(s)s.scrollIntoView({behavior:'smooth'})};
+  const after=()=>{const g=window.__goAfterUnlock,sh=window.__pendingShare;window.__goAfterUnlock=window.__pendingShare=null;if(!g&&!sh)return;
+    const ov=document.getElementById('hoyOv');if(ov&&ov.classList.contains('open'))document.getElementById('hoyBtn').click();
+    setTimeout(()=>{if(sh&&window.__sharePhotos)__sharePhotos(sh);else if(g)GOTO(g)},ov&&ov.classList.contains('open')?600:100)};
+  window.addEventListener('unlocked',()=>setTimeout(after,900));
+  const off=document.createElement('div');off.className='offline';off.textContent='📶 Sin conexión · lo que hagas se guardará cuando vuelva el internet';document.body.append(off);
+  const net=()=>off.classList.toggle('on',navigator.onLine===false||!!window.__offline&&navigator.onLine===false);net();
+  window.addEventListener('online',net);window.addEventListener('offline',net);
   let start='inicio'; try{start=sessionStorage.getItem('tab')||'inicio'}catch(e){}
   setTab(TABS.some(t=>t[0]===start)?start:'inicio');
 })();
@@ -3609,6 +3632,8 @@ async function loadContent(){
     }catch(e){}
   }
   if(!buf){try{const r=await fetchT('data.bin?t='+Date.now(),{cache:'no-store'},15000); if(r.ok) buf=await r.arrayBuffer()}catch(e){}}
+  if(buf){try{localStorage.setItem('data-cache',b64buf(buf))}catch(e){}}
+  else{try{const t=localStorage.getItem('data-cache');if(t){buf=Uint8Array.from(atob(t),c=>c.charCodeAt(0)).buffer;window.__offline=1}}catch(e){}}
   if(!buf) throw new Error('nodata');
   return JSON.parse(new TextDecoder().decode(await decBuf(buf)));
 }
@@ -3886,7 +3911,7 @@ function initEditor(){
           let dataBin=''; try{const R=ghRepo(),t=ghToken();const r=await fetch(`https://api.github.com/repos/${R.owner}/${R.repo}/contents/data.bin?ref=${R.branch||'main'}&t=${Date.now()}`,{headers:Object.assign(ghH(t),{Accept:'application/vnd.github.raw+json'}),cache:'no-store'});if(r.ok)dataBin=b64(new Uint8Array(await r.arrayBuffer()))}catch(e){}
           const out=JSON.stringify({tipo:'respaldo-nuestro-lugar',v:1,fecha:new Date().toISOString(),nota:'Todo va cifrado: sin el link especial no se puede leer.',dataBin,gist:files,media});
           const name='respaldo-nuestro-lugar-'+new Date().toISOString().slice(0,10)+'.json';
-          if(window.AndroidApp){msg.innerHTML='Desde la app no se pueden descargar archivos. Abre el editor en el navegador (la página con <b>?editar</b>) y toca este botón ahí.';msg.className='ed-note bad';return}
+          if(window.AndroidApp){if(AndroidApp.saveFile){const where=AndroidApp.saveFile(name,out);D.ultimoRespaldo=Date.now();markDirty();msg.textContent=where?`✅ Listo: se guardó en ${where} (${Math.round(out.length/1024)} KB). Súbelo a tu Drive.`:'No se pudo guardar el archivo.';msg.className='ed-note '+(where?'ok':'bad');return}msg.innerHTML='Actualiza la app para respaldar desde aquí, o abre el editor en el navegador.';msg.className='ed-note bad';return}
           const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'application/json'}));a.download=name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);
           D.ultimoRespaldo=Date.now();markDirty();
           msg.textContent=`✅ Listo: ${name} (${Math.round(out.length/1024)} KB, ${Object.keys(files).length} archivos y ${Object.keys(media).length} fotos/audios). Guárdalo en tu Drive o compu.`;msg.className='ed-note ok';
