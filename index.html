@@ -2004,9 +2004,10 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   const close=()=>{if(!ov.classList.contains('open'))return;ov.classList.add('out');setTimeout(()=>{ov.classList.remove('open','out');if(ov.dataset.bell){delete ov.dataset.bell;window.dispatchEvent(new Event('bellClosed'))}else window.dispatchEvent(new Event('hoyClosed'))},480)};
   window.addEventListener('unlocked',()=>{if(VIEWER()!=='yo')avisar(`👀 ${C.ella} entró a nuestra app`,'entrada');if(shown)return;shown=true;
     // la pantalla del mensaje sale solo la primera vez de cada día
-    const k=DK(MXD()); let seen=''; try{seen=localStorage.getItem('hoy-visto')||''}catch(e){}
-    if(seen===k)return;
-    try{localStorage.setItem('hoy-visto',k)}catch(e){}
+    // …o cuando Jon la reinicia desde el editor
+    const k=DK(MXD()), rc=String(CUTOF('rhoy')); let seen='',sr='0'; try{seen=localStorage.getItem('hoy-visto')||'';sr=localStorage.getItem('hoy-visto-r')||'0'}catch(e){}
+    if(seen===k&&sr===rc)return;
+    try{localStorage.setItem('hoy-visto',k);localStorage.setItem('hoy-visto-r',rc)}catch(e){}
     setTimeout(()=>{ov.classList.add('open');burst(35)},500)});
   document.getElementById('hoyBtn').onclick=close;
   ov.addEventListener('click',e=>{if(e.target===ov)close()});
@@ -4402,6 +4403,7 @@ function initEditor(){
         bt('Reiniciar solo «Ábrela cuando…»',()=>{D.rab=Date.now()},'todas las cartas vuelven a estar sin abrir.'),
         bt('Reiniciar solo «¿Cómo te sientes hoy?»',()=>{D.ra=Date.now()},'las caritas vuelven a estar sin elegir para los dos.'),
         bt('Reiniciar «Pregunta del día»',()=>{D.rpr=Date.now()},'se borran las respuestas y la pregunta de hoy queda sin contestar.'),
+        bt('Volver a mostrar la pantalla del mensaje de hoy',()=>{D.rhoy=Date.now()},'la próxima vez que Ale desbloquee la página le vuelve a salir la pantalla del mensaje del día (aunque ya la haya visto hoy).'),
         bt('Reiniciar la racha de visitas',()=>{D.rrc=Date.now()},'la racha vuelve a empezar desde hoy y los premios se vuelven a bloquear.'),
         h('div',{class:'ed-flab',style:'margin-top:14px'},'🗑️ Borrar todo de una sección'),
         h('div',{class:'ed-note'},'Estos borran todo lo que hay en esa sección para los dos. Toca dos veces para confirmar.'),
