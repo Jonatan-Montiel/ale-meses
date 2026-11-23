@@ -594,6 +594,10 @@
   .ds-sw input:checked+i{background:var(--rose)}.ds-sw input:checked+i::after{left:23px}
   .ds-n{font-size:13px;margin-top:10px;opacity:.85}
   .ds-p{font-size:12px;opacity:.65;margin-top:10px;line-height:1.4}
+  .upd-bar{position:fixed;left:12px;right:12px;bottom:92px;z-index:46;background:#fff7f0;color:#3d1f2a;border-radius:18px;padding:12px 40px 12px 14px;box-shadow:0 12px 28px rgba(0,0,0,.45);display:grid;gap:2px;font-size:13px;animation:fadeIn .4s}
+  .upd-bar b{font-size:14.5px}.upd-bar a{justify-self:start;margin-top:6px;background:var(--rose);color:#fff;text-decoration:none;border-radius:999px;padding:7px 16px;font:800 13px 'Nunito'}
+  .upd-bar button{position:absolute;top:8px;right:10px;border:0;background:none;font-size:15px;color:#3d1f2a;opacity:.6;cursor:pointer}
+  body.locked .upd-bar,body:has(#hoyOv.open) .upd-bar{display:none}
   .bell{position:fixed;top:12px;left:12px;z-index:44;width:44px;height:44px;border-radius:50%;border:1px solid rgba(247,198,211,.3);background:rgba(30,6,16,.65);font-size:20px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35)}
   .bell b{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:999px;background:var(--rose);color:#fff;font:800 11.5px/20px 'Nunito';padding:0 5px;display:none}
   .bell.has b{display:block}.bell.has{animation:beat 2.4s ease-in-out infinite}
@@ -3446,6 +3450,16 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const a=L[Math.floor(r()*L.length)]; let b=L[Math.floor(r()*L.length)]; if(L.length>1)while(b===a)b=L[Math.floor(r()*L.length)];
     box.innerHTML=`<div class="card ho"><div class="daily-l">${esc(MXD().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'}))}</div><p>🔮 ${esc(FILL(a))}</p><p>✨ ${esc(FILL(b))}</p><div class="ho-x"><span>🍀 número de la suerte: <b>${1+Math.floor(r()*99)}</b></span><span>🎨 color del día: <b>${COL[Math.floor(r()*COL.length)]}</b></span><span>💞 compatibilidad hoy: <b>${85+Math.floor(r()*16)}%</b></span></div></div>`}
   render(); setInterval(render,600000);
+})();
+
+/* ====== Aviso de versión nueva de la app (por si el de la app no salió) ====== */
+(function(){
+  const A=window.AndroidApp; if(!A||A.setLoc)return; // la versión más nueva trae setLoc
+  const url='https://github.com/Jonatan-Montiel/ale-meses/releases/latest/download/'+(VIEWER()==='yo'?'nuestro-lugar-jon.apk':'nuestro-lugar.apk');
+  const show=()=>{if(document.getElementById('updBar'))return;const d=document.createElement('div');d.id='updBar';d.className='upd-bar';
+    d.innerHTML=`<b>💗 Hay una versión nueva de la app</b><span>trae widgets nuevos · de preferencia con wifi</span><a href="${url}" target="_blank" rel="noopener">Actualizar</a><button aria-label="Cerrar">✕</button>`;
+    d.querySelector('button').onclick=()=>d.remove(); document.body.append(d)};
+  window.addEventListener('unlocked',()=>setTimeout(show,2500)); if(!document.body.classList.contains('locked'))setTimeout(show,2500);
 })();
 
 /* ====== Widgets de la app: distancia, cómo está el otro y cuenta regresiva ====== */
