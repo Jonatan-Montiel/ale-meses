@@ -652,6 +652,8 @@
   .pj-note{text-align:center;font-size:13.5px;opacity:.8;margin-bottom:12px}
   .pj-f{margin-bottom:14px}.pj-f .btn{margin:2px auto 0}
   .pj-l{display:grid;gap:8px}
+  .pj-env{display:block;width:100%;border:0;border-radius:18px;padding:26px 16px;background:linear-gradient(160deg,#fbe3d6,#f3c6c9);color:#5a1430;font:800 17px 'Nunito';cursor:pointer;box-shadow:0 14px 30px -12px rgba(0,0,0,.5)}
+  .pj-env-e{font-size:46px;margin-bottom:6px}.pj-env small{display:block;font:600 12.5px 'Nunito';opacity:.7;margin-top:4px}
   .pj-tk{text-align:center;margin-bottom:14px}
   #pjBox .scratch canvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
   .pj-jar{display:block;margin:0 auto;font-size:110px;line-height:1;background:none;border:0;cursor:pointer;filter:drop-shadow(0 12px 20px rgba(0,0,0,.45))}
@@ -3217,8 +3219,8 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const add=o=>S.add(Object.assign({id:UID(),a:Date.now(),u:Date.now()},o));
   const upd=(x,o)=>{Object.assign(x,o,{u:Date.now()});S.save()};
   const del=(btn,x)=>{let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent='¿Borrar?';setTimeout(()=>{armed=false;btn.textContent='✕'},2500);return}upd(x,{x:1})}};
-  const T=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana']];
-  let tab='msg', razon=null, carta=null, pick=null, scratching=false;
+  const T=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['cartaj','💌 Una carta'],['mes','✉️ Carta del mes'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana']];
+  let tab='msg', razon=null, carta=null, pick=null, scratching=false, cjOpen=false, mesOpen=null, mesSel=0;
   const doy=()=>{const n=MXD();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)};
   const el=(h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
   function todayMsg(){const L=live('msg');return L.length?L[doy()%L.length]:null}
@@ -3232,7 +3234,14 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     $('hoySign').textContent='— '+C.ella+' 💙';
     $('dailyL').textContent='Mensaje de '+C.ella+' para ti · '+MXD().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
   }
+  const ST=new Date((C.inicio||'2026-01-01')+'T00:00:00'), opensAt=m=>new Date(ST.getFullYear(),ST.getMonth()+m,ST.getDate()).getTime();
+  const curM=()=>{let m=0;while(opensAt(m+1)<=MXD().getTime())m++;return m};
+  const fecha=t=>new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
+  const paper=(t,head)=>`<div class="paper">${head?`<p style="font-weight:800;text-align:center">${esc(head)}</p>`:''}${FILL(t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(C.ella)} 💙</p></div>`;
   function pending(){
+    {const now=MXD().getTime(),cm=live('mes').filter(x=>!x.o&&opensAt(+x.m)<=now).length,cj=live('cartaj').filter(x=>!x.o).length,go=k=>()=>{tab=k;render();sec.scrollIntoView({behavior:'smooth'})};
+     PEND.set('pj-mes',{n:cm,t:cm===1?'✉️ Ya puedes abrir una carta del mes de '+C.ella:'✉️ '+cm+' cartas del mes de '+C.ella+' para abrir',go:go('mes')});
+     PEND.set('pj-cartaj',{n:cj,t:'💌 '+C.ella+' te escribió una carta',go:go('cartaj')});}
     const c=live('carta').filter(x=>!x.o).length, v=live('vale').filter(x=>!x.c).length, r=Math.max(0,live('ticket').length-live('win').length);
     const go=k=>()=>{tab=k;render();sec.scrollIntoView({behavior:'smooth'})};
     PEND.set('pj-carta',{n:c,t:c===1?'📬 1 carta de '+C.ella+' sin abrir':'📬 '+c+' cartas de '+C.ella+' sin abrir',go:go('carta')});
@@ -3273,6 +3282,20 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     razon(){box.append(el(`<div class="pj-note">${esc(C.yo)} saca un papelito al azar de su frasco 🫙</div>`),
       form([['t','Una razón por la que quieres a '+C.yo,'in',200]],'🫙 Agregar al frasco',v=>{add({k:'razon',t:v.t});avisar(`🫙 ${C.ella} agregó una razón a tu frasco`,'parajon')}),
       listAle(live('razon'),x=>esc(x.t)))},
+    cartaj(){const L=live('cartaj'),cur=L[L.length-1];
+      box.append(el(`<div class="pj-note">Una carta para ${esc(C.yo)}, como «Una carta para ti». Le aparece en un sobre para abrir 💌${cur?' · si la cambias, le vuelve a llegar como nueva':''}</div>`));
+      const f=form([['t','Escribe tu carta para '+C.yo,'ta',4000]],cur?'💌 Guardar cambios':'💌 Guardar carta',v=>{if(cur)upd(cur,{t:v.t,o:0});else add({k:'cartaj',t:v.t});avisar(`💌 ${C.ella} te escribió una carta`,'parajon')});
+      if(cur){const ta=f.querySelector('textarea');ta.value=cur.t;ta.dataset.fresh='1';ta.rows=8}
+      box.append(f); if(cur)box.append(el(`<div class="pj-note">${cur.o?`✓ ${esc(C.yo)} la abrió el ${fmtDia(cur.o)}`:`${esc(C.yo)} todavía no la abre`}</div>`))},
+    mes(){const L=live('mes'),cm=curM(),have=new Set(L.map(x=>+x.m));
+      const opts=[];for(let m=cm;m<=cm+12;m++){if(m<1)continue;if(opensAt(m)<MXD().getTime()-864e5*20&&m===cm)continue;opts.push(m)}
+      box.append(el(`<div class="pj-note">Cada mes que cumplen se abre una carta tuya para ${esc(C.yo)} ✉️ (igual que la tuya de cada mes)</div>`));
+      const f=el(`<form class="di-add card pj-f" autocomplete="off"><select class="pq-in" name="m">${opts.map(m=>`<option value="${m}">${have.has(m)?'✏️ ':''}Carta de los ${m} ${m===1?'mes':'meses'} · se abre el ${fecha(opensAt(m))}</option>`).join('')}</select><input class="pq-in" name="h" maxlength="80" placeholder="Título (opcional, ej. Nueve meses contigo)"><textarea class="pq-in" name="t" rows="6" maxlength="4000" placeholder="Escribe la carta"></textarea><button class="btn small">✉️ Guardar carta del mes</button></form>`);
+      if(mesSel&&opts.includes(mesSel))f.elements.m.value=mesSel;
+      const fillSel=()=>{mesSel=+f.elements.m.value;const x=L.find(y=>+y.m===mesSel);f.elements.t.value=x?x.t:'';f.elements.h.value=x?x.h||'':'';f.elements.t.dataset.fresh=f.elements.h.dataset.fresh='1'};f.elements.m.onchange=fillSel;fillSel();
+      f.onsubmit=e=>{e.preventDefault();const m=+f.elements.m.value,t=f.elements.t.value.trim(),h=f.elements.h.value.trim();if(!t)return f.elements.t.focus();
+        const x=L.find(y=>+y.m===m);if(x)upd(x,{t,h});else{add({k:'mes',m,t,h});avisar(`✉️ ${C.ella} te dejó la carta de los ${m} meses (se abre el ${fecha(opensAt(m))})`,'parajon')}burst(10)};
+      box.append(f,listAle(L.slice().sort((a,b)=>a.m-b.m),x=>`✉️ Carta de los ${x.m} meses${x.h?' · '+esc(x.h):''}<br><small>se abre el ${fecha(opensAt(+x.m))}</small>`+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
     carta(){box.append(el(`<div class="pj-note">Cartas para que ${esc(C.yo)} las abra cuando las necesite 📬</div>`),
       form([['w','Ábrela cuando… (ej. estés triste)','in',80],['t','Escribe la carta','ta',2000]],'📬 Guardar carta',v=>{if(!v.t)return;add({k:'carta',w:v.w,t:v.t});avisar(`📬 ${C.ella} te dejó una carta: «Ábrela cuando ${v.w}»`,'parajon')}),
       listAle(live('carta'),x=>'Ábrela cuando '+esc(x.w)+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
@@ -3295,6 +3318,15 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     razon(){const L=live('razon'); if(!L.length){box.append(empty('tu frasco todavía está vacío… '+esc(C.ella)+' lo irá llenando 🫙'));return}
       const b=el(`<button class="pj-jar" aria-label="Sacar una razón">🫙</button>`); b.onclick=()=>{let r;do{r=L[Math.floor(Math.random()*L.length)]}while(L.length>1&&r===razon);razon=r;render();burst(10)};
       box.append(b,el(`<div class="note"><span>${razon?esc(razon.t):'Toca el frasco y saca un papelito ♥'}</span></div>`),el(`<div class="tap">${L.length} ${L.length===1?'razón':'razones'} en tu frasco</div>`))},
+    cartaj(){const L=live('cartaj'),x=L[L.length-1]; if(!x){box.append(empty(esc(C.ella)+' todavía no te escribe una carta 💌'));return}
+      if(!cjOpen){const b=el(`<button class="pj-env" aria-label="Abrir carta"><div class="pj-env-e">💌</div><div>Una carta de ${esc(C.ella)} para ti</div><small>toca para abrirla</small></button>`);
+        b.onclick=()=>{cjOpen=true;if(!x.o){upd(x,{o:Date.now()});avisar(`💌 ${C.ella} abrió la carta que le escribiste`,'parajon')}else render();burst(16)};box.append(b);return}
+      box.append(el(paper(x.t)))},
+    mes(){const L=live('mes').slice().sort((a,b)=>a.m-b.m),now=MXD().getTime(); if(!L.length){box.append(empty('cuando '+esc(C.ella)+' te escriba cartas del mes aparecerán aquí ✉️'));return}
+      const g=document.createElement('div');g.className='whens';
+      L.forEach(x=>{const ok=opensAt(+x.m)<=now,b=el(`<button class="when${x.o?' read':''}"><div class="when-e">${ok?'✉️':'🔒'}</div><div class="when-t">Carta de los ${x.m} meses</div><small style="opacity:.7">${ok?(x.h?esc(x.h):'ya la puedes abrir'):'se abre el '+fecha(opensAt(+x.m))}</small></button>`);
+        b.onclick=()=>{if(!ok){alertBox('🔒 Esta carta se abre el '+fecha(opensAt(+x.m)));return}mesOpen=mesOpen===x?null:x;if(!x.o){upd(x,{o:Date.now()});avisar(`✉️ ${C.ella} abrió la carta de los ${x.m} meses que le escribiste`,'parajon');burst(14)}else render()};g.append(b)});
+      box.append(g); if(mesOpen)box.append(el(paper(mesOpen.t,mesOpen.h||('Carta de los '+mesOpen.m+' meses'))))},
     carta(){const L=live('carta'); if(!L.length){box.append(empty('aquí aparecerán las cartas que te deje '+esc(C.ella)+' 📬'));return}
       const g=document.createElement('div');g.className='whens';
       L.forEach(x=>{const b=el(`<button class="when${x.o?' read':''}"><div class="when-e">💌</div><div class="when-t">Ábrela cuando ${esc(x.w)}</div></button>`);
