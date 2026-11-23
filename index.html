@@ -516,6 +516,17 @@
   .lk{border:0;background:none;color:inherit;font-size:15px;cursor:pointer;padding:0 0 0 6px;line-height:1}
   .lk.on{animation:boing .35s}
   .lk-got{font-size:13px;padding-left:6px}
+  /* Para Jon */
+  .pj-tabs{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.pj-tabs::-webkit-scrollbar{display:none}
+  .pj-tabs button{white-space:nowrap}
+  .pj-note{text-align:center;font-size:13.5px;opacity:.8;margin-bottom:12px}
+  .pj-f{margin-bottom:14px}.pj-f .btn{margin:2px auto 0}
+  .pj-l{display:grid;gap:8px}
+  .pj-tk{text-align:center;margin-bottom:14px}
+  #pjBox .scratch canvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
+  .pj-jar{display:block;margin:0 auto;font-size:110px;line-height:1;background:none;border:0;cursor:pointer;filter:drop-shadow(0 12px 20px rgba(0,0,0,.45))}
+  .pj-jar:active{transform:scale(.94)}
+  .rch-other{margin-top:10px;font-size:14px;font-weight:700;opacity:.9}
   /* Carta del mes */
   .cm-env{text-align:center}
   .cm-env .e{font-size:46px}
@@ -689,7 +700,7 @@
   #abrazo>h2::before{content:'🤗'} #rasca>h2::before{content:'🌠'} #vales>h2::before{content:'🎟️'} #memorama>h2::before{content:'🃏'}
   #rompecabezas>h2::before{content:'🧩'} #ruleta>h2::before{content:'🎡'} #comida>h2::before{content:'🍽️'} #planes>h2::before{content:'📝'}
   #aprender>h2::before{content:'📚'} #pelis>h2::before{content:'🍿'} #viene>h2::before{content:'🗓️'} #cielo>h2::before{content:'🌌'}
-  #arbol>h2::before{content:'🌳'} #sorpresas>h2::before{content:'🎁'} #constelacion>h2::before{content:'✨'} #capsula>h2::before{content:'⏳'} #reto>h2::before{content:'🎯'} #deseos>h2::before{content:'🎁'} #diario>h2::before{content:'📔'} #cumple>h2::before{content:'🎂'} #extrano>h2::before{content:'🥺'} #recetas>h2::before{content:'🍳'} #adivina>h2::before{content:'🔍'}
+  #arbol>h2::before{content:'🌳'} #sorpresas>h2::before{content:'🎁'} #constelacion>h2::before{content:'✨'} #capsula>h2::before{content:'⏳'} #reto>h2::before{content:'🎯'} #deseos>h2::before{content:'🎁'} #diario>h2::before{content:'📔'} #cumple>h2::before{content:'🎂'} #extrano>h2::before{content:'🥺'} #recetas>h2::before{content:'🍳'} #adivina>h2::before{content:'🔍'} #cumpleyo>h2::before{content:'🎂'} #parajon>h2::before{content:'💙'}
   main section>.sub{font-size:21px;margin-bottom:22px}
   .card,.tile,.song,.capsule,.ev,.kb-col,.rch-p,.an-b{border-radius:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 28px -14px rgba(0,0,0,.6)}
   .tile,.rch-p,.an-b,.ev{border-radius:18px}
@@ -808,6 +819,13 @@
     <div id="cuBox"></div>
   </section>
 
+  <!-- CUMPLEAÑOS DE JON -->
+  <section id="cumpleyo">
+    <h2>El cumpleaños de Jon</h2>
+    <div class="sub">para celebrarlo como se merece 💙</div>
+    <div id="cyBox"></div>
+  </section>
+
   <!-- RACHA -->
   <section id="racha">
     <h2>Racha de visitas</h2>
@@ -818,6 +836,7 @@
       <div class="rch-week" id="rchWeek"></div>
       <div class="rch-bar"><i id="rchBar"></i></div>
       <div class="rch-next" id="rchNext"></div>
+      <div class="rch-other" id="rchOther"></div>
     </div>
     <div class="rch-prizes" id="rchPrizes"></div>
   </section>
@@ -1032,6 +1051,14 @@
     <div class="coupons" id="coupons"></div>
   </section>
 
+  <!-- PARA JON (lo llena Ale) -->
+  <section id="parajon">
+    <h2>Para Jon</h2>
+    <div class="sub">cosas que le dejas a Jon 💙</div>
+    <div class="cm-chips pj-tabs" id="pjTabs"></div>
+    <div id="pjBox" style="margin-top:14px"></div>
+  </section>
+
   <!-- MEMORAMA -->
   <section id="memorama">
     <h2>Memorama de nosotros</h2>
@@ -1231,6 +1258,7 @@
   <a href="#inicio">Inicio</a>
   <a href="#contador">Tiempo</a>
   <a href="#cumple">Cumpleaños</a>
+  <a href="#cumpleyo">Cumple Jon</a>
   <a href="#racha">Racha</a>
   <a href="#animo">Ánimo</a>
   <a href="#pregunta">Pregunta</a>
@@ -1249,6 +1277,7 @@
   <a href="#medidor">Cuánto</a>
   <a href="#extrano">Te extraño</a>
   <a href="#vales">Vales</a>
+  <a href="#parajon">Para Jon</a>
   <a href="#memorama">Memorama</a>
   <a href="#rompecabezas">Puzzle</a>
   <a href="#adivina">Adivina</a>
@@ -1385,7 +1414,7 @@ const AV=C.avisos||{};
 const AV_TIPOS=window.AV_TIPOS=[['vale','🎟️ Canjea un vale'],['nota','💌 Te deja una notita en el buzón'],['ruleta','🎡 Gira la ruleta de citas'],['abrela','💌 Abre una carta «Ábrela cuando…»'],
   ['abrazo','🤗 Te manda un abrazo (corazón presionado)'],['rasca','🌠 Raspa el rasca y gana'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Agrega o aprende algo nuevo'],
   ['evento','🗓️ Agrega algo a «Lo que viene»'],['foto','📷 Sube fotos al carrusel'],['recuerdo','📷 Guarda un recuerdo de algo que hicieron'],['sorpresa','🎁 Abre la sorpresa del mes'],
-  ['capsula','⏳ Abre la cápsula del tiempo'],['racha','🔥 Desbloquea un premio de su racha'],['animo','🌤️ Dice cómo se siente'],['voz','🎙️ Te manda un mensaje de voz'],['cartames','✉️ Abre la carta del mes'],['comida','🍽️ Gira la rueda de la comida'],['pregunta','💭 Responde la pregunta del día'],['deseo','🎁 Agrega algo a su lista de deseos'],['diario','📔 Guarda un momento en el diario'],['reto','🎯 Cumplen el reto de la semana'],['extrano','🥺 Te dice que te extraña'],['receta','🍳 Agrega una receta'],['adivina','🔍 Adivina una foto'],['like','❤️ Le da like a tus notitas o audios'],['cumple','🎂 Abre su carta de cumpleaños'],['peli','🍿 Agrega, ve o califica una peli o serie'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (cada vez que entra)']];
+  ['capsula','⏳ Abre la cápsula del tiempo'],['racha','🔥 Desbloquea un premio de su racha'],['animo','🌤️ Dice cómo se siente'],['voz','🎙️ Te manda un mensaje de voz'],['cartames','✉️ Abre la carta del mes'],['comida','🍽️ Gira la rueda de la comida'],['pregunta','💭 Responde la pregunta del día'],['deseo','🎁 Agrega algo a su lista de deseos'],['diario','📔 Guarda un momento en el diario'],['reto','🎯 Cumplen el reto de la semana'],['extrano','🥺 Te dice que te extraña'],['receta','🍳 Agrega una receta'],['adivina','🔍 Adivina una foto'],['like','❤️ Le da like a tus notitas o audios'],['cumple','🎂 Abre su carta de cumpleaños'],['parajon','💙 Lo que te deja en «Para Jon» (vales, cartas, rasca…)'],['peli','🍿 Agrega, ve o califica una peli o serie'],['secreto','🤫 Encuentra el mensaje secreto'],['entrada','👀 Entra a la app (cada vez que entra)']];
 const AV_OFF_DEF=window.AV_OFF_DEF={};
 const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'&&AV.notas===false)return false;return !off[t]};
 const AV_LAST={};
@@ -1393,7 +1422,7 @@ function avisarElla(txt,tipo){
   if(!AV.ntfyElla||tipo==='entrada')return;
   let m=txt.split(C.ella+' ').join(C.yo+' ');
   if(tipo==='pregunta')m='💭 '+C.yo+' ya contestó la pregunta del día · contesta para ver su respuesta';
-  const title=({nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo,deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',extrano:'🥺 '+C.yo+' te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ A '+C.yo+' le gustó'}[tipo])||'💗 '+C.yo;
+  const title=({nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo,deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',extrano:'🥺 '+C.yo+' te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ A '+C.yo+' le gustó',parajon:'💙 '+C.yo}[tipo])||'💗 '+C.yo;
   fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfyElla.trim(),title,message:m,tags:['love_letter'],priority:4})}).catch(()=>{});
 }
 function avisar(txt,tipo){
@@ -1406,7 +1435,7 @@ function avisar(txt,tipo){
   try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
   const quien=soyYo?C.yo:C.ella;
   if(soyYo){ txt=txt.split(C.ella+' ').join(C.yo+' ').replace(/ te (dejó|mandó)/,' le $1'); }
-  const title=({vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',extrano:'🥺 Te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ Le gustó',cumple:'🎂 Cumpleaños',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
+  const title=({vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',parajon:'💙 Para '+C.yo,extrano:'🥺 Te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ Le gustó',cumple:'🎂 Cumpleaños',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
   fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname})}).catch(()=>{});
 }
 const VIEWER=()=>{if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
@@ -1633,7 +1662,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     try{if(window.AndroidApp){window.AndroidApp.relink();return}}catch(e){}
     location.replace(location.pathname);
@@ -2336,8 +2365,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const W=['D','L','M','M','J','V','S'];
   const $=id=>document.getElementById(id);
   let open=null;
-  function stats(){
-    const set=new Set(S.all().filter(x=>NEWER(x,'rrc')).map(x=>x.id)), d=MXD(); if(!set.has(DK(d)))d.setDate(d.getDate()-1);
+  function stats(w){
+    const set=new Set(S.all().filter(x=>NEWER(x,'rrc')&&(w==='yo'?String(x.id).startsWith('yo:'):!String(x.id).includes(':'))).map(x=>String(x.id).replace(/^yo:/,''))), d=MXD(); if(!set.has(DK(d)))d.setDate(d.getDate()-1);
     let cur=0; while(set.has(DK(d))){cur++;d.setDate(d.getDate()-1)}
     let best=0,run=0,prev=null; [...set].sort().forEach(k=>{const t=new Date(k+'T12:00:00');run=prev&&(t-prev)/864e5<1.5?run+1:1;best=Math.max(best,run);prev=t});
     return {cur,best:Math.max(best,cur),set};
@@ -2355,20 +2384,22 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
       $('rchBar').style.width=Math.min(100,Math.round(cur/next.d*100))+'%';
       $('rchNext').textContent=cur?`Faltan ${next.d-cur} ${next.d-cur===1?'día':'días'} para desbloquear: ${next.e} ${next.t}`:(soyElla?'Entra mañana otra vez y empieza tu racha 🔥':`${C.ella} todavía no empieza una racha nueva`);}
     else{$('rchBar').style.width='100%';$('rchNext').textContent=PR.length?'¡Desbloqueaste todos los premios! 🏆':''}
+    {const o=stats('yo');$('rchOther').textContent=soyElla?`💙 Racha de ${C.yo}: ${o.cur} ${o.cur===1?'día seguido':'días seguidos'} 🔥`:`💙 Tu racha: ${o.cur} ${o.cur===1?'día seguido':'días seguidos'} 🔥`}
     const box=$('rchPrizes'); box.innerHTML='';
     PR.forEach(p=>{const ok=best>=p.d,b=document.createElement('button');b.className='rch-p '+(ok?'ok':'lock');
       b.innerHTML=`<span class="e">${ok?esc(p.e):'🔒'}</span><span><b>${ok?esc(p.t):'Premio sorpresa'}</b><small>${p.d} días seguidos${ok?' · ¡desbloqueado!':''}</small>${ok&&open===p.d?'<p>'+esc(p.x)+'</p>':''}</span>`;
       if(ok)b.onclick=()=>{open=open===p.d?null:p.d;render()}; box.append(b)});
   }
   function visit(){
-    if(!soyElla)return; const k=DK(MXD()); const before=stats().best;
+    if(!soyElla){const k='yo:'+DK(MXD()), ex=S.all().find(x=>x.id===k); if(!ex)S.add({id:k,a:Date.now(),u:Date.now()}); else if(!NEWER(ex,'rrc')){ex.a=ex.u=Date.now();S.save()} return}
+    const k=DK(MXD()); const before=stats().best;
     const ex=S.all().find(x=>x.id===k);
     if(!ex){S.add({id:k,a:Date.now(),u:Date.now()})}else if(!NEWER(ex,'rrc')){ex.a=ex.u=Date.now();S.save()}
     const after=stats().best;
     PR.filter(p=>before<p.d&&after>=p.d).forEach(p=>{let done=false;try{done=localStorage.getItem('racha-av-'+p.d)===RK+'.'+CUTOF('rrc');localStorage.setItem('racha-av-'+p.d,RK+'.'+CUTOF('rrc'))}catch(e){}
       if(!done){avisar(`🔥 ${C.ella} lleva ${p.d} días seguidos entrando y desbloqueó: ${p.e} ${p.t}`,'racha');setTimeout(()=>burst(30),600)}});
   }
-  render(); window.addEventListener('unlocked',visit); document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!document.body.classList.contains('locked'))visit()});
+  render(); window.addEventListener('unlocked',visit); if(EDIT)setTimeout(visit,1500); document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!document.body.classList.contains('locked'))visit()});
 })();
 
 /* ====== ¿Cómo te sientes hoy? ====== */
@@ -2578,6 +2609,7 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
 /* ====== Modo cumpleaños ====== */
 (function(){
   const sec=document.getElementById('cumple'), box=document.getElementById('cuBox');
+  if(VIEWER()==='yo')sec.querySelector('h2').textContent='El cumpleaños de '+C.ella;
   const raw=String(C.cumple||''), mm=+raw.slice(5,7), dd=+raw.slice(8,10);
   if(!mm||!dd){ if(EDIT){box.innerHTML='<div class="card"><div class="daily-l">Solo tú ves esto</div><div style="font-size:15px">Pon la fecha de su cumpleaños en el editor («Cumpleaños de '+esc(C.ella)+'») y aquí aparecerá la cuenta regresiva 🎂</div></div>'} else sec.hidden=true; return; }
   const now=MXD(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
@@ -2686,6 +2718,146 @@ try{if(window.AndroidApp)window.AndroidApp.setTopic(VIEWER()==='ella'?(AV.ntfyEl
     avisar(`🔍 ${C.ella} adivinó la foto #${idx+1}: «${g}» (nivel ${lv+1} de ${LV.length})`,'adivina')});
   $('agNext').onclick=nuevo;
   nuevo();
+})();
+
+/* ====== Para Jon (lo llena Ale) + cumpleaños de Jon ====== */
+(function(){
+  const $=id=>document.getElementById(id), sec=$('parajon'), box=$('pjBox'), tabs=$('pjTabs'), cs=$('cumpleyo'), cb=$('cyBox');
+  const S=SHARED('parajon.bin','p','parajon-cache',600,render);
+  const soyJon=()=>VIEWER()==='yo';
+  const live=k=>S.all().filter(x=>!x.x&&x.k===k&&NEWER(x,'rpj')).sort((a,b)=>a.a-b.a);
+  const add=o=>S.add(Object.assign({id:UID(),a:Date.now(),u:Date.now()},o));
+  const upd=(x,o)=>{Object.assign(x,o,{u:Date.now()});S.save()};
+  const del=(btn,x)=>{let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent='¿Borrar?';setTimeout(()=>{armed=false;btn.textContent='✕'},2500);return}upd(x,{x:1})}};
+  const T=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana']];
+  let tab='msg', razon=null, carta=null, pick=null, scratching=false;
+  const doy=()=>{const n=MXD();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)};
+  const el=(h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
+  function todayMsg(){const L=live('msg');return L.length?L[doy()%L.length]:null}
+  /* el mensaje del día de Jon lo escribe Ale */
+  function jonDaily(){
+    if(!soyJon())return; const m=todayMsg(); if(!m)return;
+    $('hoyMsg').textContent=m.t; $('daily').textContent=m.t;
+    $('hoyFix').textContent='Te amo mucho '+C.yo+' 💙'; $('hoySign').textContent='— '+C.ella+' 💙';
+    $('dailyL').textContent='Mensaje de '+C.ella+' para ti · '+MXD().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+  }
+  function form(fields,btnTxt,onSave){
+    const f=document.createElement('form'); f.className='di-add card pj-f'; f.autocomplete='off';
+    fields.forEach(([k,ph,type,max])=>{const i=document.createElement(type==='ta'?'textarea':'input');i.className='pq-in';i.name=k;i.placeholder=ph;i.maxLength=max||200;if(type==='ta')i.rows=3;f.append(i)});
+    const b=document.createElement('button');b.className='btn small';b.textContent=btnTxt;f.append(b);
+    f.onsubmit=e=>{e.preventDefault();const v={};fields.forEach(([k])=>v[k]=f.elements[k].value.trim());if(!v[fields[0][0]])return f.elements[fields[0][0]].focus();f.reset();f.querySelectorAll('input,textarea').forEach(i=>{i.dataset.fresh=1});onSave(v);burst(10)};
+    return f;
+  }
+  function listAle(items,fmt){
+    const l=document.createElement('div');l.className='pj-l';
+    if(!items.length)l.innerHTML='<div class="kb-empty">todavía no hay nada aquí 💭</div>';
+    items.slice().reverse().forEach(x=>{const r=el(`<div class="ds-i"><div class="ds-t">${fmt(x)}</div><div class="ds-f"><span>${fmtDia(x.a)}</span></div></div>`);
+      const d=document.createElement('button');d.className='ds-b';d.textContent='✕';del(d,x);r.querySelector('.ds-f').append(d);l.append(r)});
+    return l;
+  }
+  function keepVals(){const m={};[box,cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(i.value)m[i.placeholder]=i.value}));return m}
+  function putVals(m){[box,cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(m[i.placeholder]!=null&&!i.dataset.fresh)i.value=m[i.placeholder]}))}
+  function render(){
+    if(scratching){jonDaily();return}
+    const kv=keepVals();
+    jonDaily(); cumple();
+    sec.querySelector('h2').textContent=soyJon()?'De '+C.ella+' para ti':'Para '+C.yo;
+    sec.querySelector('.sub').textContent=soyJon()?'todo lo que '+C.ella+' te dejó 💙':'cosas que le dejas a '+C.yo+' 💙';
+    tabs.innerHTML='';
+    T.forEach(([k,n])=>{const b=document.createElement('button');b.className=k===tab?'cur':'';b.textContent=n;b.onclick=()=>{tab=k;render()};tabs.append(b)});
+    box.innerHTML=''; (soyJon()?JON:ALE)[tab]();
+    putVals(kv);
+  }
+  const ALE={
+    msg(){box.append(el(`<div class="pj-note">A ${esc(C.yo)} le sale uno distinto cada día al entrar, en grande, como a ti 💌</div>`),
+      form([['t','Escribe un mensajito para '+C.yo,'ta',300]],'💌 Agregar mensaje',v=>add({k:'msg',t:v.t})),
+      listAle(live('msg'),x=>esc(x.t)+(todayMsg()===x?' <b style="color:#b3204f">· hoy</b>':'')))},
+    razon(){box.append(el(`<div class="pj-note">${esc(C.yo)} saca un papelito al azar de su frasco 🫙</div>`),
+      form([['t','Una razón por la que quieres a '+C.yo,'in',200]],'🫙 Agregar al frasco',v=>{add({k:'razon',t:v.t});avisar(`🫙 ${C.ella} agregó una razón a tu frasco`,'parajon')}),
+      listAle(live('razon'),x=>esc(x.t)))},
+    carta(){box.append(el(`<div class="pj-note">Cartas para que ${esc(C.yo)} las abra cuando las necesite 📬</div>`),
+      form([['w','Ábrela cuando… (ej. estés triste)','in',80],['t','Escribe la carta','ta',2000]],'📬 Guardar carta',v=>{if(!v.t)return;add({k:'carta',w:v.w,t:v.t});avisar(`📬 ${C.ella} te dejó una carta: «Ábrela cuando ${v.w}»`,'parajon')}),
+      listAle(live('carta'),x=>'Ábrela cuando '+esc(x.w)+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
+    vale(){box.append(el(`<div class="pj-note">Vales que ${esc(C.yo)} puede canjear cuando quiera 🎟️</div>`),
+      form([['t','Vale por… (ej. un masaje)','in',80],['d','Detalle (opcional)','in',120],['e','Emoji (opcional)','in',4]],'🎟️ Regalar vale',v=>{add({k:'vale',t:v.t,d:v.d,e:v.e||'🎟️'});avisar(`🎟️ ${C.ella} te regaló un vale: ${v.t}`,'parajon')}),
+      listAle(live('vale'),x=>esc(x.e||'🎟️')+' Vale por: '+esc(x.t)+(x.c?` <b style="color:#2e9d5b">✓ canjeado el ${fmtDia(x.c)}</b>`:'')))},
+    rasca(){const P=live('premio'), tk=live('ticket').length, w=live('win');
+      const g=document.createElement('div');g.className='card pj-tk';
+      g.innerHTML=`<div class="daily-l">Rasca y gana de ${esc(C.yo)}</div><div>${tk-w.length>0?`Tiene <b>${tk-w.length}</b> por raspar 🌠`:'No tiene ninguno pendiente'}</div>`;
+      const b=document.createElement('button');b.className='btn small';b.textContent='🎁 Regalarle un rasca y gana';
+      b.onclick=()=>{if(!P.filter(p=>!p.used).length){alertBox('Primero agrega al menos un premio abajo 👇');return}add({k:'ticket'});burst(16);avisar(`🌠 ${C.ella} te regaló un rasca y gana`,'parajon')};
+      g.append(b); box.append(g,
+      form([['t','Premio (ej. Te invito a cenar)','in',120],['e','Emoji (opcional)','in',4]],'➕ Agregar premio',v=>add({k:'premio',t:v.t,e:v.e||'🎁'})),
+      listAle(P,x=>esc(x.e||'🎁')+' '+esc(x.t)+(x.used?' <b style="color:#2e9d5b">✓ ya lo ganó</b>':'')))}
+  };
+  function alertBox(t){const n=el(`<div class="kb-st">${esc(t)}</div>`);box.prepend(n);setTimeout(()=>n.remove(),3000)}
+  const empty=t=>el(`<div class="nb-empty">${t}</div>`);
+  const JON={
+    msg(){const m=todayMsg(); box.append(m?el(`<div class="card"><div class="daily-l">Mensaje de hoy de ${esc(C.ella)}</div><div class="daily">${esc(m.t)}</div><div class="cu-t">— ${esc(C.ella)} 💙</div></div>`):empty(esc(C.ella)+' todavía no te escribe mensajes del día 💭'))},
+    razon(){const L=live('razon'); if(!L.length){box.append(empty('tu frasco todavía está vacío… '+esc(C.ella)+' lo irá llenando 🫙'));return}
+      const b=el(`<button class="pj-jar" aria-label="Sacar una razón">🫙</button>`); b.onclick=()=>{let r;do{r=L[Math.floor(Math.random()*L.length)]}while(L.length>1&&r===razon);razon=r;render();burst(10)};
+      box.append(b,el(`<div class="note"><span>${razon?esc(razon.t):'Toca el frasco y saca un papelito ♥'}</span></div>`),el(`<div class="tap">${L.length} ${L.length===1?'razón':'razones'} en tu frasco</div>`))},
+    carta(){const L=live('carta'); if(!L.length){box.append(empty('aquí aparecerán las cartas que te deje '+esc(C.ella)+' 📬'));return}
+      const g=document.createElement('div');g.className='whens';
+      L.forEach(x=>{const b=el(`<button class="when${x.o?' read':''}"><div class="when-e">💌</div><div class="when-t">Ábrela cuando ${esc(x.w)}</div></button>`);
+        b.onclick=()=>{carta=carta===x?null:x;if(!x.o){upd(x,{o:Date.now()});avisar(`📬 ${C.ella} abrió tu carta «Ábrela cuando ${x.w}»`,'parajon');burst(14)}else render()};g.append(b)});
+      box.append(g); if(carta)box.append(el(`<div class="paper">${FILL(carta.t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(C.ella)} 💙</p></div>`))},
+    vale(){const L=live('vale'); if(!L.length){box.append(empty('cuando '+esc(C.ella)+' te regale vales aparecerán aquí 🎟️'));return}
+      const g=document.createElement('div');g.className='coupons';
+      L.forEach(x=>{const c=el(`<div class="coupon${x.c?' used':''}"><div class="c-emoji">${esc(x.e||'🎟️')}</div><div class="c-txt"><b>Vale por: ${esc(x.t)}</b><small>${esc(x.d||'')}</small>${x.c?`<div class="c-when">Canjeado el ${fmtDia(x.c)} ✓</div>`:''}</div></div>`);
+        if(!x.c){const b=document.createElement('button');b.className='c-btn';b.textContent='Canjear';let armed=false;
+          b.onclick=()=>{if(!armed){armed=true;b.textContent='¿Seguro?';setTimeout(()=>{armed=false;b.textContent='Canjear'},2500);return}upd(x,{c:Date.now()});burst(20);avisar(`🎟️ ${C.ella} canjeó tu vale: ${x.t}`,'parajon')};c.append(b)}
+        g.append(c)}); box.append(g)},
+    rasca(){const tk=live('ticket').length, W=live('win'), P=live('premio').filter(p=>!p.used);
+      if(tk>W.length&&P.length){
+        if(!pick||!P.includes(pick))pick=P[Math.floor(Math.random()*P.length)];
+        const wrap=el(`<div class="scratch"><div class="prize"><div class="prize-emoji">${esc(pick.e||'🎁')}</div><div class="prize-title">¡Ganaste!</div><div class="prize-text">${esc(pick.t)}</div></div><canvas></canvas></div>`);
+        box.append(wrap,el(`<div class="tap">raspa con tu dedito ✨</div>`)); scratch(wrap.querySelector('canvas'),()=>{const p=pick;pick=null;upd(p,{used:Date.now()});add({k:'win',p:p.id,t:p.t,e:p.e});if(window.confetti)confetti(60);burst(20);avisar(`🌠 ${C.ella} raspó su rasca y gana: ${p.e||'🎁'} ${p.t}`,'parajon')});
+      } else box.append(empty('cuando '+esc(C.ella)+' te regale un rasca y gana aparecerá aquí 🌠'));
+      if(W.length)box.append(el(`<div class="wheel-used" style="margin-top:14px"><div class="wu-t">Lo que has ganado:</div>${W.slice().reverse().map(w=>`<span class="wu" style="text-decoration:none">${esc(w.e||'🎁')} ${esc(w.t)} · ${fmtDia(w.a)}</span>`).join('')}</div>`))}
+  };
+  function scratch(cv,done){
+    requestAnimationFrame(()=>{const r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1; cv.width=r.width*dpr; cv.height=r.height*dpr; const x=cv.getContext('2d'); x.scale(dpr,dpr);
+      const g=x.createLinearGradient(0,0,r.width,r.height); g.addColorStop(0,'#e9b872'); g.addColorStop(.5,'#f7dca8'); g.addColorStop(1,'#c99550');
+      x.fillStyle=g; x.fillRect(0,0,r.width,r.height); x.fillStyle='rgba(90,40,10,.7)'; x.font='700 22px Nunito,sans-serif'; x.textAlign='center'; x.fillText('✨ Raspa aquí ✨',r.width/2,r.height/2+8);
+      x.globalCompositeOperation='destination-out'; x.lineWidth=46; x.lineCap='round'; x.lineJoin='round'; let down=false, n=0, fin=false, lx=0, ly=0;
+      const at=e=>{const b=cv.getBoundingClientRect();return [e.clientX-b.left,e.clientY-b.top]};
+      const check=()=>{const d=x.getImageData(0,0,cv.width,cv.height).data;let c=0;for(let i=3;i<d.length;i+=64)if(d[i]===0)c++;
+        if(c/(d.length/64)>.45){fin=true;cv.style.transition='opacity .6s';cv.style.opacity=0;setTimeout(()=>{scratching=false;done()},700)}};
+      const paint=e=>{if(!down||fin)return;const [px,py]=at(e);x.beginPath();x.moveTo(lx,ly);x.lineTo(px,py);x.stroke();lx=px;ly=py;if(++n%10===0)check()};
+      cv.addEventListener('pointerdown',e=>{down=true;scratching=true;cv.setPointerCapture(e.pointerId);[lx,ly]=at(e);paint(e)}); cv.addEventListener('pointermove',paint); cv.addEventListener('pointerup',()=>{down=false;if(!fin)check();setTimeout(()=>{if(!fin)scratching=false},4000)});
+      cv.style.touchAction='none';});
+  }
+  /* ---- Cumpleaños de Jon ---- */
+  let cyOpen=false, cyBanner=false;
+  function cumple(){
+    const raw=String(C.cumpleYo||''), mm=+raw.slice(5,7), dd=+raw.slice(8,10);
+    cs.querySelector('h2').textContent=soyJon()?'Tu cumpleaños':'El cumpleaños de '+C.yo;
+    if(!mm||!dd){cs.hidden=!EDIT;cb.innerHTML=EDIT?'<div class="card"><div style="font-size:15px">Pon tu fecha de cumpleaños en el editor («Cumpleaños de '+esc(C.yo)+'») 🎂</div></div>':'';return}
+    const now=MXD(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    let next=new Date(now.getFullYear(),mm-1,dd); if(next<today)next=new Date(now.getFullYear()+1,mm-1,dd);
+    const days=Math.round((next-today)/864e5), isB=days===0, fecha=`${dd} de ${MESN[mm-1]}`;
+    const L=S.all().find(x=>x.id==='cumpleyo'&&!x.x&&NEWER(x,'rpj'));
+    if(isB&&!cyBanner){cyBanner=true;const h=$('inicio'),bn=document.createElement('div');bn.className='cu-banner';bn.textContent=soyJon()?'🎂 ¡Feliz cumpleaños, '+C.yo+'! 💙':'🎂 Hoy es el cumpleaños de '+C.yo+' 🎉';h.prepend(bn);
+      window.addEventListener('hoyClosed',()=>setTimeout(()=>{if(window.confetti)confetti(120);burst(40)},300))}
+    let h='';
+    if(isB&&soyJon())h=`<div class="card cu today"><div class="cu-e">🎂</div><h3 class="cu-h">¡Feliz cumpleaños, ${esc(C.yo)}!</h3><div class="cu-t">hoy todo es para ti 💙🎁</div>${L?`<button class="btn small" id="cyBtn">${cyOpen?'💌 Guardar carta':'💌 Abrir la carta de '+esc(C.ella)}</button>`:''}</div>${cyOpen&&L?`<div class="paper">${esc(L.t).split(/\n\s*\n/).map(p=>'<p>'+p.replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(C.ella)} 💙</p></div>`:''}`;
+    else h=`<div class="card cu${isB?' today':''}"><div class="cu-e">${isB?'🎂':days<=7?'🎉':'🎂'}</div><div class="daily-l">${soyJon()?'Tu cumpleaños':'El cumpleaños de '+esc(C.yo)} · ${fecha}</div>
+      ${isB?`<h3 class="cu-h">¡Hoy es el cumpleaños de ${esc(C.yo)}! 🎉</h3><div class="cu-t">no olvides felicitarlo 💙</div>`:`<div class="cu-n"><b>${days}</b><span>${days===1?'día':'días'}</span></div><div class="cu-t">${soyJon()?(L?esc(C.ella)+' te está preparando algo para ese día 🤫':'falta poquito para celebrarte 💙'):(days<=7?'¡Ya casi! prepárale algo bonito 🎈':'escríbele su carta y se la mostramos ese día 🤫')}</div>`}</div>`;
+    cb.innerHTML=h;
+    if(!soyJon()){
+      const f=document.createElement('div');f.className='di-add card pj-f';
+      f.innerHTML=`<div class="daily-l">Su carta de cumpleaños 🤫</div><textarea class="pq-in" rows="5" maxlength="3000" placeholder="Escríbele algo bonito… ${esc(C.yo)} no lo verá hasta el ${fecha}">${L?esc(L.t):''}</textarea><button class="btn small">💌 ${L?'Guardar cambios':'Guardar carta'}</button><div class="kb-st"></div>`;
+      f.querySelector('button').onclick=()=>{const t=f.querySelector('textarea').value.trim().slice(0,3000);if(!t)return;
+        if(L)upd(L,{t,x:0});else{S.add({id:'cumpleyo',k:'cumpleyo',t,a:Date.now(),u:Date.now()});avisar(`🤫 ${C.ella} te escribió algo para tu cumpleaños`,'parajon')}
+        f.querySelector('.kb-st').textContent='💌 Guardada · '+C.yo+' la verá el '+fecha;burst(12)};
+      cb.append(f);
+    }
+    const ob=$('cyBtn'); if(ob)ob.onclick=()=>{cyOpen=!cyOpen;cumple();if(cyOpen){if(window.confetti)confetti(120);burst(30);
+      let d=false;try{const k='cumpleyo-av-'+now.getFullYear();d=localStorage.getItem(k)==='1';localStorage.setItem(k,'1')}catch(e){}
+      if(!d)avisar(`🎂 ${C.ella} abrió la carta de cumpleaños que le escribiste`,'parajon')}};
+  }
+  render();
 })();
 
 /* ====== Carta del mes ====== */
@@ -2995,7 +3167,7 @@ document.getElementById('moreLove').addEventListener('click',()=>{
 /* =====================================================================
    CARGA DEL CONTENIDO (content.json en tu repo de GitHub)
    ===================================================================== */
-const DEFAULTS = {"ella": "", "yo": "", "inicio": "2026-01-01", "pin": "0000", "pistas": [], "saludos": {"manana": "", "tarde": "", "noche": ""}, "mensajesDia": [], "cancion": {"titulo": "", "artista": "", "link": ""}, "carta": "", "abrela": [], "cartaSola": "", "fotos": [], "fotoPolaroid": 1, "polaroidTexto": "", "fotoRompecabezas": 1, "razones": [], "fortunas": [], "rasca": {"emoji": "", "titulo": "", "texto": ""}, "vales": [], "ruleta": [], "lista": [], "horaCielo": "21:00", "sorpresas": [], "sorpresasExtra": [], "capsula": {"fecha": "2030-01-01", "texto": ""}, "secreto": "", "fraseFinal": "", "mensajitos": [], "creditos": [], "whatsapp": {"numero": "", "mensajes": []}, "reinicio": "1", "kanban": {}, "racha": [{"dias": "15", "emoji": "🎟️", "titulo": "Cita sorpresa", "texto": "Por 15 días seguidos: una cita que yo planeo completita, tú solo llegas."}, {"dias": "45", "emoji": "🍰", "titulo": "Tu postre favorito", "texto": "Por 45 días seguidos: te llevo tu postre favorito a donde estés."}, {"dias": "100", "emoji": "👑", "titulo": "Un día de reina", "texto": "Por 100 días seguidos: un día entero dedicado a ti y tú pones todas las reglas."}], "animo": [{"emoji": "😊", "nombre": "Feliz", "respuesta": "¡Me encanta verte feliz! Que nada te quite esa sonrisa hoy 💗"}, {"emoji": "🥰", "nombre": "Enamorada", "respuesta": "Yo también, mi amor. Cada día más 🥰"}, {"emoji": "😴", "nombre": "Cansada", "respuesta": "Descansa tantito, preciosa. Hoy te mereces una siesta y muchos apapachos 💤"}, {"emoji": "😔", "nombre": "Triste", "respuesta": "Aquí estoy para ti, siempre. Te mando un abrazo enorme 🤗 y si quieres, háblame."}, {"emoji": "😣", "nombre": "Estresada", "respuesta": "Respira hondo… tú puedes con todo. Y si no, aquí estoy para ayudarte 💪💗"}, {"emoji": "😤", "nombre": "Enojada", "respuesta": "Ay, mi amor… cuéntame qué pasó, te escucho. (Y si fui yo, perdóname 🙈)"}], "cartasMes": [{"mes": "8", "titulo": "Ocho meses contigo", "texto": "Mi amor:\n\nHoy cumplimos ocho meses y todavía me sorprende lo bonito que se siente estar contigo. Gracias por cada risa, cada abrazo y por hacer que los días normales se sientan especiales.\n\nNo sé qué nos traiga el siguiente mes, pero sé que lo quiero vivir contigo.\n\nTe amo mucho, {ella}."}, {"mes": "9", "titulo": "Nueve meses de nosotros", "texto": "Mi vida:\n\nNueve meses ya. Cada mes que pasa te conozco un poquito más y te quiero un poquito más también.\n\nGracias por elegirme todos los días. Yo te elijo a ti, hoy y siempre.\n\nCon todo mi amor."}], "comida": ["🌮 Tacos", "🍕 Pizza", "🍣 Sushi", "🍔 Hamburguesas", "🍜 Ramen", "🍝 Pasta", "🥗 Algo sanito", "🌯 Burritos", "🍗 Alitas", "🥘 Comida casera"], "preguntas": ["¿Qué fue lo primero que pensaste de mí cuando me conociste?", "¿Cuál ha sido tu momento favorito conmigo hasta ahora?", "Si pudiéramos irnos de viaje mañana, ¿a dónde iríamos?", "¿Qué canción te recuerda a mí?", "¿Qué es lo que más te gusta de nosotros?", "¿Cuál sería nuestra cita perfecta?", "¿Qué es algo que nunca me has contado?", "¿Qué comida te gustaría que cocináramos juntos?", "¿En qué momento supiste que te gustaba?", "¿Qué sueño te gustaría que cumpliéramos juntos?", "¿Qué es lo más bonito que he hecho por ti?", "Si fuéramos una película, ¿cómo se llamaría?", "¿Qué te hace sentir más querida?", "¿Cómo te imaginas que estaremos en un año?", "¿Qué es algo pequeño que hago y que te encanta?", "¿Cuál es tu recuerdo favorito de nuestra primera cita?", "Si pudieras revivir un día conmigo, ¿cuál sería?", "¿Qué apodo te gustaría que te dijera?", "¿Qué es algo nuevo que quieras que aprendamos juntos?", "¿Qué te da más risa de mí?", "¿Qué es lo que más extrañas de mí cuando no estamos juntos?", "¿Qué lugar te gustaría que conociéramos en la ciudad?", "¿Qué tres palabras nos describen como pareja?", "¿Cuál es tu plan ideal para un domingo conmigo?", "¿Qué te gustaría que hiciéramos en nuestro aniversario?", "¿Qué es algo que admiras de mí?", "¿Qué te gustaría que hiciera más seguido?", "¿Cuál es la foto nuestra que más te gusta y por qué?", "Si tuviéramos una mascota, ¿cómo se llamaría?", "¿Qué quieres decirme hoy que no me hayas dicho?"], "retos": ["Cocinar juntos una receta que nunca hayamos hecho 🍳", "Tomarnos una foto juntos en un lugar nuevo 📸", "Tener una cita sin celulares 📵", "Escribirnos una carta a mano y dárnosla en persona ✉️", "Ver el atardecer juntos 🌅", "Probar un postre que nunca hayamos probado 🍰", "Hacer una noche de juegos de mesa 🎲", "Caminar por un lugar de la ciudad que no conozcamos 🚶", "Bailar juntos una canción en casa 💃", "Hacer un picnic 🧺", "Ver una película que elija el otro, sin quejarnos 🎬", "Darnos un masaje 💆", "Ir a desayunar a un lugar nuevo 🥞", "Decirnos 3 cosas que admiramos del otro 💗", "Hacer una manualidad juntos ✂️", "Visitar un museo 🏛️", "Prepararle el desayuno sorpresa al otro ☕", "Planear juntos nuestro próximo viaje ✈️", "Recrear nuestra primera cita 💕", "Hacer juntos algo que nos dé un poquito de miedo 🎢"], "cumple": "", "cartaCumple": "Feliz cumpleaños, mi amor 🎂\n\nHoy celebro que existes y que la vida me regaló la suerte de encontrarte. Gracias por tu risa, por tu forma de ver el mundo y por hacerme tan feliz todos los días.\n\nQue este año te traiga todo lo que sueñas, y que me dejes estar a tu lado para verte cumplirlo.\n\nTe amo muchísimo, {ella}. Hoy y siempre."};
+const DEFAULTS = {"ella": "", "yo": "", "inicio": "2026-01-01", "pin": "0000", "pistas": [], "saludos": {"manana": "", "tarde": "", "noche": ""}, "mensajesDia": [], "cancion": {"titulo": "", "artista": "", "link": ""}, "carta": "", "abrela": [], "cartaSola": "", "fotos": [], "fotoPolaroid": 1, "polaroidTexto": "", "fotoRompecabezas": 1, "razones": [], "fortunas": [], "rasca": {"emoji": "", "titulo": "", "texto": ""}, "vales": [], "ruleta": [], "lista": [], "horaCielo": "21:00", "sorpresas": [], "sorpresasExtra": [], "capsula": {"fecha": "2030-01-01", "texto": ""}, "secreto": "", "fraseFinal": "", "mensajitos": [], "creditos": [], "whatsapp": {"numero": "", "mensajes": []}, "reinicio": "1", "kanban": {}, "racha": [{"dias": "15", "emoji": "🎟️", "titulo": "Cita sorpresa", "texto": "Por 15 días seguidos: una cita que yo planeo completita, tú solo llegas."}, {"dias": "45", "emoji": "🍰", "titulo": "Tu postre favorito", "texto": "Por 45 días seguidos: te llevo tu postre favorito a donde estés."}, {"dias": "100", "emoji": "👑", "titulo": "Un día de reina", "texto": "Por 100 días seguidos: un día entero dedicado a ti y tú pones todas las reglas."}], "animo": [{"emoji": "😊", "nombre": "Feliz", "respuesta": "¡Me encanta verte feliz! Que nada te quite esa sonrisa hoy 💗"}, {"emoji": "🥰", "nombre": "Enamorada", "respuesta": "Yo también, mi amor. Cada día más 🥰"}, {"emoji": "😴", "nombre": "Cansada", "respuesta": "Descansa tantito, preciosa. Hoy te mereces una siesta y muchos apapachos 💤"}, {"emoji": "😔", "nombre": "Triste", "respuesta": "Aquí estoy para ti, siempre. Te mando un abrazo enorme 🤗 y si quieres, háblame."}, {"emoji": "😣", "nombre": "Estresada", "respuesta": "Respira hondo… tú puedes con todo. Y si no, aquí estoy para ayudarte 💪💗"}, {"emoji": "😤", "nombre": "Enojada", "respuesta": "Ay, mi amor… cuéntame qué pasó, te escucho. (Y si fui yo, perdóname 🙈)"}], "cartasMes": [{"mes": "8", "titulo": "Ocho meses contigo", "texto": "Mi amor:\n\nHoy cumplimos ocho meses y todavía me sorprende lo bonito que se siente estar contigo. Gracias por cada risa, cada abrazo y por hacer que los días normales se sientan especiales.\n\nNo sé qué nos traiga el siguiente mes, pero sé que lo quiero vivir contigo.\n\nTe amo mucho, {ella}."}, {"mes": "9", "titulo": "Nueve meses de nosotros", "texto": "Mi vida:\n\nNueve meses ya. Cada mes que pasa te conozco un poquito más y te quiero un poquito más también.\n\nGracias por elegirme todos los días. Yo te elijo a ti, hoy y siempre.\n\nCon todo mi amor."}], "comida": ["🌮 Tacos", "🍕 Pizza", "🍣 Sushi", "🍔 Hamburguesas", "🍜 Ramen", "🍝 Pasta", "🥗 Algo sanito", "🌯 Burritos", "🍗 Alitas", "🥘 Comida casera"], "preguntas": ["¿Qué fue lo primero que pensaste de mí cuando me conociste?", "¿Cuál ha sido tu momento favorito conmigo hasta ahora?", "Si pudiéramos irnos de viaje mañana, ¿a dónde iríamos?", "¿Qué canción te recuerda a mí?", "¿Qué es lo que más te gusta de nosotros?", "¿Cuál sería nuestra cita perfecta?", "¿Qué es algo que nunca me has contado?", "¿Qué comida te gustaría que cocináramos juntos?", "¿En qué momento supiste que te gustaba?", "¿Qué sueño te gustaría que cumpliéramos juntos?", "¿Qué es lo más bonito que he hecho por ti?", "Si fuéramos una película, ¿cómo se llamaría?", "¿Qué te hace sentir más querida?", "¿Cómo te imaginas que estaremos en un año?", "¿Qué es algo pequeño que hago y que te encanta?", "¿Cuál es tu recuerdo favorito de nuestra primera cita?", "Si pudieras revivir un día conmigo, ¿cuál sería?", "¿Qué apodo te gustaría que te dijera?", "¿Qué es algo nuevo que quieras que aprendamos juntos?", "¿Qué te da más risa de mí?", "¿Qué es lo que más extrañas de mí cuando no estamos juntos?", "¿Qué lugar te gustaría que conociéramos en la ciudad?", "¿Qué tres palabras nos describen como pareja?", "¿Cuál es tu plan ideal para un domingo conmigo?", "¿Qué te gustaría que hiciéramos en nuestro aniversario?", "¿Qué es algo que admiras de mí?", "¿Qué te gustaría que hiciera más seguido?", "¿Cuál es la foto nuestra que más te gusta y por qué?", "Si tuviéramos una mascota, ¿cómo se llamaría?", "¿Qué quieres decirme hoy que no me hayas dicho?"], "retos": ["Cocinar juntos una receta que nunca hayamos hecho 🍳", "Tomarnos una foto juntos en un lugar nuevo 📸", "Tener una cita sin celulares 📵", "Escribirnos una carta a mano y dárnosla en persona ✉️", "Ver el atardecer juntos 🌅", "Probar un postre que nunca hayamos probado 🍰", "Hacer una noche de juegos de mesa 🎲", "Caminar por un lugar de la ciudad que no conozcamos 🚶", "Bailar juntos una canción en casa 💃", "Hacer un picnic 🧺", "Ver una película que elija el otro, sin quejarnos 🎬", "Darnos un masaje 💆", "Ir a desayunar a un lugar nuevo 🥞", "Decirnos 3 cosas que admiramos del otro 💗", "Hacer una manualidad juntos ✂️", "Visitar un museo 🏛️", "Prepararle el desayuno sorpresa al otro ☕", "Planear juntos nuestro próximo viaje ✈️", "Recrear nuestra primera cita 💕", "Hacer juntos algo que nos dé un poquito de miedo 🎢"], "cumple": "", "cartaCumple": "Feliz cumpleaños, mi amor 🎂\n\nHoy celebro que existes y que la vida me regaló la suerte de encontrarte. Gracias por tu risa, por tu forma de ver el mundo y por hacerme tan feliz todos los días.\n\nQue este año te traiga todo lo que sueñas, y que me dejes estar a tu lado para verte cumplirlo.\n\nTe amo muchísimo, {ella}. Hoy y siempre.", "cumpleYo": ""};
 const EDIT = /[?&]editar\b/.test(location.search) || location.hash==='#editar';
 const LS={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
 function ghRepo(){
@@ -3096,6 +3268,7 @@ const SCHEMA=[
   {t:'Saludos según la hora',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
   {t:'Mensaje del día',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2],['mensajesDia','Frases (cambia una cada día)','list']]},
   {t:'Cumpleaños de Ale',f:[['cumple','Fecha de su cumpleaños (el año no importa)','date'],['cartaCumple','Carta de cumpleaños (se abre solo ese día) · deja una línea vacía entre párrafos','textarea',8]]},
+  {t:'Cumpleaños de Jon',f:[['cumpleYo','Tu fecha de cumpleaños (el año no importa)','date']]},
   {t:'Racha de visitas',f:[['racha','Premios por días seguidos','objlist',[['dias','Días seguidos (número)','text'],['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
   {t:'¿Cómo te sientes hoy?',f:[['animo','Caritas y lo que le respondes','objlist',[['emoji','Emoji','text'],['nombre','Cómo se siente','text'],['respuesta','Lo que le respondes','textarea',2]]]]},
   {t:'Pregunta del día',f:[['preguntas','Preguntas (sale una distinta cada día, en orden)','list']]},
@@ -3343,6 +3516,7 @@ function initEditor(){
         bt('Reiniciar «Reto de la semana»',()=>{D.rre=Date.now()},'los retos cumplidos se borran y el de esta semana queda pendiente.'),
         bt('Reiniciar «Te extraño»',()=>{D.rex=Date.now()},'los contadores de «Te extraño» vuelven a cero.'),
         btD('Vaciar «Nuestro recetario»',()=>{D.rrt=Date.now()},'el recetario queda vacío.'),
+        btD('Vaciar «Para Jon» (lo que te dejó Ale)',()=>{D.rpj=Date.now()},'se borra todo lo de «Para Jon», incluida la carta de cumpleaños.'),
         btD('Vaciar «Lo que viene»',()=>{D.rev=Date.now()},'la cuenta regresiva queda vacía.'),
         msg]));
       return;
