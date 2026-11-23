@@ -20,6 +20,15 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceError;
+import android.webkit.WebResourceResponse;
+import android.webkit.SslErrorHandler;
+import android.net.http.SslError;
+import android.net.LinkProperties;
+import android.net.Network;
+import android.widget.FrameLayout;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.URL;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -156,6 +165,47 @@ public class MainActivity extends Activity {
         } catch (Exception e) { return true; }
     }
 
+    /* ---- diagnóstico: si la página tarda, muestra en pantalla qué está pasando ---- */
+    TextView diag; final StringBuilder dlog = new StringBuilder(); long dt0 = 0;
+    void dl(String m) {
+        runOnUiThread(() -> {
+            long t = (System.currentTimeMillis() - dt0) / 100; dlog.append(t / 10).append('.').append(t % 10).append("s  ").append(m).append('\n');
+            if (diag != null) diag.setText("🔧 Diagnóstico (toca para ocultar)\n" + dlog);
+        });
+    }
+    void showDiag() { runOnUiThread(() -> { if (diag != null) diag.setVisibility(android.view.View.VISIBLE); }); }
+    String netInfo() {
+        try {
+            ConnectivityManager cm = getSystemService(ConnectivityManager.class); Network n = cm.getActiveNetwork();
+            if (n == null) return "sin red activa";
+            NetworkCapabilities nc = cm.getNetworkCapabilities(n); LinkProperties lp = cm.getLinkProperties(n);
+            StringBuilder b = new StringBuilder();
+            b.append(nc == null ? "?" : nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ? "wifi" : nc.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ? "datos" : "otra");
+            if (nc != null) b.append(nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) ? " · validada" : " · NO validada");
+            if (nc != null && nc.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) b.append(" · VPN");
+            if (lp != null) {
+                boolean v4 = false, v6 = false; for (android.net.LinkAddress a : lp.getLinkAddresses()) { if (a.getAddress() instanceof java.net.Inet4Address) v4 = true; else v6 = true; }
+                b.append(" · ").append(v4 ? "IPv4 " : "").append(v6 ? "IPv6" : "");
+                if (Build.VERSION.SDK_INT >= 28) b.append(" · DNS privado ").append(lp.isPrivateDnsActive() ? "sí" : "no");
+            }
+            return b.toString();
+        } catch (Exception e) { return "red ? " + e.getClass().getSimpleName(); }
+    }
+    void netTest() {
+        new Thread(() -> {
+            String host = Uri.parse(BASE).getHost();
+            long a = System.currentTimeMillis();
+            try { InetAddress[] ips = InetAddress.getAllByName(host); StringBuilder b = new StringBuilder(); for (InetAddress i : ips) b.append(i.getHostAddress()).append(' ');
+                dl("DNS " + host + " → " + b.toString().trim() + " (" + (System.currentTimeMillis() - a) + " ms)");
+            } catch (Exception e) { dl("DNS falló: " + e); }
+            a = System.currentTimeMillis();
+            try { HttpURLConnection c = (HttpURLConnection) new URL(BASE + "?diag=" + a).openConnection(); c.setConnectTimeout(8000); c.setReadTimeout(8000);
+                int code = c.getResponseCode(); InputStream in = c.getInputStream(); byte[] buf = new byte[8192]; long n = 0; int r; while ((r = in.read(buf)) > 0) n += r; in.close();
+                dl("prueba directa: HTTP " + code + " · " + (n / 1024) + " KB en " + (System.currentTimeMillis() - a) + " ms");
+            } catch (Exception e) { dl("prueba directa falló (" + (System.currentTimeMillis() - a) + " ms): " + e); }
+        }).start();
+    }
+
     // Carga la página; si no responde (internet lento o sin permiso de datos) usa la copia guardada y, si tampoco, muestra cómo arreglarlo.
     int loadId = 0; boolean loadErr = false, fromCache = false, visible = false;
     void loadHome(String url) { loadHome(url, !online()); }
@@ -164,7 +214,10 @@ public class MainActivity extends Activity {
         fromCache = cache; loadErr = false; pageReady = false; visible = false;
         wv.getSettings().setCacheMode(cache ? WebSettings.LOAD_CACHE_ELSE_NETWORK : WebSettings.LOAD_NO_CACHE);
         final int id = ++loadId; final WebView v = wv;
+        if (dt0 == 0 || !cache) { dt0 = System.currentTimeMillis(); dlog.setLength(0); dl("red: " + netInfo()); }
+        dl("cargando " + (cache ? "(copia guardada)" : "(internet)"));
         wv.loadUrl(url != null ? url : home());
+        v.postDelayed(() -> { if (wv == v && id == loadId && !pageReady) { showDiag(); netTest(); } }, 6000);
         v.postDelayed(() -> { if (wv == v && id == loadId && !pageReady && !visible) fallback(); }, cache ? 12000 : 9000);
     }
     void fallback() {
@@ -274,18 +327,33 @@ public class MainActivity extends Activity {
             }
 
             @Override
+            public void onPageStarted(WebView v, String url, Bitmap fav) { if (url != null && url.startsWith(BASE)) dl("empezó a cargar"); }
+
+            @Override
+            public void onReceivedHttpError(WebView v, WebResourceRequest r, WebResourceResponse e) {
+                dl("HTTP " + (e != null ? e.getStatusCode() : 0) + " en " + (r != null ? shortU(r.getUrl()) : "?") + (r != null && r.isForMainFrame() ? " (página)" : ""));
+                if (r != null && r.isForMainFrame()) showDiag();
+            }
+
+            @Override
+            public void onReceivedSslError(WebView v, SslErrorHandler h, SslError e) { dl("error de seguridad SSL: " + (e != null ? e.getPrimaryError() : "?") + " en " + (e != null ? e.getUrl() : "")); showDiag(); h.cancel(); }
+
+            @Override
             public void onPageCommitVisible(WebView v, String url) {
+                if (url != null && url.startsWith(BASE)) dl("la página ya se ve");
                 if (url != null && url.startsWith(BASE) && !loadErr) visible = true;
             }
 
             @Override
             public void onReceivedError(WebView v, WebResourceRequest r, WebResourceError e) {
-                if (r != null && r.isForMainFrame() && v == wv) { loadErr = true; v.post(MainActivity.this::fallback); }
+                dl("error " + (e != null ? e.getErrorCode() + " " + e.getDescription() : "?") + " en " + (r != null ? shortU(r.getUrl()) : "?") + (r != null && r.isForMainFrame() ? " (página)" : ""));
+                if (r != null && r.isForMainFrame() && v == wv) { showDiag(); loadErr = true; v.post(MainActivity.this::fallback); }
             }
 
             @Override
             public void onPageFinished(final WebView v, String url) {
                 if (loadErr || url == null || !url.startsWith(BASE)) return;
+                dl("terminó de cargar");
                 pageReady = true;
                 v.postDelayed(MainActivity.this::deliver, 1500);
                 String w = sp.getString("who", "");
@@ -327,7 +395,14 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
-        setContentView(wv);
+        FrameLayout root = new FrameLayout(this); root.addView(wv);
+        diag = new TextView(this); diag.setTextSize(11); diag.setTextColor(Color.WHITE); diag.setBackgroundColor(Color.parseColor("#E6141414")); diag.setPadding(24, 20, 24, 28);
+        diag.setVisibility(android.view.View.GONE); diag.setTextIsSelectable(false);
+        diag.setOnClickListener(x -> diag.setVisibility(android.view.View.GONE));
+        diag.setOnLongClickListener(x -> { try { ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("diag", dlog.toString())); Toast.makeText(this, "Copiado", Toast.LENGTH_SHORT).show(); } catch (Exception ignored) { } return true; });
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
+        root.addView(diag, lp);
+        setContentView(root);
         loadHome(url);
     }
 
@@ -400,7 +475,12 @@ public class MainActivity extends Activity {
         else super.onBackPressed();
     }
 
+    String shortU(Uri u) { String x = u.toString(); x = x.replaceAll("#.*$", ""); return x.length() > 70 ? x.substring(0, 70) + "…" : x; }
+
     class Bridge {
+        @JavascriptInterface
+        public void diag(String m) { dl("página: " + m); }
+
         @JavascriptInterface
         public void retry() { runOnUiThread(() -> loadHome(null, false)); }
 

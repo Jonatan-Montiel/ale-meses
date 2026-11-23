@@ -4059,12 +4059,16 @@ function slowScreen(msg){
   m.innerHTML=msg+'<div><button class="btn small" onclick="location.reload()">Reintentar ♥</button></div>';
 }
 setTimeout(()=>slowScreen('Está tardando más de lo normal en cargar…'),20000);
+const DG=m=>{try{window.AndroidApp&&AndroidApp.diag&&AndroidApp.diag(m)}catch(e){}};
 async function loadContent(){
+  DG('arrancó el código');
   // se piden las dos fuentes a la vez y gana la primera; si el internet está lento y ya hay una copia guardada, se abre con ella
   const R=ghRepo();
   const api=R?fetchT(`https://api.github.com/repos/${R.owner}/${R.repo}/contents/data.bin?ref=${encodeURIComponent(R.branch||'main')}&t=${Date.now()}`,
       {headers:Object.assign(ghH(EDIT?ghToken():''),{Accept:'application/vnd.github.raw+json'}),cache:'no-store'},12000).then(r=>r.ok?r.arrayBuffer():Promise.reject(r.status)):Promise.reject('sin repo');
+  const t0=Date.now(); api.then(()=>DG('contenido por API en '+(Date.now()-t0)+' ms'),e=>DG('API falló: '+e));
   const pages=fetchT('data.bin?t='+Date.now(),{cache:'no-store'},20000).then(r=>r.ok?r.arrayBuffer():Promise.reject(r.status));
+  pages.then(()=>DG('contenido por Pages en '+(Date.now()-t0)+' ms'),e=>DG('Pages falló: '+e));
   const net=Promise.any([api,pages]).then(buf=>{try{localStorage.setItem('data-cache',b64buf(buf))}catch(e){}return buf});
   let cached=null; try{const t=localStorage.getItem('data-cache');if(t)cached=Uint8Array.from(atob(t),c=>c.charCodeAt(0)).buffer}catch(e){}
   let buf=null;
@@ -4078,9 +4082,10 @@ let CUR=null;
   if(!KEY_B64||!window.crypto||!crypto.subtle){noKeyScreen('Ábrela desde el link especial que te mandaron 💗');return}
   let remote;
   try{remote=await loadContent()}catch(e){noKeyScreen(e.message==='nodata'?'No pude cargar el contenido. Revisa tu conexión e intenta de nuevo.':'El link no es correcto. Ábrela desde el link especial que te mandaron 💗');return}
-  CUR=mergeC(DEFAULTS,remote);
+  CUR=mergeC(DEFAULTS,remote); DG('contenido listo, cargando fotos');
   const pairs=(await Promise.all((CUR.fotos||[]).map(async p=>[p,await photoBlobURL(p).catch(()=>'')]))).filter(x=>x[1]);
   const VIEW=Object.assign({},CUR,{fotos:pairs.map(x=>x[1]),fotoPaths:pairs.map(x=>x[0])});
+  DG('fotos listas: '+pairs.length);
   if(CUR.inactiva&&!EDIT){inactiveScreen(CUR);return}
   try{boot(VIEW)}catch(e){console.error(e);slowScreen('Algo falló al abrir la página ('+String(e&&e.message||e).slice(0,80)+').');throw e}
   if(EDIT){
