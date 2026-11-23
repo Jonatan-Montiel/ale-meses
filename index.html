@@ -3460,7 +3460,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
 /* ====== Aviso de versión nueva de la app (por si el de la app no salió) ====== */
 (function(){
   const A=window.AndroidApp; if(!A)return;
-  const url='https://github.com/Jonatan-Montiel/ale-meses/releases/latest/download/'+(VIEWER()==='yo'?'nuestro-lugar-jon.apk':'nuestro-lugar.apk');
+  const url=location.origin+location.pathname.replace(/[^/]*$/,'')+'dl/'+(VIEWER()==='yo'?'nuestro-lugar-jon.apk':'nuestro-lugar.apk');
   const show=()=>{if(document.getElementById('updBar'))return;const d=document.createElement('div');d.id='updBar';d.className='upd-bar';
     d.innerHTML=`<b>💗 Hay una versión nueva de la app</b><span>trae widgets nuevos · de preferencia con wifi</span><a href="${url}" target="_blank" rel="noopener">Actualizar</a><button aria-label="Cerrar">✕</button>`;
     d.querySelector('button').onclick=()=>d.remove(); document.body.append(d)};
@@ -3474,7 +3474,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const mine=()=>{if(!A)return 'web';try{if(A.appVersion)return String(A.appVersion())}catch(e){}return A.setLoc?'21':A.saveKey?'17':A.setWidget?'12':'11'};
   const S=SHARED('versiones.bin','v','versiones-cache',10,render);
   let latest=0; try{const c=JSON.parse(localStorage.getItem('ver-latest')||'{}');if(Date.now()-(c.t||0)<30*6e4)latest=c.v||0}catch(e){}
-  const url=w=>'https://github.com/Jonatan-Montiel/ale-meses/releases/latest/download/'+(w==='yo'?'nuestro-lugar-jon.apk':'nuestro-lugar.apk');
+  const url=w=>location.origin+location.pathname.replace(/[^/]*$/,'')+'dl/'+(w==='yo'?'nuestro-lugar-jon.apk':'nuestro-lugar.apk');
   const lbl=v=>v==='web'?'navegador (sin app)':'v'+v+((A&&!A.appVersion&&v===mine()&&v!=='web')?' o más vieja':'');
   function render(){
     if(!box)return;
@@ -3489,7 +3489,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   }
   const mv=mine(); const ex=S.all().find(x=>x.id===me);
   setTimeout(()=>{const ex=S.all().find(x=>x.id===me);if(!ex||ex.v!==mv||Date.now()-(ex.u||0)>6*3600e3){if(ex){ex.v=mv;ex.x=0;ex.u=Date.now();S.save()}else S.add({id:me,v:mv,a:Date.now(),u:Date.now()})}},2500);
-  if(!latest)fetch('https://api.github.com/repos/Jonatan-Montiel/ale-meses/releases/tags/apk',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{const m=j&&String(j.body||'').match(/vc=(\d+)/);if(m){latest=+m[1];try{localStorage.setItem('ver-latest',JSON.stringify({v:latest,t:Date.now()}))}catch(e){}render()}}).catch(()=>{});
+  if(!latest)fetch('dl/version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{const m=j&&j.vc?[0,j.vc]:null;if(m){latest=+m[1];try{localStorage.setItem('ver-latest',JSON.stringify({v:latest,t:Date.now()}))}catch(e){}render()}}).catch(()=>{});
   render();
 })();
 
