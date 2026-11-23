@@ -141,6 +141,7 @@
   @keyframes boing{50%{transform:scale(1.12)}}
   .secret{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(15,2,8,.85);padding:24px}
   .secret.open{display:flex;animation:fadeIn .4s}
+  .secret .paper,.modal .paper{position:relative}
   .secret .paper{max-width:380px;text-align:center;animation:pop .7s cubic-bezier(.2,.9,.3,1.3)}
   /* Medidor */
   .meter-val{font-family:'Fraunces',serif;font-size:24px;min-height:64px;display:flex;align-items:center;justify-content:center;transition:transform .3s}
@@ -1460,7 +1461,7 @@ const AV_OFF_DEF=window.AV_OFF_DEF={};
 const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'&&AV.notas===false)return false;return !off[t]};
 const AV_LAST={};
 function avisarElla(txt,tipo){
-  if(!AV.ntfyElla||tipo==='entrada')return;
+  if(!AV.ntfyElla||tipo==='entrada'||tipo==='secreto')return;
   try{if(ELLA_PREF.off()[tipo])return}catch(e){}
   let m=txt.split(C.ella+' ').join(C.yo+' ');
   if(tipo==='pregunta')m='💭 '+C.yo+' ya contestó la pregunta del día · contesta para ver su respuesta';
