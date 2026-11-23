@@ -33,7 +33,8 @@ public class MainActivity extends Activity {
     static final String BASE = "https://jonatan-montiel.github.io/ale-meses/";
     static final boolean IS_JON = "yo".equals(BuildConfig.WHO);
     /** Jon abre la página con el editor; Ale la abre normal. */
-    static String home() { return IS_JON ? BASE + "?editar" : BASE; }
+    static String home() { return (IS_JON ? BASE + "?editar&v=" : BASE + "?v=") + (System.currentTimeMillis() / 1000); }
+    long loadedAt = 0, pausedAt = 0;
     WebView wv;
     ValueCallback<Uri[]> fileCb;
     PermissionRequest pendingPerm;
@@ -60,11 +61,14 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         Notif.appVisible = true; // lo que llegue mientras la ve, ya lo ve en la página
+        // Si estuvo cerrada un rato, carga la versión más nueva de la página.
+        if (wv != null && pausedAt > 0 && System.currentTimeMillis() - pausedAt > 2 * 60 * 1000L) { loadedAt = System.currentTimeMillis(); wv.loadUrl(home()); }
     }
 
     @Override
     protected void onPause() {
         Notif.appVisible = false;
+        pausedAt = System.currentTimeMillis();
         super.onPause();
     }
 
@@ -114,6 +118,7 @@ public class MainActivity extends Activity {
             if (i < 0) { err.setText("Ese no es el link correcto. Pídele a Jon el link especial 💗"); return; }
             sp.edit().putBoolean("linked", true).apply();
             showWeb(home() + s.substring(i));
+            loadedAt = System.currentTimeMillis();
         });
         l.addView(ico);
         l.addView(t);
