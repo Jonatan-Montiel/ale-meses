@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ew59xX6/ImMyyOX6pR4203CoiI/A+0MYTniXqwJG/Rc='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+HPoKsBotR4tEbraZbGkKKjpUD7hyUNZgaXfBiCDzKs='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -4680,12 +4680,13 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
 /* ====== Pestañas ====== */
 (function(){
   const J=VIEWER()==='yo';
-  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','resumen','insignias','animo','termo','sello','distancia','horoscopo','pregunta','extrano','tablero','noches','undia','mapa','misavisos','final']],
+  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','resumen','insignias','animo','termo','sello','distancia','horoscopo','pregunta','extrano','tablero','noches','undia','mapa','final']],
     ['nosotros','💑','Nosotros',['detalles','cancion','momentos','albumes','polaroid','historia','diario','cielo','constelacion','arbol','sorpresas','capsula']],
     ['cartas','💌','Cartas',['carta','cartames','abrela','buzon','voz','botella','pizarra','escribir','razones','galleta','medidor','abrazo','tregua']],
     ['juegos','🎮','Juegos',['probable','fotoreto','elige','debo','corazones','rasca','vales','memorama','rompecabezas','adivina','ruleta','comida']],
     ['planes','📝','Planes',['planes','viene','lista','bingo','aprender','pelis','recetas','reto','deseos']],
-    ['parajon','💙',J?'De '+C.ella:'Para '+C.yo,['parajon']]];
+    ['parajon','💙',J?'De '+C.ella:'Para '+C.yo,['parajon']],
+    ['avisos','🔔','Avisos',['misavisos']]];
   const nav=document.querySelector('nav'); nav.innerHTML=''; nav.classList.add('tabbar');
   TABS.forEach(([k,,,ids])=>ids.forEach(id=>{const s=document.getElementById(id);if(s)s.dataset.tab=k}));
   document.querySelectorAll('main section').forEach(s=>{if(!s.dataset.tab)s.dataset.tab='inicio'});
@@ -5442,13 +5443,13 @@ function REACT(btn,x,w,save,what){
 })();
 /* ---------- Índice: todas las secciones ---------- */
 (function(){
-  const TN={inicio:'🏠 Inicio',nosotros:'💑 Nosotros',cartas:'💌 Cartas',juegos:'🎮 Juegos',planes:'📝 Planes',parajon:VIEWER()==='yo'?'💙 De '+C.ella:'💙 Para '+C.yo};
+  const TN={inicio:'🏠 Inicio',nosotros:'💑 Nosotros',cartas:'💌 Cartas',juegos:'🎮 Juegos',planes:'📝 Planes',parajon:VIEWER()==='yo'?'💙 De '+C.ella:'💙 Para '+C.yo,avisos:'🔔 Avisos'};
   const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
   window.IDX_OPEN=()=>{
     const ov=document.createElement('div');ov.className='idx-ov';const p=document.createElement('div');p.className='idx-p';
     const i=document.createElement('input');i.placeholder='🔎 Buscar una sección…';i.type='search';
     const l=document.createElement('div');l.className='idx-l';
-    const ORD=['inicio','nosotros','cartas','juegos','planes','parajon'];
+    const ORD=['inicio','nosotros','cartas','juegos','planes','parajon','avisos'];
     const secs=[...document.querySelectorAll('main section[id]')].filter(s=>!s.hidden&&!s.classList.contains('fuera')&&!s.classList.contains('oculta')&&s.querySelector(':scope>h2')).sort((a,b)=>ORD.indexOf(a.dataset.tab||'inicio')-ORD.indexOf(b.dataset.tab||'inicio'));
     const G=(window.TABNAV&&TABNAV.GRP)||{};
     function draw(){l.innerHTML='';const q=norm(i.value.trim());let last='';
@@ -5724,7 +5725,7 @@ function initEditor(){
     if(sec.special==='ocultas'){
       D.ocultas=(D.ocultas&&typeof D.ocultas==='object'&&!Array.isArray(D.ocultas))?D.ocultas:{};
       const TN={inicio:'🏠 Inicio',nosotros:'💑 Nosotros',cartas:'💌 Cartas',juegos:'🎮 Juegos',planes:'📝 Planes',parajon:'💙 De '+(D.ella||'Ale')};
-      const ORD=['inicio','nosotros','cartas','juegos','planes','parajon'];
+      const ORD=['inicio','nosotros','cartas','juegos','planes','parajon','avisos'];
       const secs=[...document.querySelectorAll('main section[id]')].filter(x=>x.querySelector(':scope>h2')&&!['tablero','misavisos'].includes(x.id)).sort((a,b)=>ORD.indexOf(a.dataset.tab||'inicio')-ORD.indexOf(b.dataset.tab||'inicio'));
       const cnt=h('div',{class:'ed-note'}), list=h('div',null);
       const paintC=ch=>{const n=Object.values(D.ocultas).filter(Boolean).length;cnt.textContent=(n?('Tienes '+n+(n===1?' sección oculta.':' secciones ocultas.')):'Todas las secciones están visibles.')+(ch?' Se aplica cuando toques «Guardar cambios».':'')};
