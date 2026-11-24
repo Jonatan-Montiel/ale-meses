@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-u0XPn++g9saAwuyfiQkbOaxLnqMTxwNET3RSB3H2g0s='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-RTUPeieerM1P+RMWIzDhy9oDONWjAtRxffSYn8teXUY='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1062,12 +1062,15 @@
 .sh-ask{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:9000;background:#fff7f0;color:#3d1f2a;font:700 14px "Nunito";border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);text-align:center}.sh-th{display:flex;gap:6px;justify-content:center;margin:10px 0;flex-wrap:wrap}.sh-th img{width:54px;height:54px;object-fit:cover;border-radius:10px}.sh-b{display:flex;gap:10px;justify-content:center}.sh-b button{border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-family:inherit}.sh-b .si{background:var(--rose,#e85d84);color:#fff}.sh-b .no{background:rgba(0,0,0,.08);color:#3d1f2a}
   /* ===== Orden: sub-pestañas, puntitos, índice, temporadas ===== */
   .fuera{display:none!important}
-  .subtabs{position:sticky;top:0;z-index:40;display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:12px 2px 8px 48px;min-height:60px;margin:0 -4px;background:var(--bartop,#5e1532);box-shadow:0 0 0 100vmax var(--bartop,#5e1532);clip-path:inset(0 -100vmax)}
+  .subtabs{position:sticky;top:0;z-index:40;display:flex;gap:5px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:22px 62px 12px;min-height:78px;margin:0 -4px;background:var(--bartop,#5e1532);box-shadow:0 0 0 100vmax var(--bartop,#5e1532);clip-path:inset(0 -100vmax)}
   body[data-t=noche]{--bartop:#232860} body[data-t=atardecer]{--bartop:#ff9f7a} body[data-t=pastel]{--bartop:#fff6f0} body[data-t=minimal]{--bartop:#faf8f7}
   .subtabs::-webkit-scrollbar{display:none}
-  .subtabs button{flex:none;position:relative;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.25);color:var(--cream);border-radius:999px;padding:8px 14px;font:800 13px 'Nunito';cursor:pointer;white-space:nowrap}
+  .subtabs button{flex:none;position:relative;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.25);color:var(--cream);border-radius:999px;padding:8px 10px;font:800 12.5px 'Nunito';cursor:pointer;white-space:nowrap}
   .subtabs button.cur{background:var(--rose);border-color:transparent;color:#fff}
-  .subtabs .st-idx{margin-left:auto;padding:8px 12px}
+  .subtabs .st-idx{padding:8px 10px}
+  .subtabs.tight{padding-right:8px}
+  .subtabs>button:first-child{margin-left:auto}.subtabs>button:last-child{margin-right:auto}
+  .bell{top:22px!important}
   .subtabs button.dot::after,nav.tabbar button.dot::after{content:'';position:absolute;top:3px;right:6px;width:9px;height:9px;border-radius:50%;background:#ff4f7e;box-shadow:0 0 0 2px #3b0d1c}
   nav.tabbar button{position:relative}
   nav.tabbar button.dot::after{top:4px;right:12px}
@@ -4640,6 +4643,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     subBar.innerHTML=''; const gs=GRP[cur]||[], g=gOf(cur);
     gs.forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.className=(k===g?'cur':'')+([...DOT].some(id=>{const s=document.getElementById(id);return s&&s.dataset.tab===cur&&s.dataset.grp===k})&&k!==g?' dot':'');b.onclick=()=>setGrp(cur,k);subBar.append(b)});
     const ix=document.createElement('button');ix.type='button';ix.className='st-idx';ix.textContent='🔎';ix.setAttribute('aria-label','Todas las secciones');ix.onclick=()=>window.IDX_OPEN&&IDX_OPEN();subBar.append(ix);
+    subBar.classList.remove('tight');requestAnimationFrame(()=>{if(subBar.scrollWidth>subBar.clientWidth+1)subBar.classList.add('tight')});
   }
   function apply(){const g=gOf(cur);document.querySelectorAll('main section').forEach(s=>s.classList.toggle('tab-off',s.dataset.tab!==cur||(!!g&&!!s.dataset.grp&&s.dataset.grp!==g)));renderSub()}
   function setGrp(t,k,keep){curG[t]=k;saveG();if(t===cur){apply();if(!keep)window.scrollTo(0,0);window.dispatchEvent(new Event('resize'))}}
