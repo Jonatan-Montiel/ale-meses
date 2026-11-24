@@ -3006,7 +3006,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const mp=days.filter(d=>{const A=live('probable-cache').find(x=>x.id===d+':ella'),B=live('probable-cache').find(x=>x.id===d+':yo');return A&&B&&A.v===B.v}).length;
     const mpBoth=days.filter(d=>live('probable-cache').some(x=>x.id===d+':ella')&&live('probable-cache').some(x=>x.id===d+':yo')).length;
     const tm=w=>{const v=days.map(d=>live('detalles-cache').find(x=>x.id==='tm:'+w+':'+d)).filter(Boolean).map(x=>+x.v);return v.length?Math.round(v.reduce((s,x)=>s+x,0)/v.length):null};
-    const sellos=w=>days.map(d=>{const x=live('sellos-cache').find(y=>y.id===d+':'+w);return x?x.e:'·'});
+    const sellos=w=>days.map(d=>{const x=live('sellos-cache').find(y=>y.id===d+':'+w);return x?esc(x.e):'·'});
     const vis=w=>live('racha-cache').filter(x=>w==='yo'?String(x.id).startsWith('yo:')&&dset.has(String(x.id).slice(3)):dset.has(String(x.id))).length;
     const det=live('detalles-cache').filter(x=>x.k&&x.k!=='termo'&&inW(x.a)).length;
     const fotos=L('fotos-ale-cache').filter(x=>!x.x&&inW(x.a)).length+live('fotoreto-cache').filter(x=>inW(x.a)).length;
@@ -3118,7 +3118,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     $('tmH').innerHTML=`✍️ Tú → ${esc(nm(oth))} <i>· lo que tú sientes, le llega a ${esc(nm(oth))}</i>`;
     $('tmSt').textContent=mine?`✓ ${nm(oth)} ya sabe que hoy ${me==='yo'?'la':'lo'} extrañas ${mine.v}%`:`mueve la barra y suéltala para mandárselo a ${nm(oth)}`;
     const box=$('tmO'); box.hidden=false;
-    box.innerHTML=`<div class="tm-h">💌 ${esc(nm(oth))} → tú <i>· lo que siente ${esc(nm(oth))} por ti</i></div>`+(o?`<b>${E(o.v)} Hoy ${esc(nm(oth))} te extraña ${o.v}%</b><div class="bar"><i style="width:${o.v}%"></i></div><div style="font-size:12px;opacity:.65;margin-top:6px">${fmtHora(o.u||o.a)}</div>`:`<div style="font-size:14px;opacity:.75">${esc(nm(oth))} todavía no te dice hoy 💭</div>`);
+    const ov=o?Math.max(0,Math.min(100,Math.round(+o.v)||0)):0;
+    box.innerHTML=`<div class="tm-h">💌 ${esc(nm(oth))} → tú <i>· lo que siente ${esc(nm(oth))} por ti</i></div>`+(o?`<b>${E(ov)} Hoy ${esc(nm(oth))} te extraña ${ov}%</b><div class="bar"><i style="width:${ov}%"></i></div><div style="font-size:12px;opacity:.65;margin-top:6px">${fmtHora(o.u||o.a)}</div>`:`<div style="font-size:14px;opacity:.75">${esc(nm(oth))} todavía no te dice hoy 💭</div>`);
   }
   $('tmR').addEventListener('input',()=>{$('tmV').textContent=$('tmR').value;$('tmE').textContent=E(+$('tmR').value)});
   $('tmR').addEventListener('change',()=>{const v=+$('tmR').value,id='tm:'+me+':'+DK(MXD()),ex=S.all().find(x=>x.id===id);
@@ -3303,14 +3304,14 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const p=$('slPick'); p.innerHTML='';
     E.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.className=mine&&mine.e===e?'on':'';b.onclick=()=>{const id=d+':'+me,ex=S.all().find(x=>x.id===id);if(ex&&ex.e===e&&!ex.x)return;
       if(ex){ex.e=e;ex.x=0;ex.u=Date.now();S.save()}else S.add({id,d,w:me,e,a:Date.now(),u:Date.now()});burst(6);avisar(`🗓️ ${C.ella} eligió el sello de su día: ${e}`,'sello')};p.append(b)});
-    $('slSt').innerHTML=(mine?`Tu sello de hoy: <b>${mine.e}</b>`:'¿Cómo resumirías tu día?')+(o?` · ${esc(nm(oth))}: <b>${o.e}</b>`:` · ${esc(nm(oth))} todavía no elige`);
+    $('slSt').innerHTML=(mine?`Tu sello de hoy: <b>${esc(mine.e)}</b>`:'¿Cómo resumirías tu día?')+(o?` · ${esc(nm(oth))}: <b>${esc(o.e)}</b>`:` · ${esc(nm(oth))} todavía no elige`);
     if(!mo)mo=new Date(now.getFullYear(),now.getMonth(),1);
     const y=mo.getFullYear(),m=mo.getMonth(), first=(new Date(y,m,1).getDay()+6)%7, days=new Date(y,m+1,0).getDate();
     const cal=$('slCal'); cal.innerHTML=`<div class="sl-mh"><button aria-label="Mes anterior">‹</button><span>${mo.toLocaleDateString('es-MX',{month:'long',year:'numeric'})}</span><button aria-label="Mes siguiente">›</button></div><div class="sl-g">${['L','M','M','J','V','S','D'].map(x=>`<div class="h">${x}</div>`).join('')}</div><div class="sl-leg">en cada día: ${esc(C.ella)} · ${esc(C.yo)}</div>`;
     const g=cal.querySelector('.sl-g');
     for(let i=0;i<first;i++)g.append(document.createElement('div'));
     for(let i=1;i<=days;i++){const k=y+'-'+String(m+1).padStart(2,'0')+'-'+String(i).padStart(2,'0'),a=get(k,'ella'),b=get(k,'yo'),c=document.createElement('div');
-      c.className='d'+(k===d?' today':''); c.innerHTML=`<span class="n">${i}</span><span class="e">${a?a.e:''}${b?b.e:''}</span>`; g.append(c)}
+      c.className='d'+(k===d?' today':''); c.innerHTML=`<span class="n">${i}</span><span class="e">${a?esc(a.e):''}${b?esc(b.e):''}</span>`; g.append(c)}
     const [pv,nx]=cal.querySelectorAll('.sl-mh button'); pv.onclick=()=>{mo=new Date(y,m-1,1);render()};
     nx.disabled=y===now.getFullYear()&&m===now.getMonth(); nx.style.opacity=nx.disabled?.3:1; nx.onclick=()=>{if(!nx.disabled){mo=new Date(y,m+1,1);render()}};
   }
@@ -3592,7 +3593,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     try{
       const d=DK(MXD()), est={d};
       const an=L('animo-cache').filter(x=>!x.x&&x.w===oth&&DK(MXD(x.a))===d).sort((a,b)=>b.a-a.a)[0]; if(an)est.animo=an.m+' '+GEN(an.n||'',oth).toLowerCase();
-      const tm=L('detalles-cache').find(x=>x.id==='tm:'+oth+':'+d&&!x.x); if(tm)est.termo=String(tm.v);
+      const tm=L('detalles-cache').find(x=>x.id==='tm:'+oth+':'+d&&!x.x); if(tm)est.termo=String(Math.max(0,Math.min(100,Math.round(+tm.v)||0)));
       const sl=L('sellos-cache').find(x=>x.id===d+':'+oth&&!x.x); if(sl)est.sello=sl.e;
       const ev=L('eventos-cache').filter(x=>!x.x&&x.f&&x.f>=d).sort((a,b)=>a.f<b.f?-1:1).slice(0,8).map(x=>({t:x.t,f:x.f}));
       const cu={inicio:C.inicio,cumple:C.cumple||'',cumpleYo:C.cumpleYo||'',ella:C.ella,yo:C.yo,eventos:ev};
