@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-f9ohnMjAy4fV6qqLjJJL0RHKYTjhxFJl90W0349/2Tk='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-THhnHGly5pUJJwbQIWmrlJdKa4qf6gVxkuUuQRgsUX8='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -3784,14 +3784,28 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   function render(){
     const now=Date.now(), mine=S.all().filter(x=>!x.x&&x.w===me).sort((a,b)=>b.a-a.a), got=S.all().filter(x=>!x.x&&x.w===oth&&x.at<=now).sort((a,b)=>b.at-a.at);
     const l=$('btList'); l.innerHTML='';
-    mine.slice(0,8).forEach(x=>{const d=document.createElement('div');d.className='ds-i';d.innerHTML=`<div class="ds-t"><span class="dt-tag out">✍️ Tú → ${esc(nm(oth))}</span><br>${esc(x.t)}</div><div class="ds-f"><span>${x.o?'✓ la encontró el '+fmtDia(x.o)+' '+fmtHora(x.o):x.at<=now?'🌊 ya llegó, no la ha abierto':'🌊 va flotando… llega a una hora sorpresa'}</span></div>`;l.append(d)});
+    mine.slice(0,8).forEach(x=>{const d=document.createElement('div');d.className='ds-i';d.innerHTML=`<div class="ds-t"><span class="dt-tag out">✍️ Tú → ${esc(nm(oth))}</span><br>${esc(x.t)}</div><div class="ds-f"><span>${x.o?'✓ la encontró el '+fmtDia(x.o)+' '+fmtHora(x.o):x.at<=now?'🌊 ya llegó, no la ha abierto':'🌊 va flotando… llega a una hora sorpresa'}</span></div>`;
+      // editar o tirar la botella (las tuyas)
+      const f=d.querySelector('.ds-f'), bx=document.createElement('span');bx.style.cssText='display:flex;gap:6px';
+      const be=document.createElement('button');be.className='ds-b';be.textContent='✏️ Editar';
+      const bd=document.createElement('button');bd.className='ds-b';bd.textContent='🗑️';let armed=false;
+      be.onclick=()=>{const t=d.querySelector('.ds-t');t.innerHTML='';const ta=document.createElement('textarea');ta.className='pq-in';ta.rows=3;ta.maxLength=600;ta.value=x.t;ta.style.width='100%';
+        const ok=document.createElement('button');ok.className='ds-b';ok.textContent='💾 Guardar';const no=document.createElement('button');no.className='ds-b';no.textContent='Cancelar';
+        const r=document.createElement('div');r.style.cssText='display:flex;gap:6px;margin-top:6px';r.append(ok,no);t.append(ta,r);ta.focus();
+        ok.onclick=()=>{const v=ta.value.trim();if(!v)return;x.t=v;x.u=Date.now();S.save();$('btSt').textContent='✏️ Botella editada'};no.onclick=()=>render()};
+      bd.onclick=()=>{if(!armed){armed=true;bd.textContent='¿Tirarla?';setTimeout(()=>{armed=false;bd.textContent='🗑️'},2500);return}
+        x.x=1;x.u=Date.now();S.save();$('btSt').textContent='🗑️ Botella eliminada';
+        if(x.nid&&!x.o&&x.at>Date.now()){const tp=topic(oth);if(tp)fetch('https://ntfy.sh/'+encodeURIComponent(tp.trim())+'/'+encodeURIComponent(x.nid),{method:'DELETE'}).catch(()=>{})}};
+      bx.append(be,bd);f.append(bx);
+      l.append(d)});
     got.slice(0,8).forEach(x=>{const d=document.createElement('div');d.className='ds-i';d.innerHTML=`<div class="ds-t"><span class="dt-tag in">💌 De ${esc(nm(oth))} para ti</span><br>${x.o?esc(x.t):'🍾 ¡Te llegó! Toca la botella para abrirla'}</div><div class="ds-f"><span>${fmtDia(x.at)} ${fmtHora(x.at)}</span></div>`;if(!x.o)d.onclick=()=>openB(x);l.append(d)});
     if(!mine.length&&!got.length)l.innerHTML='<div class="kb-empty">todavía no hay botellas en el mar 🌊</div>';
     float();
   }
   $('btForm').onsubmit=e=>{e.preventDefault();const i=$('btIn'),t=i.value.trim();if(!t)return;const at=when();
-    S.add({id:UID(),w:me,t,at,a:Date.now(),u:Date.now()});i.value='';burst(10);$('btSt').textContent='🍾 ¡Al agua! Le va a llegar a una hora sorpresa';
-    const tp=topic(oth); if(tp)NTFY({topic:tp.trim(),title:'🍾 Mensaje en una botella',message:'Te llegó un mensaje en una botella de '+nm(me)+' 💗 ábrelo en nuestro lugar',tags:['love_letter'],priority:4,click:location.origin+location.pathname+'?ir=botella',delay:String(Math.round(at/1000))}).catch(()=>{})};
+    const rec={id:UID(),w:me,t,at,a:Date.now(),u:Date.now()}; S.add(rec);i.value='';burst(10);$('btSt').textContent='🍾 ¡Al agua! Le va a llegar a una hora sorpresa';
+    const tp=topic(oth); if(tp)NTFY({topic:tp.trim(),title:'🍾 Mensaje en una botella',message:'Te llegó un mensaje en una botella de '+nm(me)+' 💗 ábrelo en nuestro lugar',tags:['love_letter'],priority:4,click:location.origin+location.pathname+'?ir=botella',delay:String(Math.round(at/1000))})
+      .then(r=>r&&r.json?r.json():null).then(j=>{if(j&&j.id){const x=S.all().find(y=>y.id===rec.id);if(x){x.nid=String(j.id);x.u=Date.now();S.save()}}}).catch(()=>{})};
   render(); setInterval(float,30000); window.addEventListener('unlocked',()=>setTimeout(float,1500));
 })();
 
