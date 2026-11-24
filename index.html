@@ -602,6 +602,20 @@
   .ver-w{margin-top:22px}.ver{display:grid;gap:4px;font-size:13px;background:rgba(255,255,255,.06);border:1px solid rgba(247,198,211,.18);border-radius:16px;padding:12px 14px;text-align:left}
   .ver span{opacity:.6}.ver a{justify-self:start;margin-top:6px;background:var(--rose);color:#fff;text-decoration:none;border-radius:999px;padding:7px 14px;font:800 12.5px 'Nunito'}
   body.light .ver{background:#fff}
+  .rs-h{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:center}
+  .rs-h b{display:block;font-family:'Fraunces',serif;font-size:19px}.rs-h small{font-size:12px;opacity:.7}
+  .rs-h button{width:34px;height:34px;border-radius:50%;border:1px solid rgba(247,198,211,.35);background:rgba(255,255,255,.08);color:inherit;font-size:18px;cursor:pointer}
+  .rs-h button:disabled{opacity:.25}
+  .rs-top{text-align:center;margin:10px 0 4px;font-size:14px;opacity:.9}.rs-top span{font-size:26px;vertical-align:middle}
+  .rs-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .rs-g>div{background:rgba(255,255,255,.07);border-radius:14px;padding:10px 4px;text-align:center}
+  .rs-g .e{font-size:22px;display:block}.rs-g b{display:block;font:800 22px 'Nunito'}.rs-g small{display:block;font-size:10.5px;opacity:.75;line-height:1.2}
+  .rs-g .rs-empty{grid-column:1/-1;font-size:14px;opacity:.75;padding:14px}
+  .rs-s{margin-top:14px;font-size:13px}.rs-d,.rs-row{display:grid;grid-template-columns:54px repeat(7,1fr);align-items:center;text-align:center}
+  .rs-d{font-size:10.5px;opacity:.6}.rs-d i{font-style:normal}.rs-d::before{content:''}
+  .rs-row{margin-top:4px}.rs-row b{text-align:left;font-size:12.5px}.rs-row span{font-size:18px}
+  .rs-f{margin-top:12px;font-size:12.5px;opacity:.8;display:grid;gap:3px;text-align:center}
+  body.light .rs-g>div{background:#fff}
   .bell{position:fixed;top:12px;left:12px;z-index:44;width:44px;height:44px;border-radius:50%;border:1px solid rgba(247,198,211,.3);background:rgba(30,6,16,.65);font-size:20px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35)}
   .bell b{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:999px;background:var(--rose);color:#fff;font:800 11.5px/20px 'Nunito';padding:0 5px;display:none}
   .bell.has b{display:block}.bell.has{animation:beat 2.4s ease-in-out infinite}
@@ -988,7 +1002,7 @@
   main section{padding:62px 0 26px}
   main section>h2{font-size:31px;letter-spacing:-.2px;line-height:1.15}
   main section>h2::before{display:grid;place-items:center;width:46px;height:46px;margin:0 auto 12px;border-radius:50%;font-size:22px;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.22);box-shadow:0 6px 16px -6px rgba(0,0,0,.45)}
-  #contador>h2::before{content:'💞'} #racha>h2::before{content:'🔥'} #probable>h2::before{content:'🤔'} #distancia>h2::before{content:'📍'} #botella>h2::before{content:'🍾'} #debo>h2::before{content:'😘'} #elige>h2::before{content:'🎲'} #horoscopo>h2::before{content:'🔮'} #corazones>h2::before{content:'💗'} #pizarra>h2::before{content:'🎨'} #fotoreto>h2::before{content:'📸'} #sello>h2::before{content:'🗓️'} #termo>h2::before{content:'🌡️'} #detalles>h2::before{content:'💝'} #insignias>h2::before{content:'🏅'} #animo>h2::before{content:'🌤️'} #pregunta>h2::before{content:'💭'}
+  #contador>h2::before{content:'💞'} #racha>h2::before{content:'🔥'} #probable>h2::before{content:'🤔'} #resumen>h2::before{content:'📊'} #distancia>h2::before{content:'📍'} #botella>h2::before{content:'🍾'} #debo>h2::before{content:'😘'} #elige>h2::before{content:'🎲'} #horoscopo>h2::before{content:'🔮'} #corazones>h2::before{content:'💗'} #pizarra>h2::before{content:'🎨'} #fotoreto>h2::before{content:'📸'} #sello>h2::before{content:'🗓️'} #termo>h2::before{content:'🌡️'} #detalles>h2::before{content:'💝'} #insignias>h2::before{content:'🏅'} #animo>h2::before{content:'🌤️'} #pregunta>h2::before{content:'💭'}
   #cancion>h2::before{content:'🎵'} #carta>h2::before{content:'💌'} #cartames>h2::before{content:'✉️'} #abrela>h2::before{content:'📬'}
   #buzon>h2::before{content:'📮'} #voz>h2::before{content:'🎙️'} #escribir>h2::before{content:'✍️'} #momentos>h2::before{content:'📸'}
   #polaroid>h2::before{content:'🖼️'} #razones>h2::before{content:'🫙'} #galleta>h2::before{content:'🥠'} #medidor>h2::before{content:'💗'}
@@ -1152,6 +1166,13 @@
       <div class="rch-other" id="rchOther"></div>
     </div>
     <div class="rch-prizes" id="rchPrizes"></div>
+  </section>
+
+  <!-- RESUMEN DE LA SEMANA -->
+  <section id="resumen">
+    <h2>Resumen de la semana</h2>
+    <div class="sub">todo lo que vivieron estos días 📊</div>
+    <div id="rsBox"></div>
   </section>
 
   <!-- INSIGNIAS -->
@@ -2138,7 +2159,7 @@ galRender();
   const b=document.getElementById('logoutBtn'); b.style.display=''; b.textContent='🔒 Cerrar sesión en este dispositivo'; let armed=false;
   b.onclick=()=>{
     if(!armed){armed=true;b.textContent='¿Seguro? Tendrás que abrir de nuevo el link especial · toca otra vez';setTimeout(()=>{armed=false;b.textContent='🔒 Cerrar sesión en este dispositivo'},4000);return}
-    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|data-cache|versiones-cache|ver-latest|botella-cache|debo-cache|elige-cache|corazones-cache|dibujos-cache|dw-visto|sellos-cache|fotoreto-cache|probable-cache|fotocom-cache|fc-visto|dt-visto-|detalles-cache|pend-quitados|actividad-cache|act-visto|act-desde|insignias-cache|insig-init|hoy-visto|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    try{Object.keys(localStorage).filter(k=>/^(app-key|planes-cache|aprender-cache|notas-cache|notas-visto|racha-|animo-cache|preguntas-cache|deseos-cache|data-cache|rs-visto|versiones-cache|ver-latest|botella-cache|debo-cache|elige-cache|corazones-cache|dibujos-cache|dw-visto|sellos-cache|fotoreto-cache|probable-cache|fotocom-cache|fc-visto|dt-visto-|detalles-cache|pend-quitados|actividad-cache|act-visto|act-desde|insignias-cache|insig-init|hoy-visto|especiales-cache|sv-av-|an-av-|prefs-cache|voz-visto|like-visto|tip-|parajon-cache|cumpleyo-av-|extrano-cache|recetas-cache|cumple-av-|diario-cache|retos-cache|voz-cache|pelis-cache|cm-av-|eventos-cache|juegos-cache|yo-soy|av-last-|fotos-ale-cache|gh-token|gh-repo|pin-fails|pin-until|vales-ale-|abrela-ale-|lista-ale-)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
     try{sessionStorage.clear()}catch(e){}
     try{if(window.AndroidApp){window.AndroidApp.relink();return}}catch(e){}
     location.replace(location.pathname);
@@ -2965,6 +2986,56 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     b.style.display='block';b.style.margin='14px auto 0';s.append(b)}}
   /* foto del carrusel */
   {const a=document.querySelector('#momentos .car-actions');if(a)a.append(SHARE.btn('📤 Compartir foto',async()=>{const it=GAL.items[carIdx];if(!it||!it.src)return;SHARE.blob(await photos([it.src]))}))}
+})();
+
+/* ====== Resumen de la semana ====== */
+(function(){
+  const $=id=>document.getElementById(id), box=$('rsBox'); if(!box)return;
+  const me=VIEWER(), oth=me==='yo'?'ella':'yo', nm=w=>w==='yo'?C.yo:C.ella;
+  const L=k=>{try{const v=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(v)?v:[]}catch(e){return []}};
+  const mon=(off)=>{const d=MXD();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7)+7*off);return d};
+  let off=0;
+  function stats(o){
+    const a=mon(o), b=new Date(a);b.setDate(b.getDate()+7);
+    const inW=t=>{const x=MXD(t);return x>=a&&x<b};
+    const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const days=[];for(let i=0;i<7;i++){const d=new Date(a);d.setDate(d.getDate()+i);days.push(ymd(d))}
+    const dset=new Set(days), live=k=>L(k).filter(x=>!x.x);
+    const cnt=(k,w)=>live(k).filter(x=>inW(x.a)&&(!w||x.w===w)).length;
+    const pq={};live('preguntas-cache').filter(x=>dset.has(x.d)).forEach(x=>{pq[x.d]=(pq[x.d]||0)+1});
+    const mp=days.filter(d=>{const A=live('probable-cache').find(x=>x.id===d+':ella'),B=live('probable-cache').find(x=>x.id===d+':yo');return A&&B&&A.v===B.v}).length;
+    const mpBoth=days.filter(d=>live('probable-cache').some(x=>x.id===d+':ella')&&live('probable-cache').some(x=>x.id===d+':yo')).length;
+    const tm=w=>{const v=days.map(d=>live('detalles-cache').find(x=>x.id==='tm:'+w+':'+d)).filter(Boolean).map(x=>+x.v);return v.length?Math.round(v.reduce((s,x)=>s+x,0)/v.length):null};
+    const sellos=w=>days.map(d=>{const x=live('sellos-cache').find(y=>y.id===d+':'+w);return x?x.e:'·'});
+    const vis=w=>live('racha-cache').filter(x=>w==='yo'?String(x.id).startsWith('yo:')&&dset.has(String(x.id).slice(3)):dset.has(String(x.id))).length;
+    const det=live('detalles-cache').filter(x=>x.k&&x.k!=='termo'&&inW(x.a)).length;
+    const fotos=L('fotos-ale-cache').filter(x=>!x.x&&inW(x.a)).length+live('fotoreto-cache').filter(x=>inW(x.a)).length;
+    const T=[['💌','notita|notitas',cnt('notas-cache')],['🎙️','mensaje de voz|mensajes de voz',cnt('voz-cache')],['📸','foto|fotos',fotos],['🥺','vez que se extrañaron|veces que se extrañaron',cnt('extrano-cache')],
+      ['💭','pregunta contestada por los dos|preguntas contestadas por los dos',Object.values(pq).filter(c=>c>=2).length],['🤔','coincidencia en «¿quién es más probable?»|coincidencias en «¿quién es más probable?»',mp],['📔','momento en el diario|momentos en el diario',cnt('diario-cache')],
+      ['💝','detalle|detalles',det],['🎨','dibujito|dibujitos',cnt('dibujos-cache')],['🍾','botella|botellas',cnt('botella-cache')],['🎯','reto cumplido|retos cumplidos',live('retos-cache').filter(x=>inW(x.a)).length]].filter(x=>x[2]>0).map(([e,l,n])=>[e,l.split('|')[n===1?0:1],n]);
+    const all=[...sellos('ella'),...sellos('yo')].filter(e=>e!=='·'), freq={};all.forEach(e=>freq[e]=(freq[e]||0)+1);
+    const top=Object.entries(freq).sort((x,y)=>y[1]-x[1])[0];
+    return {a,b,days,T,sel:{ella:sellos('ella'),yo:sellos('yo')},tm:{ella:tm('ella'),yo:tm('yo')},vis:{ella:vis('ella'),yo:vis('yo')},top:top?top[0]:null};
+  }
+  function render(){
+    const s=stats(off), end=new Date(s.b);end.setDate(end.getDate()-1);
+    const f=d=>d.toLocaleDateString('es-MX',{day:'numeric',month:'short'});
+    const W=['L','M','M','J','V','S','D'];
+    box.innerHTML=`<div class="card rs">
+      <div class="rs-h"><button aria-label="Semana anterior">‹</button><div><b>${off===0?'Esta semana':off===-1?'La semana pasada':'Semana del '+f(s.a)}</b><small>${f(s.a)} – ${f(end)}</small></div><button aria-label="Semana siguiente" ${off>=0?'disabled':''}>›</button></div>
+      ${s.top?`<div class="rs-top">La semana en un sello: <span>${s.top}</span></div>`:''}
+      <div class="rs-g">${s.T.length?s.T.map(([e,l,n])=>`<div><span class="e">${e}</span><b>${n}</b><small>${esc(l)}</small></div>`).join(''):'<div class="rs-empty">todavía no hay mucho esta semana… ¡a llenarla! 💗</div>'}</div>
+      <div class="rs-s"><div class="rs-d">${W.map(x=>`<i>${x}</i>`).join('')}</div>
+        ${['ella','yo'].map(w=>`<div class="rs-row"><b>${esc(nm(w))}</b>${s.sel[w].map(e=>`<span>${e}</span>`).join('')}</div>`).join('')}</div>
+      <div class="rs-f">${['ella','yo'].map(w=>`<div>${esc(nm(w))}: entró ${s.vis[w]} de 7 días${s.tm[w]!=null?` · extrañó ${s.tm[w]}% en promedio`:''}</div>`).join('')}</div></div>`;
+    const [pv,nx]=box.querySelectorAll('.rs-h button'); pv.onclick=()=>{off--;render()}; nx.onclick=()=>{if(off<0){off++;render()}};
+    if(window.SHARE&&s.T.length){const sb=SHARE.btn('📤 Compartir la semana',async()=>SHARE.blob(await SHARE.card({emoji:s.top||'💞',title:'Nuestra semana · '+f(s.a)+' – '+f(end),big:s.T.slice(0,3).map(x=>x[2]+' '+x[0]).join('  '),sub:s.T.slice(3,7).map(x=>x[0]+' '+x[2]+' '+x[1]).join(' · ')})));sb.style.cssText='display:block;margin:12px auto 0';box.querySelector('.rs').append(sb)}
+    // los domingos (y lunes) avisa que ya está el resumen
+    const dow=MXD().getDay(), wk=String(mon(dow===1?-1:0).getTime()); let seen=''; try{seen=localStorage.getItem('rs-visto')||''}catch(e){}
+    PEND.set('resumen',{n:(dow===0||dow===1)&&seen!==wk?1:0,t:'📊 Ya está su resumen de la semana',go:()=>{off=dow===1?-1:0;render();GOTO('resumen')}});
+  }
+  new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&!document.body.classList.contains('locked')){const dow=MXD().getDay();try{localStorage.setItem('rs-visto',String(mon(dow===1?-1:0).getTime()))}catch(_){}setTimeout(render,500)}}),{threshold:.3}).observe(box);
+  setTimeout(render,2500); setInterval(()=>{if(!document.hidden)render()},120000); window.addEventListener('unlocked',()=>setTimeout(render,3000));
 })();
 
 /* ====== Insignias ====== */
@@ -4276,7 +4347,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
 /* ====== Pestañas ====== */
 (function(){
   const J=VIEWER()==='yo';
-  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','insignias','animo','termo','sello','distancia','horoscopo','pregunta','extrano','misavisos','final']],
+  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','resumen','insignias','animo','termo','sello','distancia','horoscopo','pregunta','extrano','misavisos','final']],
     ['nosotros','💑','Nosotros',['detalles','cancion','momentos','polaroid','diario','cielo','constelacion','arbol','sorpresas','capsula']],
     ['cartas','💌','Cartas',['carta','cartames','abrela','buzon','voz','botella','pizarra','escribir','razones','galleta','medidor','abrazo']],
     ['juegos','🎮','Juegos',['probable','fotoreto','elige','debo','corazones','rasca','vales','memorama','rompecabezas','adivina','ruleta','comida']],
