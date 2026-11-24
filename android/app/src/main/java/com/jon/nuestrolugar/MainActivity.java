@@ -84,6 +84,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         sp = getSharedPreferences("nl", MODE_PRIVATE);
+        applyBars(sp.getString("barTop", ""), sp.getString("barBot", ""), sp.getBoolean("barLT", false), sp.getBoolean("barLB", false));
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
         }
@@ -506,7 +507,29 @@ public class MainActivity extends Activity {
             .setNegativeButton("Ahora no", null).show();
     }
 
+    /** Barra de arriba y de abajo del color del tema que eligieron en la página. */
+    void applyBars(String top, String bot, boolean lightTop, boolean lightBot) {
+        try {
+            if (top == null || !top.matches("#[0-9a-fA-F]{6}") || bot == null || !bot.matches("#[0-9a-fA-F]{6}")) return;
+            android.view.Window w = getWindow();
+            w.setStatusBarColor(Color.parseColor(top));
+            w.setNavigationBarColor(Color.parseColor(bot));
+            w.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.parseColor(bot)));
+            android.view.View d = w.getDecorView();
+            int f = d.getSystemUiVisibility();
+            f = lightTop ? (f | android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) : (f & ~android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            if (Build.VERSION.SDK_INT >= 26) f = lightBot ? (f | android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) : (f & ~android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+            d.setSystemUiVisibility(f);
+        } catch (Exception ignored) { }
+    }
+
     class Bridge {
+        @JavascriptInterface
+        public void setBars(String top, String bot, boolean lightTop, boolean lightBot) {
+            if (top == null || bot == null || !top.matches("#[0-9a-fA-F]{6}") || !bot.matches("#[0-9a-fA-F]{6}")) return;
+            sp.edit().putString("barTop", top).putString("barBot", bot).putBoolean("barLT", lightTop).putBoolean("barLB", lightBot).apply();
+            runOnUiThread(() -> applyBars(top, bot, lightTop, lightBot));
+        }
         @JavascriptInterface
         public int appVersion() { try { android.content.pm.PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0); return (int) (Build.VERSION.SDK_INT >= 28 ? pi.getLongVersionCode() : pi.versionCode); } catch (Exception e) { return 0; } }
 

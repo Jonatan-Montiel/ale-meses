@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-2m/Zbj1Xr5QgZwWyejIQoKX6Ba/twPChQUXXUauDXhg='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-u0XPn++g9saAwuyfiQkbOaxLnqMTxwNET3RSB3H2g0s='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1062,7 +1062,8 @@
 .sh-ask{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:9000;background:#fff7f0;color:#3d1f2a;font:700 14px "Nunito";border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);text-align:center}.sh-th{display:flex;gap:6px;justify-content:center;margin:10px 0;flex-wrap:wrap}.sh-th img{width:54px;height:54px;object-fit:cover;border-radius:10px}.sh-b{display:flex;gap:10px;justify-content:center}.sh-b button{border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-family:inherit}.sh-b .si{background:var(--rose,#e85d84);color:#fff}.sh-b .no{background:rgba(0,0,0,.08);color:#3d1f2a}
   /* ===== Orden: sub-pestañas, puntitos, índice, temporadas ===== */
   .fuera{display:none!important}
-  .subtabs{position:sticky;top:0;z-index:40;display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:12px 2px 8px 48px;min-height:60px;margin:0 -4px;background:linear-gradient(180deg,rgba(14,3,9,.78) 65%,rgba(14,3,9,0));-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  .subtabs{position:sticky;top:0;z-index:40;display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:12px 2px 8px 48px;min-height:60px;margin:0 -4px;background:var(--bartop,#5e1532);box-shadow:0 0 0 100vmax var(--bartop,#5e1532);clip-path:inset(0 -100vmax)}
+  body[data-t=noche]{--bartop:#232860} body[data-t=atardecer]{--bartop:#ff9f7a} body[data-t=pastel]{--bartop:#fff6f0} body[data-t=minimal]{--bartop:#faf8f7}
   .subtabs::-webkit-scrollbar{display:none}
   .subtabs button{flex:none;position:relative;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.25);color:var(--cream);border-radius:999px;padding:8px 14px;font:800 13px 'Nunito';cursor:pointer;white-space:nowrap}
   .subtabs button.cur{background:var(--rose);border-color:transparent;color:#fff}
@@ -1070,7 +1071,7 @@
   .subtabs button.dot::after,nav.tabbar button.dot::after{content:'';position:absolute;top:3px;right:6px;width:9px;height:9px;border-radius:50%;background:#ff4f7e;box-shadow:0 0 0 2px #3b0d1c}
   nav.tabbar button{position:relative}
   nav.tabbar button.dot::after{top:4px;right:12px}
-  body.light .subtabs{background:linear-gradient(180deg,rgba(255,247,242,.97) 70%,rgba(255,247,242,0))}
+
   body.light .subtabs button:not(.cur){background:#fff;color:#3d1f2a;border-color:rgba(120,40,70,.18)}
   body.light .subtabs button.dot::after,body.light nav.tabbar button.dot::after{box-shadow:0 0 0 2px #fff}
   .idx-ov{position:fixed;inset:0;z-index:9500;background:rgba(20,4,10,.6);display:flex;align-items:flex-end;justify-content:center}
@@ -1997,6 +1998,9 @@ function applyTema(t){
   if(t==='vino')delete document.body.dataset.t; else document.body.dataset.t=t;
   document.body.classList.toggle('light',t==='pastel'||t==='minimal');
   const m=document.querySelector('meta[name=theme-color]'); if(m)m.content=TEMAS.find(x=>x[0]===t)[2];
+  // en la app: barra de arriba y de abajo del mismo color que el tema
+  const BAR={vino:['#5e1532','#1e0610',0,0],noche:['#232860','#070a1c',0,0],atardecer:['#ff9f7a','#2b0f33',1,0],pastel:['#fff6f0','#f8d3df',1,1],minimal:['#faf8f7','#faf8f7',1,1]}[t];
+  try{if(BAR&&window.AndroidApp&&AndroidApp.setBars)AndroidApp.setBars(BAR[0],BAR[1],!!BAR[2],!!BAR[3])}catch(e){}
 }
 try{applyTema(localStorage.getItem('tema')||'vino')}catch(e){}
 function boot(C){
