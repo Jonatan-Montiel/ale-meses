@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-OQL7d9GNnGIdzxwcJCmX0mIiX6hcmrC5w0OQK4oK+1I='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-B20QZFT+33ggRkqQQGGCsAs+S/fZXBdngjdBqMAx8P4='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1089,7 +1089,7 @@
   .subtabs button{flex:none;position:relative;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.25);color:var(--cream);border-radius:999px;padding:8px 10px;font:800 12.5px 'Nunito';cursor:pointer;white-space:nowrap}
   .subtabs button.cur{background:var(--rose);border-color:transparent;color:#fff}
   .subtabs .st-idx{padding:8px 10px}
-  .subtabs.tight{padding-right:8px}
+  .subtabs.tight{padding-right:6px;gap:4px}.subtabs.tight button{padding:8px 8px;font-size:12px}
   .subtabs>button:first-child{margin-left:auto}.subtabs>button:last-child{margin-right:auto}
   .bell{top:calc(17px + var(--sat,0px))!important}
   /* app de lado a lado: espacio para la barra del celular (--sat lo pone la app) */
@@ -4004,6 +4004,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     try{oi.value=localStorage.getItem('fondo-emo-mios')||''}catch(e){}}
   own.onsubmit=e=>{e.preventDefault();const L=emoParse(oi.value);if(!L.length)return;try{localStorage.setItem('fondo-emo-mios',L.join(''));localStorage.setItem('fondo-emo','mios')}catch(_){}emoApply();paintE();for(let i=0;i<6;i++)setTimeout(()=>heart(true),i*120)};
   b.onclick=()=>{paint();paintE();sh.classList.add('open')};
+  window.TEMA_OPEN=b.onclick; b.style.display='none';
   sh.addEventListener('click',e=>{if(e.target===sh||e.target.classList.contains('btn'))sh.classList.remove('open')});
 })();
 
@@ -4687,6 +4688,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     subBar.innerHTML=''; const gs=GRP[cur]||[], g=gOf(cur);
     gs.forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.className=(k===g?'cur':'')+([...DOT].some(id=>{const s=document.getElementById(id);return s&&s.dataset.tab===cur&&s.dataset.grp===k})&&k!==g?' dot':'');b.onclick=()=>setGrp(cur,k);subBar.append(b)});
     const ix=document.createElement('button');ix.type='button';ix.className='st-idx';ix.textContent='🔎';ix.setAttribute('aria-label','Todas las secciones');ix.onclick=()=>window.IDX_OPEN&&IDX_OPEN();subBar.append(ix);
+    const tb=document.createElement('button');tb.type='button';tb.className='st-idx';tb.textContent='🎨';tb.setAttribute('aria-label','Cambiar tema');tb.onclick=()=>window.TEMA_OPEN&&TEMA_OPEN();subBar.append(tb);
     subBar.classList.remove('tight');requestAnimationFrame(()=>{if(subBar.scrollWidth>subBar.clientWidth+1)subBar.classList.add('tight')});
   }
   function apply(){const g=gOf(cur);document.querySelectorAll('main section').forEach(s=>s.classList.toggle('tab-off',s.dataset.tab!==cur||(!!g&&!!s.dataset.grp&&s.dataset.grp!==g)));renderSub()}
