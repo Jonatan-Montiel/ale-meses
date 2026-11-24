@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-9f/SVPCnE6GdqjB7q4i7mkUHhXSJRycDcov8xhpyKBU='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-OQL7d9GNnGIdzxwcJCmX0mIiX6hcmrC5w0OQK4oK+1I='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1065,6 +1065,25 @@
   .subtabs{position:sticky;top:0;z-index:40;display:flex;gap:5px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:calc(22px + var(--sat,0px)) 62px 12px;min-height:calc(78px + var(--sat,0px));margin:0 calc(50% - 50vw);background:transparent;transition:background .25s}
   .subtabs.sc{background:rgba(20,6,20,.38);background:color-mix(in srgb,var(--bartop,#5e1532) 58%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2)}
   body.light .subtabs.sc{background:rgba(255,255,255,.6)}
+  /* --- Temas nuevos --- */
+  body[data-t=oceano]{--wine:#0e3349;--rose:#ff7a9c;--gold:#ffd27a;--blush:#bfe9ff;--bartop:#174e66;background:radial-gradient(120% 80% at 50% 0%,#1d5f7a 0%,#0e3349 55%,#04141f 100%) fixed!important}
+  body[data-t=bosque]{--wine:#173323;--rose:#ff8fa3;--gold:#e9c46a;--blush:#cde8c8;--bartop:#274c35;background:radial-gradient(120% 80% at 50% 0%,#2f5a3f 0%,#173323 55%,#08140d 100%) fixed!important}
+  body[data-t=galaxia]{--wine:#24123f;--rose:#ff6fb5;--gold:#ffd36e;--blush:#e2c8ff;--bartop:#3e2266;background:radial-gradient(1.5px 1.5px at 15% 25%,#fff,transparent),radial-gradient(1px 1px at 65% 10%,#fff,transparent),radial-gradient(1.5px 1.5px at 80% 55%,#fff,transparent),radial-gradient(1px 1px at 30% 75%,#fff,transparent),radial-gradient(1px 1px at 50% 40%,#ffd6f5,transparent),radial-gradient(60% 40% at 80% 20%,rgba(255,111,181,.18),transparent),radial-gradient(120% 80% at 50% 0%,#4b2a7a 0%,#24123f 55%,#0b0516 100%) fixed!important}
+  body[data-t=lavanda]{--rose:#9b5de5;--gold:#a07a3c;--blush:#8b6fd1;--bartop:#f7f2ff;background:linear-gradient(180deg,#f7f2ff 0%,#e9e0ff 60%,#dccffb 100%) fixed!important}
+  body[data-t=durazno]{--rose:#e8577f;--gold:#c0782f;--blush:#d0694f;--bartop:#fff6ee;background:linear-gradient(180deg,#fff6ee 0%,#ffe3cc 60%,#ffc9a8 100%) fixed!important}
+  body[data-t=oceano] .coupon::before,body[data-t=oceano] .coupon::after{background:#0e3349}
+  body[data-t=bosque] .coupon::before,body[data-t=bosque] .coupon::after{background:#173323}
+  body[data-t=galaxia] .coupon::before,body[data-t=galaxia] .coupon::after{background:#24123f}
+  body[data-t=lavanda] .coupon::before,body[data-t=lavanda] .coupon::after{background:#ece4ff}
+  body[data-t=durazno] .coupon::before,body[data-t=durazno] .coupon::after{background:#ffe8d6}
+  .th-sub{margin:18px 0 8px;font:800 13px 'Nunito';text-align:left;opacity:.75}
+  .th-emo{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .th-emo button{border:2px solid transparent;border-radius:999px;padding:8px 12px;background:#fff;box-shadow:0 4px 12px -6px rgba(0,0,0,.25);font:700 13px 'Nunito';color:#3d1f2a;cursor:pointer}
+  .th-emo button.sel{border-color:#e85d84}
+  .th-own{display:flex;gap:8px;margin-top:10px}
+  .th-own input{flex:1;border-radius:12px;border:1px solid rgba(120,40,70,.2);padding:10px 12px;font:600 16px 'Nunito';background:#fff;color:#3d1f2a}
+  .th-own button{border:0;border-radius:12px;padding:10px 14px;background:#e85d84;color:#fff;font:800 13px 'Nunito'}
+  .th-box{max-height:88vh;overflow-y:auto}
   body[data-t=noche]{--bartop:#232860} body[data-t=atardecer]{--bartop:#ff9f7a} body[data-t=pastel]{--bartop:#fff6f0} body[data-t=minimal]{--bartop:#faf8f7}
   .subtabs::-webkit-scrollbar{display:none}
   .subtabs button{flex:none;position:relative;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.25);color:var(--cream);border-radius:999px;padding:8px 10px;font:800 12.5px 'Nunito';cursor:pointer;white-space:nowrap}
@@ -2005,14 +2024,19 @@ const TEMAS=[['vino','Vino','#5a1430','radial-gradient(circle at 50% 0,#7a1d40,#
   ['noche','Noche estrellada','#141a3a','radial-gradient(circle at 50% 0,#2b2f6b,#070a1c)','rgba(207,200,255,.3)'],
   ['atardecer','Atardecer','#e8577f','linear-gradient(180deg,#ff9f7a,#e8577f,#6e2a6e)','rgba(255,255,255,.35)'],
   ['pastel','Rosa pastel','#fde3ea','linear-gradient(180deg,#fff6f0,#f8d3df)','#fff'],
-  ['minimal','Minimalista','#faf8f7','#faf8f7','#fff']];
+  ['minimal','Minimalista','#faf8f7','#faf8f7','#fff'],
+  ['oceano','Océano','#0e3349','radial-gradient(circle at 50% 0,#1d5f7a,#04141f)','rgba(191,233,255,.3)'],
+  ['bosque','Bosque','#173323','radial-gradient(circle at 50% 0,#2f5a3f,#08140d)','rgba(205,232,200,.3)'],
+  ['galaxia','Galaxia','#24123f','radial-gradient(circle at 50% 0,#4b2a7a,#0b0516)','rgba(226,200,255,.3)'],
+  ['lavanda','Lavanda','#e6dcff','linear-gradient(180deg,#f7f2ff,#dccffb)','#fff'],
+  ['durazno','Durazno','#ffe3cc','linear-gradient(180deg,#fff6ee,#ffc9a8)','#fff']];
 function applyTema(t){
   if(!TEMAS.some(x=>x[0]===t))t='vino';
   if(t==='vino')delete document.body.dataset.t; else document.body.dataset.t=t;
-  document.body.classList.toggle('light',t==='pastel'||t==='minimal');
+  document.body.classList.toggle('light',['pastel','minimal','lavanda','durazno'].includes(t));
   const m=document.querySelector('meta[name=theme-color]'); if(m)m.content=TEMAS.find(x=>x[0]===t)[2];
   // en la app: barra de arriba y de abajo del mismo color que el tema
-  const BAR={vino:['#5e1532','#1e0610',0,0],noche:['#232860','#070a1c',0,0],atardecer:['#ff9f7a','#2b0f33',1,0],pastel:['#fff6f0','#f8d3df',1,1],minimal:['#faf8f7','#faf8f7',1,1]}[t];
+  const BAR={vino:['#5e1532','#1e0610',0,0],noche:['#232860','#070a1c',0,0],atardecer:['#ff9f7a','#2b0f33',1,0],pastel:['#fff6f0','#f8d3df',1,1],minimal:['#faf8f7','#faf8f7',1,1],oceano:['#174e66','#04141f',0,0],bosque:['#274c35','#08140d',0,0],galaxia:['#3e2266','#0b0516',0,0],lavanda:['#f7f2ff','#dccffb',1,1],durazno:['#fff6ee','#ffc9a8',1,1]}[t];
   try{const A=window.AndroidApp;if(BAR&&A){
     if(A.setEdge){A.setEdge(BAR[1],!!BAR[2],!!BAR[3]);const i=+A.statusInset()||0;if(i>0)document.documentElement.style.setProperty('--sat',i+'px')}
     else if(A.setBars)A.setBars(BAR[0],BAR[1],!!BAR[2],!!BAR[3])}}catch(e){}
@@ -3966,13 +3990,20 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const hero=document.getElementById('inicio'); if(!hero)return;
   const b=document.createElement('button'); b.className='th-btn'; b.textContent='🎨'; b.setAttribute('aria-label','Cambiar tema'); hero.append(b);
   const sh=document.createElement('div'); sh.className='th-sheet';
-  sh.innerHTML='<div class="th-box"><h3>Elige un tema 🎨</h3><p>se queda guardado en este celular</p><div class="th-grid"></div><button class="btn small" style="margin-top:16px">Listo ♥</button></div>';
+  sh.innerHTML='<div class="th-box"><h3>Elige un tema 🎨</h3><p>se queda guardado en este celular</p><div class="th-grid"></div><div class="th-sub">✨ Lo que flota en el fondo</div><div class="th-emo"></div><form class="th-own"><input maxlength="40" placeholder="o escribe tus emojis, ej. 🐻🍕💗"><button>Usar</button></form><button class="btn small" style="margin-top:16px">Listo ♥</button></div>';
   document.body.append(sh);
   const grid=sh.querySelector('.th-grid'), cur=()=>{try{return localStorage.getItem('tema')||'vino'}catch(e){return 'vino'}};
   function paint(){grid.innerHTML='';TEMAS.forEach(([k,n,,bg,c])=>{const o=document.createElement('button');o.className='th-op'+(cur()===k?' sel':'');
     o.innerHTML=`<i style="background:${bg};--c:${c};border:1px solid rgba(0,0,0,.06)"></i>${n}`;
     o.onclick=()=>{try{localStorage.setItem('tema',k)}catch(e){}applyTema(k);paint()};grid.append(o)})}
-  b.onclick=()=>{paint();sh.classList.add('open')};
+  const emo=sh.querySelector('.th-emo'), own=sh.querySelector('.th-own'), oi=own.querySelector('input');
+  const ek=()=>{try{return localStorage.getItem('fondo-emo')||'corazones'}catch(e){return 'corazones'}};
+  function paintE(){emo.innerHTML='';EMO_SETS.forEach(([k,n])=>{const o=document.createElement('button');o.type='button';o.className=ek()===k?'sel':'';o.textContent=n;
+      o.onclick=()=>{try{localStorage.setItem('fondo-emo',k)}catch(e){}emoApply();paintE();for(let i=0;i<6;i++)setTimeout(()=>heart(true),i*120)};emo.append(o)});
+    if(ek()==='mios'){const o=document.createElement('button');o.type='button';o.className='sel';o.textContent='✏️ Los míos: '+emoParse(localStorage.getItem('fondo-emo-mios')||'').join('');emo.append(o)}
+    try{oi.value=localStorage.getItem('fondo-emo-mios')||''}catch(e){}}
+  own.onsubmit=e=>{e.preventDefault();const L=emoParse(oi.value);if(!L.length)return;try{localStorage.setItem('fondo-emo-mios',L.join(''));localStorage.setItem('fondo-emo','mios')}catch(_){}emoApply();paintE();for(let i=0;i<6;i++)setTimeout(()=>heart(true),i*120)};
+  b.onclick=()=>{paint();paintE();sh.classList.add('open')};
   sh.addEventListener('click',e=>{if(e.target===sh||e.target.classList.contains('btn'))sh.classList.remove('open')});
 })();
 
@@ -4980,9 +5011,17 @@ tick(); setInterval(tick,1000);
 /* ====== Corazones flotantes ====== */
 const H = document.getElementById('hearts');
 const icons = ['♥','❤','💕','💗','♡'];
+const EMO_SETS=[['corazones','💗 Corazones',['♥','❤','💕','💗','♡']],['flores','🌸 Flores',['🌸','🌷','🌺','💮','🌼']],['estrellas','⭐ Estrellas',['⭐','✨','🌟','💫']],
+  ['mariposas','🦋 Mariposas',['🦋','💜','✨']],['burbujas','🫧 Burbujas',['🫧','○','◦']],['dulces','🍓 Dulces',['🍓','🍬','🧁','🍭','🍫']],['patitas','🐾 Patitas',['🐾','🐶','🐱']],
+  ['luna','🌙 Luna',['🌙','⭐','✨','☁️']],['nada','🚫 Nada',[]]];
+function emoParse(t){let L=[];try{L=[...new Intl.Segmenter('es',{granularity:'grapheme'}).segment(String(t||''))].map(x=>x.segment)}catch(e){L=Array.from(String(t||''))}return L.filter(x=>x.trim()&&!/[<>&"'`\\]/.test(x)).slice(0,10)}
+function emoApply(){let k='corazones',own='';try{k=localStorage.getItem('fondo-emo')||'corazones';own=localStorage.getItem('fondo-emo-mios')||''}catch(e){}
+  const L=k==='mios'?emoParse(own):((EMO_SETS.find(x=>x[0]===k)||EMO_SETS[0])[2]); icons.length=0; L.forEach(x=>icons.push(x)); document.querySelectorAll('#hearts .fh').forEach(e=>{if(!icons.length)e.remove()})}
+emoApply();
 function heart(burst){
   const h=document.createElement('span');
   h.className='fh';
+  if(!icons.length)return;
   h.textContent=icons[Math.floor(Math.random()*icons.length)];
   h.style.left=(Math.random()*100)+'vw';
   h.style.fontSize=(12+Math.random()*(burst?26:16))+'px';
