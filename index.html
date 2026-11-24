@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-5+ysMR2RRgGxInCp05QO/ya6ronQ7VZ2sENgL+QWVqE='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Jsn+Pp9l58avXLlQlxuSly2kChi/iBRS6LBHFM438cU='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2959,10 +2959,11 @@ const papers=document.getElementById('jarPapers');
 const pc=['#ffd1dc','#fff3c4','#d6f0ff','#e8dcff','#ffe0c7'];
 for(let i=0;i<22;i++){
   const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
-  r.setAttribute('x',52+Math.random()*80);r.setAttribute('y',110+Math.random()*105);
+  const px=52+Math.random()*74, py=122+Math.random()*90;
+  r.setAttribute('x',px);r.setAttribute('y',py);
   r.setAttribute('width',22);r.setAttribute('height',12);r.setAttribute('rx',2);
   r.setAttribute('fill',pc[i%pc.length]);
-  r.setAttribute('transform',`rotate(${Math.random()*80-40} ${62+Math.random()*80} ${115+Math.random()*100})`);
+  r.setAttribute('transform',`rotate(${Math.random()*80-40} ${px+11} ${py+6})`);
   papers.appendChild(r);
 }
 let deck=[], seen=0;
@@ -2977,6 +2978,23 @@ document.getElementById('jar').addEventListener('click',()=>{
     document.getElementById('noteCount').textContent=`${seen} de ${REASONS.length} razones (y contando)`;
   },350);
 });
+
+/* el mismo frasco, para los papelitos que Ale le deja a Jon */
+let JAR_N=0;
+function JARBOX(items){
+  const w=document.createElement('div'), b=document.getElementById('jar').cloneNode(true), gid='glassJ'+(++JAR_N);
+  b.removeAttribute('id'); b.classList.remove('shake');
+  b.querySelectorAll('[id]').forEach(e=>{if(e.id==='glass')e.id=gid;else e.removeAttribute('id')});
+  b.querySelectorAll('[fill="url(#glass)"]').forEach(e=>e.setAttribute('fill','url(#'+gid+')'));
+  const note=document.createElement('div'), sp=document.createElement('span'), cnt=document.createElement('div');
+  note.className='note'; sp.textContent='Aquí aparecerá tu razón ♥'; note.append(sp); cnt.className='tap';
+  let deck=[], seen=0;
+  const upd=()=>{cnt.textContent=seen?`${seen} de ${items.length} razones (y contando)`:`${items.length} ${items.length===1?'razón':'razones'} en el frasco · tócalo`};
+  b.onclick=()=>{if(!items.length)return;if(!deck.length)deck=items.map((_,i)=>i).sort(()=>Math.random()-.5);
+    b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');
+    setTimeout(()=>{sp.textContent=items[deck.pop()];note.classList.remove('pop');void note.offsetWidth;note.classList.add('pop');seen=Math.min(seen+1,items.length);upd()},350)};
+  upd(); w.append(b,note,cnt); return w;
+}
 
 /* ====== Rasca y gana ====== */
 (function(){
@@ -4243,7 +4261,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     msg(){box.append(el(`<div class="pj-note">A ${esc(C.yo)} le sale uno distinto cada día al entrar, en grande, como a ti 💌</div>`),
       form([['t','Escribe un mensajito para '+C.yo,'ta',300]],'💌 Agregar mensaje',v=>add({k:'msg',t:v.t})),
       listAle(live('msg'),x=>esc(x.t)+(todayMsg()===x?' <b style="color:#b3204f">· hoy</b>':'')))},
-    razon(){box.append(el(`<div class="pj-note">${esc(C.yo)} saca un papelito al azar de su frasco 🫙</div>`),
+    razon(){const RL=live('razon');box.append(el(`<div class="pj-note">${esc(C.yo)} saca un papelito al azar de su frasco 🫙 · así lo ve él</div>`));if(RL.length)box.append(JARBOX(RL.map(x=>x.t)));box.append(
       form([['t','Una razón por la que quieres a '+C.yo,'in',200]],'🫙 Agregar al frasco',v=>{add({k:'razon',t:v.t});avisar(`🫙 ${C.ella} agregó una razón a tu frasco`,'parajon')}),
       listAle(live('razon'),x=>esc(x.t)))},
     cartaj(){const L=live('cartaj'),cur=L[L.length-1];
@@ -4280,8 +4298,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const JON={
     msg(){const m=todayMsg(); box.append(m?el(`<div class="card"><div class="daily-l">Mensaje de hoy de ${esc(C.ella)}</div><div class="daily">${esc(m.t)}</div><div class="cu-t">— ${esc(C.ella)} 💙</div></div>`):empty(esc(C.ella)+' todavía no te escribe mensajes del día 💭'))},
     razon(){const L=live('razon'); if(!L.length){box.append(empty('tu frasco todavía está vacío… '+esc(C.ella)+' lo irá llenando 🫙'));return}
-      const b=el(`<button class="pj-jar" aria-label="Sacar una razón">🫙</button>`); b.onclick=()=>{let r;do{r=L[Math.floor(Math.random()*L.length)]}while(L.length>1&&r===razon);razon=r;render();burst(10)};
-      box.append(b,el(`<div class="note"><span>${razon?esc(razon.t):'Toca el frasco y saca un papelito ♥'}</span></div>`),el(`<div class="tap">${L.length} ${L.length===1?'razón':'razones'} en tu frasco</div>`))},
+      box.append(JARBOX(L.map(x=>x.t)))},
     cartaj(){const L=live('cartaj'),x=L[L.length-1]; if(!x){box.append(empty(esc(C.ella)+' todavía no te escribe una carta 💌'));return}
       if(!cjOpen){const b=el(`<button class="pj-env" aria-label="Abrir carta"><div class="pj-env-e">💌</div><div>Una carta de ${esc(C.ella)} para ti</div><small>toca para abrirla</small></button>`);
         b.onclick=()=>{cjOpen=true;if(!x.o){upd(x,{o:Date.now()});avisar(`💌 ${C.ella} abrió la carta que le escribiste`,'parajon')}else render();burst(16)};box.append(b);return}
