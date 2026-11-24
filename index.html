@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-TLrIYvMbfrSOLM7I/kXXV8lDymKNEn1W+5iAULUdm2w='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NxPl7W8k9pZEnEEDfuckf3jxfYhNH339zE9mJHDT/IA='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -3887,13 +3887,26 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   let latest=0; try{const c=JSON.parse(localStorage.getItem('ver-latest')||'{}');if(Date.now()-(c.t||0)<30*6e4)latest=c.v||0}catch(e){}
   const url=w=>location.origin+location.pathname.replace(/[^/]*$/,'')+'dl/'+(w==='yo'?'nuestro-lugar-jon.apk':'nuestro-lugar.apk');
   const lbl=v=>v==='web'?'navegador (sin app)':'v'+v+((A&&!A.appVersion&&v===mine()&&v!=='web')?' o más vieja':'');
+  // señal de «app instalada» que manda la app del otro cada ~30 min (cifrada, por ntfy; ntfy la guarda 12 h)
+  let hb=null, hbDone=false;
+  async function beat(){try{if(!KEY_B64)return;
+    const d=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('nl-hb:'+KEY_B64+':'+oth)));
+    const tp='nlhb'+[...d.slice(0,12)].map(b=>b.toString(16).padStart(2,'0')).join('');
+    const r=await fetch('https://ntfy.sh/'+tp+'/json?poll=1&since=12h',{cache:'no-store'}); if(!r.ok)return; let last=null;
+    (await r.text()).split('\n').forEach(l=>{try{const x=JSON.parse(l);if(x.event==='message'&&x.message)last=x.message}catch(e){}});
+    hb=null; if(last){const u=Uint8Array.from(atob(String(last).trim()),c=>c.charCodeAt(0));hb=JSON.parse(new TextDecoder().decode(await decBuf(u.buffer)))}
+    hbDone=true; render()}catch(e){}}
+  const ago=t=>{const m=Math.max(0,Math.round((Date.now()-t)/6e4));return m<2?'hace un momento':m<60?'hace '+m+' min':m<1440?'hace '+Math.round(m/60)+' h':'el '+fmtDia(t)};
+  setTimeout(beat,3000); setInterval(()=>{if(!document.hidden)beat()},5*60e3);
   function render(){
     if(!box)return;
     const o=S.all().find(x=>x.id===oth&&!x.x), mv=mine(), num=v=>+String(v).replace(/\D/g,'')||0;
+    const hbl=!hbDone?'':hb&&hb.t?`<div>📲 Su app: <b>instalada</b> <span>· activa ${ago(+hb.t)}</span></div>`:(o&&num(o.v)>=29?`<div>⚠️ <b>Sin señal de su app</b> en las últimas 12 h <span>· puede que la haya desinstalado o que el celular la tenga dormida</span></div>`:`<div><span>📲 Si tiene la app instalada se verá aquí cuando los dos tengan la v29</span></div>`);
     const st=v=>v==='web'||!latest?'':num(v)>=latest?' ✅':' ⚠️';
     box.innerHTML=`<div class="ver"><b>📱 Versiones de la app</b>
       <div>Tú: <b>${esc(lbl(mv))}</b>${st(mv)}</div>
       <div>${esc(nm(oth))}: <b>${o?esc(lbl(o.v)):'todavía no se sabe'}</b>${o?st(o.v)+' <span>· visto '+fmtDia(o.u)+' '+fmtHora(o.u)+'</span>':''}</div>
+      ${hbl}
       ${latest?`<div>La más nueva: <b>v${latest}</b></div>`:''}
       ${A&&latest&&num(mv)<latest?`<a href="${url(me)}" target="_blank" rel="noopener">⬇️ Actualizar mi app</a>`:''}</div>`;
     const bar=document.getElementById('updBar'); if(A&&latest&&num(mv)<latest&&!bar&&window.__showUpd)window.__showUpd();
