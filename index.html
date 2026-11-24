@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+HPoKsBotR4tEbraZbGkKKjpUD7hyUNZgaXfBiCDzKs='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-f9ohnMjAy4fV6qqLjJJL0RHKYTjhxFJl90W0349/2Tk='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -4691,7 +4691,11 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   TABS.forEach(([k,,,ids])=>ids.forEach(id=>{const s=document.getElementById(id);if(s)s.dataset.tab=k}));
   document.querySelectorAll('main section').forEach(s=>{if(!s.dataset.tab)s.dataset.tab='inicio'});
   {const O=(C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{}, E=VIEWER()==='ella';
-    Object.entries(O).forEach(([id,v])=>{const s=document.getElementById(id);if(s&&(v==='dos'||(v==='ella'&&E)))s.classList.add('oculta')})}
+    const PZ={'p-frase':['#finalQ','#moreLove','#loveMsg'],'p-creditos':['#crBtn'],'p-wa':['#wa'],'p-ver':['#verBox']};
+    const box=el=>el&&(el.id==='crBtn'?el.parentNode:el.id==='wa'?el.closest('.card'):el);
+    Object.entries(O).forEach(([id,v])=>{if(!(v==='dos'||(v==='ella'&&E)))return;
+      if(PZ[id])PZ[id].forEach(q=>{const e=box(document.querySelector(q));if(e)e.classList.add('oculta')});
+      else{const s=document.getElementById(id);if(s)s.classList.add('oculta')}})}
   const GRP={inicio:[['hoy','☀️ Hoy'],['logros','🏆 Logros',['racha','resumen','insignias','mapa']]],
     nosotros:[['rec','📸 Recuerdos',['momentos','albumes','polaroid','historia','diario']],['det','💝 Detalles',['detalles','cancion']],['esp','✨ Especiales',['cielo','constelacion','arbol','sorpresas','capsula']]],
     cartas:[['leer','📖 Leer',['carta','cartames','abrela','escribir','razones','galleta','medidor']],['escr','✍️ Escribir',['botella','pizarra']],['msj','💬 Mensajes',['buzon','voz','tregua','abrazo']]],
@@ -5730,11 +5734,15 @@ function initEditor(){
       const cnt=h('div',{class:'ed-note'}), list=h('div',null);
       const paintC=ch=>{const n=Object.values(D.ocultas).filter(Boolean).length;cnt.textContent=(n?('Tienes '+n+(n===1?' sección oculta.':' secciones ocultas.')):'Todas las secciones están visibles.')+(ch?' Se aplica cuando toques «Guardar cambios».':'')};
       let last='';
-      secs.forEach(x=>{const t=x.dataset.tab||'inicio';if(t!==last){last=t;list.append(h('div',{class:'ed-flab',style:'margin-top:12px'},TN[t]||t))}
+      const rows=secs.map(x=>({id:x.id,t:x.dataset.tab||'inicio',n:x.querySelector(':scope>h2').textContent.trim()}));
+      const hoyI=rows.findIndex(r=>r.t==='inicio'); rows.splice(Math.max(0,hoyI),0,{id:'hoy',t:'inicio',n:'💬 Mensaje del día'});
+      const finI=rows.map(r=>r.t).lastIndexOf('inicio')+1;
+      rows.splice(finI,0,{id:'p-frase',t:'inicio',n:'✨ Frase final y «un poquito más de amor»'},{id:'p-creditos',t:'inicio',n:'🎬 Ver los créditos'},{id:'p-wa',t:'inicio',n:'💬 Estoy pensando en ti (WhatsApp)'},{id:'p-ver',t:'inicio',n:'📱 Versiones de la app'});
+      rows.forEach(x=>{const t=x.t;if(t!==last){last=t;list.append(h('div',{class:'ed-flab',style:'margin-top:12px'},TN[t]||t))}
         const sel=h('select',{class:'ed-in',style:'max-width:150px;padding:6px 8px'});
         [['','👁️ Visible'],['ella','🙈 Ocultar a '+(D.ella||'Ale')],['dos','🚫 Ocultar a los dos']].forEach(([v,l])=>{const o=h('option',{value:v},l);if((D.ocultas[x.id]||'')===v)o.selected=true;sel.append(o)});
         sel.addEventListener('change',()=>{if(sel.value)D.ocultas[x.id]=sel.value;else delete D.ocultas[x.id];markDirty();paintC(true)});
-        list.append(h('div',{style:'display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;border-top:1px solid rgba(247,198,211,.12)'},h('span',{style:'font-weight:700;font-size:14px'},x.querySelector(':scope>h2').textContent.trim()),sel))});
+        list.append(h('div',{style:'display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;border-top:1px solid rgba(247,198,211,.12)'},h('span',{style:'font-weight:700;font-size:14px'},x.n),sel))});
       paintC();
       body.append(section('🙈 '+sec.t,[h('div',{class:'ed-note'},'Elige qué secciones no se ven. «Ocultar a '+(D.ella||'Ale')+'» la quita solo de su app; «a los dos» la quita también de la tuya. Nada se borra: si la vuelves a poner visible, todo sigue ahí.'),cnt,list]));
       return;
