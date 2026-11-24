@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nNQp+Dkx8T75NyWfSsd9BbniDZixIJmnSyzqlf1lYO0='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,7 +17,7 @@
 <link rel="alternate icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Caveat:wght@500;700&family=Nunito:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Caveat:wght@500;700&family=Nunito:wght@400;600;700&display=swap" id="fontCss">
 <style>
   :root{
     --wine:#3b0d1c; --wine2:#5a1430; --rose:#e85d84; --blush:#f7c6d3;
@@ -1059,6 +1059,7 @@
   body[data-t=atardecer] .coupon::before,body[data-t=atardecer] .coupon::after{background:#c94a7c}
   body.light input[type=range].love{background:linear-gradient(90deg,var(--rose) var(--p,0%),rgba(120,40,70,.12) var(--p,0%))}
   body.light input[type=range].love::-webkit-slider-thumb{box-shadow:0 2px 8px rgba(120,40,70,.35)}
+.sh-ask{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:9000;background:#fff7f0;color:#3d1f2a;font:700 14px "Nunito";border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);text-align:center}.sh-th{display:flex;gap:6px;justify-content:center;margin:10px 0;flex-wrap:wrap}.sh-th img{width:54px;height:54px;object-fit:cover;border-radius:10px}.sh-b{display:flex;gap:10px;justify-content:center}.sh-b button{border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-family:inherit}.sh-b .si{background:var(--rose,#e85d84);color:#fff}.sh-b .no{background:rgba(0,0,0,.08);color:#3d1f2a}
 </style>
 </head>
 <body class="locked">
@@ -1760,6 +1761,7 @@
 </nav>
 
 <script>
+{const f=document.getElementById('fontCss');if(f)f.rel='stylesheet'}
 /* ====== Temas ====== */
 const TEMAS=[['vino','Vino','#5a1430','radial-gradient(circle at 50% 0,#7a1d40,#2a0a18)','rgba(255,255,255,.18)'],
   ['noche','Noche estrellada','#141a3a','radial-gradient(circle at 50% 0,#2b2f6b,#070a1c)','rgba(207,200,255,.3)'],
@@ -1882,6 +1884,16 @@ const avOn=t=>{const off=Object.assign({},AV_OFF_DEF,(AV.off||{}));if(t==='nota'
 const AV_LAST={};
 const ACT_Q=window.ACT_Q=[];
 function ACT_LOG(t,k,w){if((k==='entrada'||k==='secreto')&&w!=='ella')return;try{window.ACT_PUT?ACT_PUT(t,k,w):ACT_Q.push([t,k,w])}catch(e){}}
+/* ntfy: si la app del que recibe ya sabe descifrar (v26+), el aviso viaja cifrado con la llave */
+function NTFY_ENC(w){try{const L=JSON.parse(localStorage.getItem('versiones-cache')||'[]');const x=L.find(y=>y.id===w&&!y.x);return !!x&&(+String(x.v).replace(/\D/g,'')||0)>=26}catch(e){return false}}
+function NTFY(o){o=Object.assign({},o);o.topic=String(o.topic||'').trim();if(!o.topic)return Promise.resolve({ok:false});
+  const go=b=>fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify(b)});
+  let av={};try{av=AV||{}}catch(e){}
+  const who=o.topic===String(av.ntfy||'').trim()?'yo':o.topic===String(av.ntfyElla||'').trim()?'ella':null;
+  if(!who||!NTFY_ENC(who))return go(o);
+  let ir='';try{ir=new URL(o.click||'').searchParams.get('ir')||''}catch(e){}
+  return encBuf(new TextEncoder().encode(JSON.stringify({t:o.title||'',m:o.message||'',ir}))).then(b=>{let x='';b.forEach(c=>x+=String.fromCharCode(c));
+    const e={topic:o.topic,title:'💗 Nuestro lugar',message:'nl1:'+btoa(x),priority:o.priority||4};if(o.delay)e.delay=o.delay;return go(e)},()=>go(o))}
 function avisarElla(txt,tipo){
   if(tipo==='entrada'||tipo==='secreto')return;
   let m=txt.split(C.ella+' ').join(C.yo+' ');
@@ -1890,7 +1902,7 @@ function avisarElla(txt,tipo){
   if(!AV.ntfyElla)return;
   try{if(ELLA_PREF.off()[tipo])return}catch(e){}
   const title=({botella:'🍾 Mensaje en una botella',debo:'😘 Me debes…',dibujo:'🎨 Un dibujito',corazones:'💗 Corazones escondidos',insignia:'🏅 ¡Nueva insignia!',fotoreto:'📸 Reto de fotos',sello:'🗓️ El sello del día',probable:'🤔 ¿Quién es más probable?',fotocom:'📸 Nuestras fotos',detalle:'💝 Un detalle de '+C.yo,termo:'🌡️ ¿Cuánto te extraña '+C.yo+'?',nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo,deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',extrano:'🥺 '+C.yo+' te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ A '+C.yo+' le gustó',parajon:'💙 '+C.yo}[tipo])||'💗 '+C.yo;
-  fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfyElla.trim(),title,message:m,tags:['love_letter'],priority:4,click:location.origin+location.pathname+'?ir='+encodeURIComponent(tipo||'')})}).catch(()=>{});
+  NTFY({topic:AV.ntfyElla.trim(),title,message:m,tags:['love_letter'],priority:4,click:location.origin+location.pathname+'?ir='+encodeURIComponent(tipo||'')}).catch(()=>{});
 }
 function avisar(txt,tipo){
   let soyYo=EDIT; try{if(localStorage.getItem('yo-soy')==='yo')soyYo=true}catch(e){}
@@ -1903,7 +1915,7 @@ function avisar(txt,tipo){
   const quien=soyYo?C.yo:C.ella;
   if(soyYo){ txt=txt.split(C.ella+' ').join(C.yo+' ').replace(/ te (dejó|mandó)/,' le $1'); }
   const title=({botella:'🍾 Mensaje en una botella',debo:'😘 Me debes…',dibujo:'🎨 Un dibujito',corazones:'💗 Corazones escondidos',insignia:'🏅 ¡Nueva insignia!',fotoreto:'📸 Reto de fotos',sello:'🗓️ El sello del día',probable:'🤔 ¿Quién es más probable?',fotocom:'📸 Nuestras fotos',detalle:'💝 Un detalle para ti',termo:'🌡️ ¿Cuánto te extraña?',vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',especial:'💝 Fecha especial',parajon:'💙 Para '+C.yo,extrano:'🥺 Te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ Le gustó',cumple:'🎂 Cumpleaños',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
-  fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname+'?ir='+encodeURIComponent(tipo||'')})}).catch(()=>{});
+  NTFY({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname+'?ir='+encodeURIComponent(tipo||'')}).catch(()=>{});
 }
 const VIEWER=()=>{if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
 /* textos en masculino cuando es Jon */
@@ -2059,7 +2071,13 @@ galRender();
   }
   add.onclick=()=>file.click();
   file.onchange=()=>{const fs=[...file.files]; file.value=''; upFiles(fs)};
-  window.__sharePhotos=list=>{const fs=(list||[]).map(d=>{const b=atob(String(d).split(',')[1]||'');const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new Blob([u],{type:'image/jpeg'})});if(!fs.length)return;GOTO('momentos');setTimeout(()=>upFiles(fs),600)};
+  window.__sharePhotos=list=>{const fs=(list||[]).map(d=>{const b=atob(String(d).split(',')[1]||'');const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new Blob([u],{type:'image/jpeg'})});if(!fs.length)return;GOTO('momentos');
+    // otra app puede mandar fotos: se suben solo si tú confirmas
+    const q=document.createElement('div');q.className='sh-ask';const n=fs.length;
+    q.innerHTML=`<b>📷 ¿Subir ${n} ${n===1?'foto compartida':'fotos compartidas'} a nuestras fotos?</b><div class="sh-th"></div><div class="sh-b"><button class="no">Cancelar</button><button class="si">Subir</button></div>`;
+    const th=q.querySelector('.sh-th');fs.slice(0,6).forEach(f=>{const im=new Image();im.src=URL.createObjectURL(f);th.append(im)});
+    q.querySelector('.no').onclick=()=>q.remove();q.querySelector('.si').onclick=()=>{q.remove();upFiles(fs)};
+    document.body.append(q)};
   async function upFiles(fs){
     if(!fs.length)return; add.disabled=true;
     let okN=0;
@@ -3467,7 +3485,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   }
   $('btForm').onsubmit=e=>{e.preventDefault();const i=$('btIn'),t=i.value.trim();if(!t)return;const at=when();
     S.add({id:UID(),w:me,t,at,a:Date.now(),u:Date.now()});i.value='';burst(10);$('btSt').textContent='🍾 ¡Al agua! Le va a llegar a una hora sorpresa';
-    const tp=topic(oth); if(tp)fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:tp.trim(),title:'🍾 Mensaje en una botella',message:'Te llegó un mensaje en una botella de '+nm(me)+' 💗 ábrelo en nuestro lugar',tags:['love_letter'],priority:4,click:location.origin+location.pathname+'?ir=botella',delay:String(Math.round(at/1000))})}).catch(()=>{})};
+    const tp=topic(oth); if(tp)NTFY({topic:tp.trim(),title:'🍾 Mensaje en una botella',message:'Te llegó un mensaje en una botella de '+nm(me)+' 💗 ábrelo en nuestro lugar',tags:['love_letter'],priority:4,click:location.origin+location.pathname+'?ir=botella',delay:String(Math.round(at/1000))}).catch(()=>{})};
   render(); setInterval(float,30000); window.addEventListener('unlocked',()=>setTimeout(float,1500));
 })();
 
@@ -4764,7 +4782,7 @@ function inactiveScreen(c){
   l.innerHTML='<div class="lock-ico">💤</div><div class="lock-q">'+e(c.inactivaTitulo||'Página inactiva')+'</div><div class="lock-h" style="max-width:310px;margin:12px auto 0;line-height:1.3">'+e(c.inactivaTexto||'Esta página se desactivó por no entrar a verla.')+'</div>';
   const A=c.avisos||{};
   if(A.ntfy){let yo=false;try{yo=localStorage.getItem('yo-soy')==='yo'}catch(_){}
-    if(!yo)fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:A.ntfy.trim(),title:'💤 Página inactiva · '+c.ella,message:'👀 '+c.ella+' intentó entrar, pero la página está inactiva',tags:['zzz'],priority:4})}).catch(()=>{})}
+    if(!yo)NTFY({topic:A.ntfy.trim(),title:'💤 Página inactiva · '+c.ella,message:'👀 '+c.ella+' intentó entrar, pero la página está inactiva',tags:['zzz'],priority:4}).catch(()=>{})}
 }
 const ghH=tok=>Object.assign({Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},tok?{Authorization:'Bearer '+tok}:{});
 function mergeC(a,b){
@@ -4780,7 +4798,7 @@ function fetchT(u,o,ms){const c=new AbortController();const t=setTimeout(()=>c.a
 function slowScreen(msg){
   const l=document.getElementById('lock'), pad=document.getElementById('pad'); if(!l||!pad||pad.children.length)return;
   let m=document.getElementById('slowMsg'); if(!m){m=document.createElement('div');m.id='slowMsg';m.style.cssText='margin-top:18px;max-width:300px;font-size:14px;opacity:.85;text-align:center';l.append(m)}
-  m.innerHTML=msg+'<div><button class="btn small" onclick="location.reload()">Reintentar ♥</button></div>';
+  m.innerHTML=msg+'<div><button class="btn small">Reintentar ♥</button></div>';m.querySelector('button').onclick=()=>location.reload();
 }
 setTimeout(()=>slowScreen('Está tardando más de lo normal en cargar…'),20000);
 const DG=m=>{try{window.AndroidApp&&AndroidApp.diag&&AndroidApp.diag(m)}catch(e){}};
@@ -4968,7 +4986,7 @@ function initEditor(){
       const msg=h('div',{class:'ed-note'});
       async function test(){
         msg.textContent='Enviando prueba…';msg.className='ed-note'; const add=t=>{if(msg.textContent==='Enviando prueba…')msg.textContent='';msg.textContent+=t}; const txt='🎟️ Prueba: así te va a llegar el aviso cuando '+(D.ella||'Ale')+' canjee un vale 💗'; let any=false;
-        if(A.ntfy){any=true;try{const r=await fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:A.ntfy,title:'🎟️ Prueba de aviso',message:txt,tags:['heart'],priority:4})});add(r.ok?'🔔 Notificación enviada a ntfy. ':'No se pudo mandar a ntfy. ')}catch(e){add('No se pudo mandar a ntfy. ')}}
+        if(A.ntfy){any=true;try{const r=await NTFY({topic:A.ntfy,title:'🎟️ Prueba de aviso',message:txt,tags:['heart'],priority:4});add(r.ok?'🔔 Notificación enviada a ntfy. ':'No se pudo mandar a ntfy. ')}catch(e){add('No se pudo mandar a ntfy. ')}}
         if(!any){msg.textContent='Primero genera tu nombre secreto de ntfy y guarda.';msg.className='ed-note bad'}else msg.className='ed-note ok';
       }
       body.append(section('🔔 '+sec.t,[
@@ -4994,7 +5012,7 @@ function initEditor(){
           const ok=(x,good)=>{m2.textContent=x;m2.className='ed-note '+(good?'ok':'bad')};
           const gen=h('button',{class:'ed-btn',style:'background:#7a6168',onclick:()=>{const r=[...crypto.getRandomValues(new Uint8Array(15))].map(x=>'abcdefghijkmnpqrstuvwxyz23456789'[x%32]).join('');t.value='al-'+r;A.ntfyElla=t.value;markDirty();ok('Listo. Toca «Guardar cambios»: su app lo toma sola la próxima vez que la abra.',true)}},'Generar');
           const send=async(title,message)=>{if(!A.ntfyElla){ok('Primero toca «Generar» y guarda.',false);return}
-            try{const r=await fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:A.ntfyElla,title,message,tags:['love_letter'],priority:4})});ok(r.ok?'✅ Enviado a su celular.':'No se pudo enviar.',r.ok)}catch(e){ok('No se pudo enviar.',false)}};
+            try{const r=await NTFY({topic:A.ntfyElla,title,message,tags:['love_letter'],priority:4});ok(r.ok?'✅ Enviado a su celular.':'No se pudo enviar.',r.ok)}catch(e){ok('No se pudo enviar.',false)}};
           const cm=h('input',{class:'ed-in',placeholder:'Ej. Te dejé algo en nuestro lugar 💌',maxlength:200});
           return h('div',{style:'margin-top:18px;padding-top:14px;border-top:1px solid #f0e2dc'},
             h('div',{class:'ed-flab'},'📱 Notificaciones para '+(D.ella||'Ale')+' (app ntfy)'),

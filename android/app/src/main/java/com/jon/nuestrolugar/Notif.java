@@ -37,14 +37,19 @@ class Notif {
         String nseen = (id + "," + seen);
         if (nseen.length() > 600) nseen = nseen.substring(0, 600);
         sp.edit().putString("seen", nseen).putString("since", id.isEmpty() ? String.valueOf(System.currentTimeMillis() / 1000) : id).apply();
-        try { String ck = o.optString("click", ""); String tp = ck.isEmpty() ? null : Uri.parse(ck).getQueryParameter("ir"); WidgetEstado.fromNtfy(c, tp, o.optString("message", "")); } catch (Exception ignored) { }
+        String msg = o.optString("message", ""), title = o.optString("title", ""), tp = null;
+        try { String ck = o.optString("click", ""); if (!ck.isEmpty()) tp = Uri.parse(ck).getQueryParameter("ir"); } catch (Exception ignored) { }
+        // aviso cifrado con la llave de la página (nl1:…): ntfy.sh no ve el texto
+        if (msg.startsWith("nl1:")) {
+            try { JSONObject p = new JSONObject(Loc.dec(Loc.key(c), msg.substring(4))); title = p.optString("t", ""); msg = p.optString("m", ""); String r = p.optString("ir", ""); tp = r.isEmpty() ? null : r; }
+            catch (Exception e) { title = ""; msg = "Tienes algo nuevo 💗"; tp = null; }
+        }
+        try { WidgetEstado.fromNtfy(c, tp, msg); } catch (Exception ignored) { }
         if (appVisible) return; // ya lo está viendo en la página
-        String title = o.optString("title", "");
         if (title.isEmpty()) title = "💗 Nuestro lugar";
-        // a qué sección llevar al tocarla: viene en el link (…?ir=tipo)
-        String ir = null;
-        try { String ck = o.optString("click", ""); if (!ck.isEmpty()) { String t = Uri.parse(ck).getQueryParameter("ir"); if (t != null && t.matches("[a-z]{2,20}")) ir = "n:" + t + "\n" + o.optString("message", ""); } } catch (Exception ignored) { }
-        show(c, id.hashCode(), title, o.optString("message", ""), true, ir);
+        // a qué sección llevar al tocarla (…?ir=tipo, o dentro del aviso cifrado)
+        String ir = (tp != null && tp.matches("[a-z]{2,20}")) ? "n:" + tp + "\n" + msg : null;
+        show(c, id.hashCode(), title, msg, true, ir);
     }
 
     static void show(Context c, int id, String title, String msg) { show(c, id, title, msg, false); }
