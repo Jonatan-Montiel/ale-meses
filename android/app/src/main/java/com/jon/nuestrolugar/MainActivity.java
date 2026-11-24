@@ -84,7 +84,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         sp = getSharedPreferences("nl", MODE_PRIVATE);
-        applyBars(sp.getString("barTop", ""), sp.getString("barBot", ""), sp.getBoolean("barLT", false), sp.getBoolean("barLB", false));
+        if (sp.getBoolean("edge", false)) applyEdge(sp.getString("barBot", ""), sp.getBoolean("barLT", false), sp.getBoolean("barLB", false));
+        else applyBars(sp.getString("barTop", ""), sp.getString("barBot", ""), sp.getBoolean("barLT", false), sp.getBoolean("barLB", false));
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
         }
@@ -367,6 +368,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageFinished(final WebView v, String url) {
+                if (edgeOn) pushInset();
                 if (loadErr || !ours(url)) return;
                 dl("terminó de cargar");
                 pageReady = true;
@@ -523,7 +525,62 @@ public class MainActivity extends Activity {
         } catch (Exception ignored) { }
     }
 
+    /** La página se dibuja también detrás de la barra de arriba (con sus corazones); abajo queda del color del tema. */
+    boolean edgeOn = false; int topInsetPx = 0;
+    void applyEdge(String bot, boolean lightTop, boolean lightBot) {
+        try {
+            if (bot == null || !bot.matches("#[0-9a-fA-F]{6}")) return;
+            android.view.Window w = getWindow();
+            edgeOn = true;
+            w.setStatusBarColor(Color.TRANSPARENT);
+            w.setNavigationBarColor(Color.parseColor(bot));
+            w.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.parseColor(bot)));
+            android.view.View d = w.getDecorView();
+            if (Build.VERSION.SDK_INT >= 30) {
+                w.setDecorFitsSystemWindows(false); // nosotros acomodamos el teclado y la barra de abajo
+                android.view.WindowInsetsController c = w.getInsetsController();
+                if (c != null) {
+                    int m = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                    c.setSystemBarsAppearance((lightTop ? android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS : 0) | (lightBot ? android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS : 0), m);
+                }
+            } else {
+                int f = d.getSystemUiVisibility() | android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE | android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+                f = lightTop ? (f | android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) : (f & ~android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                if (Build.VERSION.SDK_INT >= 26) f = lightBot ? (f | android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) : (f & ~android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                d.setSystemUiVisibility(f);
+            }
+            final android.view.View root = findViewById(android.R.id.content);
+            if (root != null) {
+                root.setOnApplyWindowInsetsListener((v, ins) -> {
+                    int b;
+                    if (Build.VERSION.SDK_INT >= 30) {
+                        b = ins.getInsets(android.view.WindowInsets.Type.ime() | android.view.WindowInsets.Type.navigationBars()).bottom;
+                        topInsetPx = ins.getInsets(android.view.WindowInsets.Type.statusBars()).top;
+                    } else { b = ins.getSystemWindowInsetBottom(); topInsetPx = ins.getSystemWindowInsetTop(); }
+                    v.setPadding(0, 0, 0, b);
+                    pushInset();
+                    return ins;
+                });
+                root.requestApplyInsets();
+            }
+        } catch (Exception ignored) { }
+    }
+    int topInsetDp() { float dn = getResources().getDisplayMetrics().density; return dn > 0 ? Math.round(topInsetPx / dn) : 0; }
+    void pushInset() {
+        final WebView v = wv; if (v == null) return;
+        final String js = "document.documentElement.style.setProperty('--sat','" + topInsetDp() + "px')";
+        v.post(() -> { try { v.evaluateJavascript(js, null); } catch (Exception ignored) { } });
+    }
+
     class Bridge {
+        @JavascriptInterface
+        public void setEdge(String bot, boolean lightTop, boolean lightBot) {
+            if (bot == null || !bot.matches("#[0-9a-fA-F]{6}")) return;
+            sp.edit().putBoolean("edge", true).putString("barBot", bot).putBoolean("barLT", lightTop).putBoolean("barLB", lightBot).apply();
+            runOnUiThread(() -> applyEdge(bot, lightTop, lightBot));
+        }
+        @JavascriptInterface
+        public int statusInset() { return topInsetDp(); }
         @JavascriptInterface
         public void setBars(String top, String bot, boolean lightTop, boolean lightBot) {
             if (top == null || bot == null || !top.matches("#[0-9a-fA-F]{6}") || !bot.matches("#[0-9a-fA-F]{6}")) return;

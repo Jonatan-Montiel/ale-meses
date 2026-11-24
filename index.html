@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-RTUPeieerM1P+RMWIzDhy9oDONWjAtRxffSYn8teXUY='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-9f/SVPCnE6GdqjB7q4i7mkUHhXSJRycDcov8xhpyKBU='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,7 +32,7 @@
   }
   #hearts{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
   .fh{position:absolute;bottom:-40px;opacity:.0;animation:rise linear forwards;color:var(--rose)}
-  @keyframes rise{0%{transform:translateY(0) scale(.6) rotate(0);opacity:0}10%{opacity:.7}100%{transform:translateY(-110vh) scale(1.1) rotate(25deg);opacity:0}}
+  @keyframes rise{0%{transform:translateY(0) scale(.6) rotate(0);opacity:0}8%{opacity:.7}90%{opacity:.7}100%{transform:translateY(calc(-100vh - 80px)) scale(1.1) rotate(25deg);opacity:0}}
 
   main{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:0 20px 90px}
   section{padding:56px 0 24px}
@@ -1062,7 +1062,9 @@
 .sh-ask{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:9000;background:#fff7f0;color:#3d1f2a;font:700 14px "Nunito";border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);text-align:center}.sh-th{display:flex;gap:6px;justify-content:center;margin:10px 0;flex-wrap:wrap}.sh-th img{width:54px;height:54px;object-fit:cover;border-radius:10px}.sh-b{display:flex;gap:10px;justify-content:center}.sh-b button{border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-family:inherit}.sh-b .si{background:var(--rose,#e85d84);color:#fff}.sh-b .no{background:rgba(0,0,0,.08);color:#3d1f2a}
   /* ===== Orden: sub-pestañas, puntitos, índice, temporadas ===== */
   .fuera{display:none!important}
-  .subtabs{position:sticky;top:0;z-index:40;display:flex;gap:5px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:22px 62px 12px;min-height:78px;margin:0 -4px;background:var(--bartop,#5e1532);box-shadow:0 0 0 100vmax var(--bartop,#5e1532);clip-path:inset(0 -100vmax)}
+  .subtabs{position:sticky;top:0;z-index:40;display:flex;gap:5px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:calc(22px + var(--sat,0px)) 62px 12px;min-height:calc(78px + var(--sat,0px));margin:0 calc(50% - 50vw);background:transparent;transition:background .25s}
+  .subtabs.sc{background:rgba(20,6,20,.38);background:color-mix(in srgb,var(--bartop,#5e1532) 58%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2)}
+  body.light .subtabs.sc{background:rgba(255,255,255,.6)}
   body[data-t=noche]{--bartop:#232860} body[data-t=atardecer]{--bartop:#ff9f7a} body[data-t=pastel]{--bartop:#fff6f0} body[data-t=minimal]{--bartop:#faf8f7}
   .subtabs::-webkit-scrollbar{display:none}
   .subtabs button{flex:none;position:relative;background:rgba(255,255,255,.08);border:1px solid rgba(247,198,211,.25);color:var(--cream);border-radius:999px;padding:8px 10px;font:800 12.5px 'Nunito';cursor:pointer;white-space:nowrap}
@@ -1070,7 +1072,15 @@
   .subtabs .st-idx{padding:8px 10px}
   .subtabs.tight{padding-right:8px}
   .subtabs>button:first-child{margin-left:auto}.subtabs>button:last-child{margin-right:auto}
-  .bell{top:22px!important}
+  .bell{top:calc(17px + var(--sat,0px))!important}
+  /* app de lado a lado: espacio para la barra del celular (--sat lo pone la app) */
+  .offline,.nb-pill{top:calc(12px + var(--sat,0px))}
+  .ed-bar{padding-top:calc(7px + var(--sat,0px))}
+  .ed-fab{top:calc(42px + var(--sat,0px))}
+  .ed-panel{padding-top:var(--sat,0px)}
+  .pend-ov{padding-top:calc(14px + var(--sat,0px))}
+  .al-ov{padding-top:calc(16px + var(--sat,0px))}
+  .lb-close,.cr-x{top:calc(16px + var(--sat,0px))}
   .subtabs button.dot::after,nav.tabbar button.dot::after{content:'';position:absolute;top:3px;right:6px;width:9px;height:9px;border-radius:50%;background:#ff4f7e;box-shadow:0 0 0 2px #3b0d1c}
   nav.tabbar button{position:relative}
   nav.tabbar button.dot::after{top:4px;right:12px}
@@ -2003,7 +2013,9 @@ function applyTema(t){
   const m=document.querySelector('meta[name=theme-color]'); if(m)m.content=TEMAS.find(x=>x[0]===t)[2];
   // en la app: barra de arriba y de abajo del mismo color que el tema
   const BAR={vino:['#5e1532','#1e0610',0,0],noche:['#232860','#070a1c',0,0],atardecer:['#ff9f7a','#2b0f33',1,0],pastel:['#fff6f0','#f8d3df',1,1],minimal:['#faf8f7','#faf8f7',1,1]}[t];
-  try{if(BAR&&window.AndroidApp&&AndroidApp.setBars)AndroidApp.setBars(BAR[0],BAR[1],!!BAR[2],!!BAR[3])}catch(e){}
+  try{const A=window.AndroidApp;if(BAR&&A){
+    if(A.setEdge){A.setEdge(BAR[1],!!BAR[2],!!BAR[3]);const i=+A.statusInset()||0;if(i>0)document.documentElement.style.setProperty('--sat',i+'px')}
+    else if(A.setBars)A.setBars(BAR[0],BAR[1],!!BAR[2],!!BAR[3])}}catch(e){}
 }
 try{applyTema(localStorage.getItem('tema')||'vino')}catch(e){}
 function boot(C){
@@ -4636,6 +4648,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const saveG=()=>{try{sessionStorage.setItem('grp',JSON.stringify(curG))}catch(e){}};
   const gOf=t=>{const gs=GRP[t];if(!gs)return null;return gs.some(g=>g[0]===curG[t])?curG[t]:gs[0][0]};
   const subBar=document.createElement('div'); subBar.className='subtabs'; document.querySelector('main').prepend(subBar);
+  {const sc=()=>subBar.classList.toggle('sc',window.scrollY>4);window.addEventListener('scroll',sc,{passive:true});sc()}
   const PK={botella:'botella',cartames:'cartames',dibujo:'pizarra',fotocom:'momentos',fotoreto:'fotoreto',likes:'buzon',notas:'buzon',pregunta:'pregunta',probable:'probable',resumen:'resumen',reto:'reto',voz:'voz'};
   const sidOf=x=>x.sid||PK[x.k]||(/^dt-/.test(x.k)?'detalles':/^pj-/.test(x.k)?'parajon':(!x.act&&document.getElementById(x.k))?x.k:null);
   let DOT=new Set();

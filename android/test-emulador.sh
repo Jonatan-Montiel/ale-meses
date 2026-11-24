@@ -22,6 +22,9 @@ sleep 1
 adb shell input keyevent 66
 sleep 15
 adb exec-out screencap -p > $OUT/2-pagina.png
+sleep 5
+adb exec-out screencap -p > $OUT/3-pagina-borde.png
+adb shell dumpsys window windows | grep -E "mCurrentFocus|statusBar|Window #" | head -20 > $OUT/ventana.txt 2>&1
 adb shell uiautomator dump /sdcard/u2.xml >/dev/null 2>&1; adb pull /sdcard/u2.xml $OUT/u2.xml >/dev/null 2>&1
 # teclear el código del candado de prueba no aplica (clave falsa): solo vemos que cargue la página
 adb shell input keyevent 4
