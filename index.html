@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Jsn+Pp9l58avXLlQlxuSly2kChi/iBRS6LBHFM438cU='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-2m/Zbj1Xr5QgZwWyejIQoKX6Ba/twPChQUXXUauDXhg='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -4436,8 +4436,8 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const bell=document.createElement('button'); bell.className='bell'; bell.setAttribute('aria-label','Pendientes'); bell.innerHTML='🔔<b></b>'; document.body.append(bell);
   const ps=document.createElement('div'); ps.className='pend-ov'; document.body.append(ps);
   let dis=new Set(); try{dis=new Set(JSON.parse(localStorage.getItem('pend-quitados')||'[]'))}catch(e){}
-  const dk=v=>v.k+'|'+v.t, VIS=()=>PEND.all().filter(v=>!dis.has(dk(v)));
-  const quitar=v=>{if(v.del)v.del();else{dis.add(dk(v));try{localStorage.setItem('pend-quitados',JSON.stringify([...dis].slice(-200)))}catch(e){}}count();render()};
+  const dk=v=>v.k+'|'+v.t, VIS=()=>PEND.all().filter(v=>!dis.has(dk(v))); window.PEND_VIS=VIS;
+  const quitar=v=>{if(v.del)v.del();else{dis.add(dk(v));try{localStorage.setItem('pend-quitados',JSON.stringify([...dis].slice(-200)))}catch(e){}}count();render();try{window.TABNAV&&TABNAV.refresh()}catch(e){}};
   function swipe(b,v){
     let x0=null,y0=0,dx=0,drag=false;
     b.addEventListener('pointerdown',e=>{x0=e.clientX;y0=e.clientY;dx=0;drag=false;b.style.transition='none'});
@@ -4639,10 +4639,10 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   }
   function apply(){const g=gOf(cur);document.querySelectorAll('main section').forEach(s=>s.classList.toggle('tab-off',s.dataset.tab!==cur||(!!g&&!!s.dataset.grp&&s.dataset.grp!==g)));renderSub()}
   function setGrp(t,k,keep){curG[t]=k;saveG();if(t===cur){apply();if(!keep)window.scrollTo(0,0);window.dispatchEvent(new Event('resize'))}}
-  function dots(){DOT=new Set();try{PEND.all().forEach(x=>{if(!x||!(x.n>0))return;const id=sidOf(x);if(id&&id!=='inicio'&&document.getElementById(id))DOT.add(id)})}catch(e){}
+  function dots(){DOT=new Set();try{(window.PEND_VIS?PEND_VIS():PEND.all()).forEach(x=>{if(!x||!(x.n>0))return;const id=sidOf(x);if(id&&id!=='inicio'&&document.getElementById(id))DOT.add(id)})}catch(e){}
     const tabs=new Set([...DOT].map(id=>document.getElementById(id).dataset.tab));
     nav.querySelectorAll('button').forEach(b=>b.classList.toggle('dot',tabs.has(b.dataset.k)&&b.dataset.k!==cur));renderSub()}
-  window.TABNAV={GRP,gOf,setGrp,cur:()=>cur,dots:()=>DOT};
+  window.TABNAV={GRP,gOf,setGrp,cur:()=>cur,dots:()=>DOT,refresh:()=>dots()};
   /* etiqueta en cada sección: para quién es */
   {const FOR={hoy:'cada',cumple:'ella',racha:'ella',cancion:'ella',carta:'ella',cartames:'ella',abrela:'ella',escribir:'ella',razones:'ella',galleta:'ella',medidor:'ella',sorpresas:'ella',capsula:'ella',rasca:'ella',vales:'ella',adivina:'ella',misavisos:'ella',
      parajon:'yo',cumpleyo:'yo'};
