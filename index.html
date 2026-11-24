@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-P5U+Hi3ohDYpiOetqzuAz0FfMTDNFRJSHaR/T9Ldo8Q='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-TLrIYvMbfrSOLM7I/kXXV8lDymKNEn1W+5iAULUdm2w='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -4286,10 +4286,11 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const del=(btn,x)=>{let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent='¿Borrar?';setTimeout(()=>{armed=false;btn.textContent='✕'},2500);return}upd(x,{x:1})}};
   const T=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['cartaj','💌 Una carta'],['mes','✉️ Carta del mes'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana']];
   let tab='msg', razon=null, carta=null, pick=null, scratching=false, cjOpen=false, mesOpen=null, mesSel=0;
+  const PJO=k=>{const v=((C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{})['pj-'+k];return v==='dos'||(v==='ella'&&VIEWER()==='ella')}, TV=()=>T.filter(([k])=>!PJO(k));
   window.PJ_GO=t=>{if(t)tab=t;render();GOTO('parajon')};
   const doy=()=>{const n=MXD();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)};
   const el=(h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
-  function todayMsg(){const L=live('msg');return L.length?L[doy()%L.length]:null}
+  function todayMsg(){if(PJO('msg'))return null;const L=live('msg');return L.length?L[doy()%L.length]:null}
   /* el mensaje del día de Jon lo escribe Ale */
   function jonDaily(){
     if(!soyJon())return; pending(); const m=todayMsg();
@@ -4337,7 +4338,9 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     sec.querySelector('h2').textContent=soyJon()?'De '+C.ella+' para ti':'Para '+C.yo;
     sec.querySelector('.sub').textContent=soyJon()?'todo lo que '+C.ella+' te dejó 💙':'cosas que le dejas a '+C.yo+' 💙';
     tabs.innerHTML='';
-    T.forEach(([k,n])=>{const b=document.createElement('button');b.className=k===tab?'cur':'';b.textContent=n;b.onclick=()=>{tab=k;render()};tabs.append(b)});
+    if(PJO(tab))tab=(TV()[0]||[])[0]||null;
+    if(!tab){box.innerHTML='';putVals(kv);return}
+    TV().forEach(([k,n])=>{const b=document.createElement('button');b.className=k===tab?'cur':'';b.textContent=n;b.onclick=()=>{tab=k;render()};tabs.append(b)});
     box.innerHTML=''; (soyJon()?JON:ALE)[tab]();
     putVals(kv);
   }
@@ -5752,6 +5755,8 @@ function initEditor(){
       const hoyI=rows.findIndex(r=>r.t==='inicio'); rows.splice(Math.max(0,hoyI),0,{id:'hoy',t:'inicio',n:'💬 Mensaje del día'});
       const finI=rows.map(r=>r.t).lastIndexOf('inicio')+1;
       rows.splice(finI,0,{id:'p-frase',t:'inicio',n:'✨ Frase final y «un poquito más de amor»'},{id:'p-creditos',t:'inicio',n:'🎬 Ver los créditos'},{id:'p-wa',t:'inicio',n:'💬 Estoy pensando en ti (WhatsApp)'},{id:'p-ver',t:'inicio',n:'📱 Versiones de la app'});
+      {const pi=rows.findIndex(r=>r.id==='parajon');const PJ=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['cartaj','💌 Una carta'],['mes','✉️ Carta del mes'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana']].map(([k,n])=>({id:'pj-'+k,t:'parajon',n:'· '+n}));
+        if(pi>=0){rows[pi].n='Toda la pestaña';rows.splice(pi+1,0,...PJ)}else rows.push(...PJ)}
       rows.forEach(x=>{const t=x.t;if(t!==last){last=t;list.append(h('div',{class:'ed-flab',style:'margin-top:12px'},TN[t]||t))}
         const sel=h('select',{class:'ed-in',style:'max-width:150px;padding:6px 8px'});
         [['','👁️ Visible'],['ella','🙈 Ocultar a '+(D.ella||'Ale')],['dos','🚫 Ocultar a los dos']].forEach(([v,l])=>{const o=h('option',{value:v},l);if((D.ocultas[x.id]||'')===v)o.selected=true;sel.append(o)});
