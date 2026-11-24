@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-THhnHGly5pUJJwbQIWmrlJdKa4qf6gVxkuUuQRgsUX8='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-P5U+Hi3ohDYpiOetqzuAz0FfMTDNFRJSHaR/T9Ldo8Q='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -5135,7 +5135,7 @@ function REACT(btn,x,w,save,what){
 
   /* ---------- Tablero de Hoy ---------- */
   safe(()=>{
-    const tb=$('tablero'); if(!tb)return;
+    const tb=$('tablero'); if(!tb||tb.classList.contains('oculta'))return; // si ocultan «Hoy», las secciones del día se ven normales
     const D=[['animo','🌤️','Cómo te sientes'],['termo','🌡️','Cuánto me extrañas'],['sello','🗓️','Sello del día'],['pregunta','💭','Pregunta del día'],
       ['noches','🌙','Buenas noches'],['extrano','🥺','Te extraño'],['horoscopo','🔮','Horóscopo'],['distancia','📍','Distancia']];
     let last=tb, open=null;
@@ -5744,11 +5744,11 @@ function initEditor(){
       D.ocultas=(D.ocultas&&typeof D.ocultas==='object'&&!Array.isArray(D.ocultas))?D.ocultas:{};
       const TN={inicio:'🏠 Inicio',nosotros:'💑 Nosotros',cartas:'💌 Cartas',juegos:'🎮 Juegos',planes:'📝 Planes',parajon:'💙 De '+(D.ella||'Ale')};
       const ORD=['inicio','nosotros','cartas','juegos','planes','parajon','avisos'];
-      const secs=[...document.querySelectorAll('main section[id]')].filter(x=>x.querySelector(':scope>h2')&&!['tablero','misavisos'].includes(x.id)).sort((a,b)=>ORD.indexOf(a.dataset.tab||'inicio')-ORD.indexOf(b.dataset.tab||'inicio'));
+      const secs=[...document.querySelectorAll('main section[id]')].filter(x=>x.querySelector(':scope>h2')&&!['misavisos'].includes(x.id)).sort((a,b)=>ORD.indexOf(a.dataset.tab||'inicio')-ORD.indexOf(b.dataset.tab||'inicio'));
       const cnt=h('div',{class:'ed-note'}), list=h('div',null);
       const paintC=ch=>{const n=Object.values(D.ocultas).filter(Boolean).length;cnt.textContent=(n?('Tienes '+n+(n===1?' sección oculta.':' secciones ocultas.')):'Todas las secciones están visibles.')+(ch?' Se aplica cuando toques «Guardar cambios».':'')};
       let last='';
-      const rows=secs.map(x=>({id:x.id,t:x.dataset.tab||'inicio',n:x.querySelector(':scope>h2').textContent.trim()}));
+      const rows=secs.map(x=>({id:x.id,t:x.dataset.tab||'inicio',n:x.id==='tablero'?'☀️ Hoy (tablero y «Hoy te falta»)':x.querySelector(':scope>h2').textContent.trim()}));
       const hoyI=rows.findIndex(r=>r.t==='inicio'); rows.splice(Math.max(0,hoyI),0,{id:'hoy',t:'inicio',n:'💬 Mensaje del día'});
       const finI=rows.map(r=>r.t).lastIndexOf('inicio')+1;
       rows.splice(finI,0,{id:'p-frase',t:'inicio',n:'✨ Frase final y «un poquito más de amor»'},{id:'p-creditos',t:'inicio',n:'🎬 Ver los créditos'},{id:'p-wa',t:'inicio',n:'💬 Estoy pensando en ti (WhatsApp)'},{id:'p-ver',t:'inicio',n:'📱 Versiones de la app'});
