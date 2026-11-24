@@ -21,10 +21,19 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Preparar llave de firma (desde los secretos)
+        env:
+          NL_SIGN: ${{ secrets.NL_SIGN }}
+        run: |
+          if [ -z "$NL_SIGN" ]; then echo "::error::Falta el secreto NL_SIGN"; exit 1; fi
+          P="${NL_SIGN%%:*}"; echo "::add-mask::$P"
+          printf %s "${NL_SIGN#*:}" | tr -d ' \n\r' | base64 -d > "$RUNNER_TEMP/nl.jks"
+          echo "NL_KEY_PASS=$P" >> "$GITHUB_ENV"
       - name: Construir APK
         working-directory: android
         env:
           VC: ${{ github.run_number }}
+          NL_KS: ${{ runner.temp }}/nl.jks
         run: gradle assembleAleRelease assembleJonRelease --no-daemon --stacktrace 2>&1 | tee build.log
       - name: Preparar archivo
         run: |
@@ -60,6 +69,9 @@ jobs:
           arch: x86_64
           disable-animations: true
           script: bash android/test-emulador.sh
+      - name: Borrar llave del runner
+        if: always()
+        run: rm -f "$RUNNER_TEMP/nl.jks"
       - name: Guardar resultado de la prueba
         if: always()
         run: |

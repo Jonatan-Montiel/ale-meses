@@ -10,7 +10,8 @@ android {
     versionName '1.' + (System.getenv('VC') ?: '1')
   }
   signingConfigs {
-    rel { storeFile file('../keystore.jks'); storePassword 'nuestrolugar'; keyAlias 'nl'; keyPassword 'nuestrolugar' }
+    // La llave vive SOLO en los secretos de GitHub (NL_SIGN); nunca en el repo
+    rel { storeFile file(System.getenv('NL_KS') ?: 'sin-llave.jks'); storePassword System.getenv('NL_KEY_PASS') ?: ''; keyAlias 'nl'; keyPassword System.getenv('NL_KEY_PASS') ?: '' }
   }
   buildFeatures { buildConfig true }
   flavorDimensions 'rol'
