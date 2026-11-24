@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-B20QZFT+33ggRkqQQGGCsAs+S/fZXBdngjdBqMAx8P4='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ew59xX6/ImMyyOX6pR4203CoiI/A+0MYTniXqwJG/Rc='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1061,7 +1061,7 @@
   body.light input[type=range].love::-webkit-slider-thumb{box-shadow:0 2px 8px rgba(120,40,70,.35)}
 .sh-ask{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:9000;background:#fff7f0;color:#3d1f2a;font:700 14px "Nunito";border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);text-align:center}.sh-th{display:flex;gap:6px;justify-content:center;margin:10px 0;flex-wrap:wrap}.sh-th img{width:54px;height:54px;object-fit:cover;border-radius:10px}.sh-b{display:flex;gap:10px;justify-content:center}.sh-b button{border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-family:inherit}.sh-b .si{background:var(--rose,#e85d84);color:#fff}.sh-b .no{background:rgba(0,0,0,.08);color:#3d1f2a}
   /* ===== Orden: sub-pestañas, puntitos, índice, temporadas ===== */
-  .fuera{display:none!important}
+  .fuera,.oculta{display:none!important}
   .subtabs{position:sticky;top:0;z-index:40;display:flex;gap:5px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:calc(22px + var(--sat,0px)) 62px 12px;min-height:calc(78px + var(--sat,0px));margin:0 calc(50% - 50vw);background:transparent;transition:background .25s}
   .subtabs.sc{background:rgba(20,6,20,.38);background:color-mix(in srgb,var(--bartop,#5e1532) 58%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2)}
   body.light .subtabs.sc{background:rgba(255,255,255,.6)}
@@ -4689,6 +4689,8 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const nav=document.querySelector('nav'); nav.innerHTML=''; nav.classList.add('tabbar');
   TABS.forEach(([k,,,ids])=>ids.forEach(id=>{const s=document.getElementById(id);if(s)s.dataset.tab=k}));
   document.querySelectorAll('main section').forEach(s=>{if(!s.dataset.tab)s.dataset.tab='inicio'});
+  {const O=(C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{}, E=VIEWER()==='ella';
+    Object.entries(O).forEach(([id,v])=>{const s=document.getElementById(id);if(s&&(v==='dos'||(v==='ella'&&E)))s.classList.add('oculta')})}
   const GRP={inicio:[['hoy','☀️ Hoy'],['logros','🏆 Logros',['racha','resumen','insignias','mapa']]],
     nosotros:[['rec','📸 Recuerdos',['momentos','albumes','polaroid','historia','diario']],['det','💝 Detalles',['detalles','cancion']],['esp','✨ Especiales',['cielo','constelacion','arbol','sorpresas','capsula']]],
     cartas:[['leer','📖 Leer',['carta','cartames','abrela','escribir','razones','galleta','medidor']],['escr','✍️ Escribir',['botella','pizarra']],['msj','💬 Mensajes',['buzon','voz','tregua','abrazo']]],
@@ -4697,7 +4699,8 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   Object.entries(GRP).forEach(([t,gs])=>{const def=gs.find(g=>!g[2])||gs[0];document.querySelectorAll('main section').forEach(s=>{if(s.dataset.tab!==t)return;const g=gs.find(g=>g[2]&&g[2].includes(s.id));s.dataset.grp=(g||def)[0]})});
   const curG={}; try{Object.assign(curG,JSON.parse(sessionStorage.getItem('grp')||'{}'))}catch(e){}
   const saveG=()=>{try{sessionStorage.setItem('grp',JSON.stringify(curG))}catch(e){}};
-  const gOf=t=>{const gs=GRP[t];if(!gs)return null;return gs.some(g=>g[0]===curG[t])?curG[t]:gs[0][0]};
+  const gVis=(t,k)=>[...document.querySelectorAll('main section')].some(s=>s.dataset.tab===t&&s.dataset.grp===k&&!s.classList.contains('oculta'));
+  const gOf=t=>{const gs=GRP[t];if(!gs)return null;if(gs.some(g=>g[0]===curG[t])&&gVis(t,curG[t]))return curG[t];const v=gs.find(g=>gVis(t,g[0]));return (v||gs[0])[0]};
   const subBar=document.createElement('div'); subBar.className='subtabs'; document.querySelector('main').prepend(subBar);
   {const sc=()=>subBar.classList.toggle('sc',window.scrollY>4);window.addEventListener('scroll',sc,{passive:true});sc()}
   const PK={botella:'botella',cartames:'cartames',dibujo:'pizarra',fotocom:'momentos',fotoreto:'fotoreto',likes:'buzon',notas:'buzon',pregunta:'pregunta',probable:'probable',resumen:'resumen',reto:'reto',voz:'voz'};
@@ -4705,14 +4708,14 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   let DOT=new Set();
   function renderSub(){
     subBar.innerHTML=''; const gs=GRP[cur]||[], g=gOf(cur);
-    gs.forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.className=(k===g?'cur':'')+([...DOT].some(id=>{const s=document.getElementById(id);return s&&s.dataset.tab===cur&&s.dataset.grp===k})&&k!==g?' dot':'');b.onclick=()=>setGrp(cur,k);subBar.append(b)});
+    gs.filter(([k])=>[...document.querySelectorAll('main section')].some(s=>s.dataset.tab===cur&&s.dataset.grp===k&&!s.classList.contains('oculta'))).forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.className=(k===g?'cur':'')+([...DOT].some(id=>{const s=document.getElementById(id);return s&&s.dataset.tab===cur&&s.dataset.grp===k})&&k!==g?' dot':'');b.onclick=()=>setGrp(cur,k);subBar.append(b)});
     const ix=document.createElement('button');ix.type='button';ix.className='st-idx';ix.textContent='🔎';ix.setAttribute('aria-label','Todas las secciones');ix.onclick=()=>window.IDX_OPEN&&IDX_OPEN();subBar.append(ix);
     const tb=document.createElement('button');tb.type='button';tb.className='st-idx';tb.textContent='🎨';tb.setAttribute('aria-label','Cambiar tema');tb.onclick=()=>window.TEMA_OPEN&&TEMA_OPEN();subBar.append(tb);
     subBar.classList.remove('tight');requestAnimationFrame(()=>{if(subBar.scrollWidth>subBar.clientWidth+1)subBar.classList.add('tight')});
   }
   function apply(){const g=gOf(cur);document.querySelectorAll('main section').forEach(s=>s.classList.toggle('tab-off',s.dataset.tab!==cur||(!!g&&!!s.dataset.grp&&s.dataset.grp!==g)));renderSub()}
   function setGrp(t,k,keep){curG[t]=k;saveG();if(t===cur){apply();if(!keep)window.scrollTo(0,0);window.dispatchEvent(new Event('resize'))}}
-  function dots(){DOT=new Set();try{(window.PEND_VIS?PEND_VIS():PEND.all()).forEach(x=>{if(!x||!(x.n>0))return;const id=sidOf(x);if(id&&id!=='inicio'&&document.getElementById(id))DOT.add(id)})}catch(e){}
+  function dots(){DOT=new Set();try{(window.PEND_VIS?PEND_VIS():PEND.all()).forEach(x=>{if(!x||!(x.n>0))return;const id=sidOf(x);if(id&&id!=='inicio'&&document.getElementById(id)&&!document.getElementById(id).classList.contains('oculta'))DOT.add(id)})}catch(e){}
     const tabs=new Set([...DOT].map(id=>document.getElementById(id).dataset.tab));
     nav.querySelectorAll('button').forEach(b=>b.classList.toggle('dot',tabs.has(b.dataset.k)&&b.dataset.k!==cur));renderSub()}
   window.TABNAV={GRP,gOf,setGrp,cur:()=>cur,dots:()=>DOT,refresh:()=>dots()};
@@ -4736,7 +4739,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     window.dispatchEvent(new Event('resize'));
     dots();
   }
-  TABS.forEach(([k,i,n])=>{const b=document.createElement('button');b.dataset.k=k;b.innerHTML=`<span>${i}</span>${esc(n)}`;b.onclick=()=>setTab(k);nav.append(b)});
+  TABS.forEach(([k,i,n])=>{if(![...document.querySelectorAll('main section')].some(s=>s.dataset.tab===k&&!s.classList.contains('oculta')))return;const b=document.createElement('button');b.dataset.k=k;b.innerHTML=`<span>${i}</span>${esc(n)}`;b.onclick=()=>setTab(k);nav.append(b)});
   const orig=Element.prototype.scrollIntoView;
   Element.prototype.scrollIntoView=function(...a){try{const s=this.closest&&this.closest('main section');if(s){if(s.dataset.tab&&s.dataset.tab!==cur)setTab(s.dataset.tab,true);
     if(s.dataset.grp&&GRP[s.dataset.tab]&&gOf(s.dataset.tab)!==s.dataset.grp){curG[s.dataset.tab]=s.dataset.grp;saveG();apply()}
@@ -4751,7 +4754,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const net=()=>off.classList.toggle('on',navigator.onLine===false||!!window.__offline&&navigator.onLine===false);net();
   window.addEventListener('online',net);window.addEventListener('offline',net);
   let start='inicio'; try{start=sessionStorage.getItem('tab')||'inicio'}catch(e){}
-  setTab(TABS.some(t=>t[0]===start)?start:'inicio');
+  setTab(nav.querySelector('button[data-k="'+start+'"]')?start:'inicio');
 })();
 
 /* ====== Carta del mes ====== */
@@ -5144,9 +5147,10 @@ function REACT(btn,x,w,save,what){
       ['sello','🗓️','Sello',()=>!!sl(ME())],['pregunta','💭','Pregunta',()=>!!pq(ME())],['buzon','💌','Notita o voz',notaHoy]];
     function render(){
       const g=$('tbGrid'); g.innerHTML='';
-      D.forEach(([id,ic,tt])=>{const s=$(id);if(!s||s.hidden)return;let r=['',''];try{r=ST[id]()}catch(e){}
+      D.forEach(([id,ic,tt])=>{const s=$(id);if(!s||s.hidden||s.classList.contains('oculta'))return;let r=['',''];try{r=ST[id]()}catch(e){}
         const b=mk('button','tb-t'+(r[1]?' '+r[1]:''));b.type='button';b.append(mk('span','tb-i',ic),mk('b',null,tt),mk('small',null,r[0]));b.onclick=()=>DASH_OPEN(id);g.append(b)});
-      const it=P.map(p=>{let ok=false;try{ok=p[3]()}catch(e){}return [p,ok]}), done=it.filter(x=>x[1]).length, pct=Math.round(done/it.length*100);
+      const vis=id=>{const s=$(id);return !s||!s.classList.contains('oculta')};
+      const it=P.filter(p=>p[0]==='entrar'||vis(p[0])).map(p=>{let ok=false;try{ok=p[3]()}catch(e){}return [p,ok]}), done=it.filter(x=>x[1]).length, pct=Math.round(done/it.length*100);
       const pr=$('tbProg'); pr.innerHTML='';
       const ring=mk('div','tb-ring'); ring.style.background=`conic-gradient(var(--rose) ${pct}%, rgba(247,198,211,.2) 0)`; ring.append(mk('b',null,done+'/'+it.length));
       const r=mk('div','tb-r'); r.append(mk('div','tb-h',done===it.length?'¡Todo listo por hoy! 💞':'Hoy te falta…'));
@@ -5445,7 +5449,7 @@ function REACT(btn,x,w,save,what){
     const i=document.createElement('input');i.placeholder='🔎 Buscar una sección…';i.type='search';
     const l=document.createElement('div');l.className='idx-l';
     const ORD=['inicio','nosotros','cartas','juegos','planes','parajon'];
-    const secs=[...document.querySelectorAll('main section[id]')].filter(s=>!s.hidden&&!s.classList.contains('fuera')&&s.querySelector(':scope>h2')).sort((a,b)=>ORD.indexOf(a.dataset.tab||'inicio')-ORD.indexOf(b.dataset.tab||'inicio'));
+    const secs=[...document.querySelectorAll('main section[id]')].filter(s=>!s.hidden&&!s.classList.contains('fuera')&&!s.classList.contains('oculta')&&s.querySelector(':scope>h2')).sort((a,b)=>ORD.indexOf(a.dataset.tab||'inicio')-ORD.indexOf(b.dataset.tab||'inicio'));
     const G=(window.TABNAV&&TABNAV.GRP)||{};
     function draw(){l.innerHTML='';const q=norm(i.value.trim());let last='';
       secs.forEach(s=>{const h=s.querySelector(':scope>h2').textContent.trim(),sub=(s.querySelector(':scope>.sub')||{}).textContent||'';
@@ -5580,6 +5584,7 @@ let CUR=null;
 const SCHEMA=[
   {g:'⚙️ General'},
   {t:'Página inactiva',special:'inactiva'},
+  {t:'Ocultar secciones',special:'ocultas'},
   {t:'Nombres, fecha y candado',f:[['ella','Su nombre','text'],['yo','Tu nombre (firma)','text'],['inicio','Fecha en que empezó todo','date'],['pin','Código del candado (4 números)','text']]},
   {t:'Saludos según la hora',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
   {g:'🏠 Inicio'},
@@ -5714,6 +5719,23 @@ function initEditor(){
       paint();
       body.append(section('💤 '+sec.t,[h('div',{class:'ed-note'},'Con un botón, '+(D.ella||'Ale')+' deja de ver la página y solo le aparece un aviso de que está inactiva. Nada se borra: al reactivarla todo vuelve a estar igual. Tú sigues viendo todo aquí en el editor.'),
         tg,st,h('label',{class:'ed-lab'},h('span',null,'Título que verá'),t1),h('label',{class:'ed-lab'},h('span',null,'Mensaje que verá'),t2)]));
+      return;
+    }
+    if(sec.special==='ocultas'){
+      D.ocultas=(D.ocultas&&typeof D.ocultas==='object'&&!Array.isArray(D.ocultas))?D.ocultas:{};
+      const TN={inicio:'🏠 Inicio',nosotros:'💑 Nosotros',cartas:'💌 Cartas',juegos:'🎮 Juegos',planes:'📝 Planes',parajon:'💙 De '+(D.ella||'Ale')};
+      const ORD=['inicio','nosotros','cartas','juegos','planes','parajon'];
+      const secs=[...document.querySelectorAll('main section[id]')].filter(x=>x.querySelector(':scope>h2')&&!['tablero','misavisos'].includes(x.id)).sort((a,b)=>ORD.indexOf(a.dataset.tab||'inicio')-ORD.indexOf(b.dataset.tab||'inicio'));
+      const cnt=h('div',{class:'ed-note'}), list=h('div',null);
+      const paintC=ch=>{const n=Object.values(D.ocultas).filter(Boolean).length;cnt.textContent=(n?('Tienes '+n+(n===1?' sección oculta.':' secciones ocultas.')):'Todas las secciones están visibles.')+(ch?' Se aplica cuando toques «Guardar cambios».':'')};
+      let last='';
+      secs.forEach(x=>{const t=x.dataset.tab||'inicio';if(t!==last){last=t;list.append(h('div',{class:'ed-flab',style:'margin-top:12px'},TN[t]||t))}
+        const sel=h('select',{class:'ed-in',style:'max-width:150px;padding:6px 8px'});
+        [['','👁️ Visible'],['ella','🙈 Ocultar a '+(D.ella||'Ale')],['dos','🚫 Ocultar a los dos']].forEach(([v,l])=>{const o=h('option',{value:v},l);if((D.ocultas[x.id]||'')===v)o.selected=true;sel.append(o)});
+        sel.addEventListener('change',()=>{if(sel.value)D.ocultas[x.id]=sel.value;else delete D.ocultas[x.id];markDirty();paintC(true)});
+        list.append(h('div',{style:'display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;border-top:1px solid rgba(247,198,211,.12)'},h('span',{style:'font-weight:700;font-size:14px'},x.querySelector(':scope>h2').textContent.trim()),sel))});
+      paintC();
+      body.append(section('🙈 '+sec.t,[h('div',{class:'ed-note'},'Elige qué secciones no se ven. «Ocultar a '+(D.ella||'Ale')+'» la quita solo de su app; «a los dos» la quita también de la tuya. Nada se borra: si la vuelves a poner visible, todo sigue ahí.'),cnt,list]));
       return;
     }
     if(sec.special==='avisos'){
