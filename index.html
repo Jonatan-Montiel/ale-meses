@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-3F/osCaZdm3nSmExGIKWj6tmV3INCVih2fb8ISNHdT4='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-l6LseXKMfQZ/mCq/OCg6VaZhEEOXc2YiOQv6hZnu/yE='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -794,7 +794,13 @@
   .pj-jar:active{transform:scale(.94)}
   .rch-other{margin-top:10px;font-size:14px;font-weight:700;opacity:.9}
   /* Pestañas */
-  .tab-off{position:absolute!important;left:-10000px!important;top:0!important;width:100%!important;height:0!important;padding:0!important;overflow:hidden!important;visibility:hidden!important;pointer-events:none!important}
+  html.lite *,html.lite *::before,html.lite *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  html.lite .subtabs.sc{background:color-mix(in srgb,var(--bartop,#5e1532) 92%,transparent)}
+  html.lite .pr-dot,html.lite .bell.has,html.lite .cap-ico,html.lite .rch-fire,html.lite .hh{animation:none!important}
+  html.lite #hearts .fh{will-change:transform}
+  .th-lite{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.07);text-align:left;cursor:pointer}.th-lite small{display:block;font-size:12px;opacity:.7;margin-top:2px}.th-lite input{width:22px;height:22px;accent-color:var(--rose,#e8577f);flex:none}
+  body.light .th-lite{background:rgba(0,0,0,.05)}
+  .tab-off{content-visibility:auto;contain-intrinsic-size:auto 0;position:absolute!important;left:-10000px!important;top:0!important;width:100%!important;height:0!important;padding:0!important;overflow:hidden!important;visibility:hidden!important;pointer-events:none!important}
   nav.tabbar{display:flex;gap:2px;padding:6px;max-width:96vw;width:max-content}
   nav.tabbar button{background:none;border:0;color:var(--cream);font:800 11px 'Nunito';display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 9px;border-radius:14px;opacity:.75;cursor:pointer;white-space:nowrap}
   nav.tabbar button span{font-size:19px;line-height:1}
@@ -2243,7 +2249,9 @@ const GEN=(t,w)=>(w||VIEWER())==='yo'?MASC(t):String(t||'');
 const CUMPLE_TXT=(days,propio,heart)=>propio
   ?(days===1?'¡Mañana es tu gran día! 🥳':days<=7?'¡Ya casi! esta semana es tu cumpleaños 🎈':days<=31?'falta menos de un mes para celebrarte 🎉':days<=90?'faltan unos meses, pero ya se siente cerca 🎂':'todavía falta, pero ya cuento los días '+heart)
   :(days===1?'¡Mañana es su cumpleaños! ten todo listo 🥳':days<=7?'¡Ya casi! prepárale algo bonito 🎈':days<=31?'falta menos de un mes, ve pensando en su regalo 🎁':days<=90?'faltan unos meses, hay tiempo de planear algo especial 🎂':'todavía falta mucho, pero que no se te olvide 😉');
-const MXD=t=>new Date(new Date(t==null?Date.now():t).toLocaleString('en-US',{timeZone:'America/Mexico_City'}));
+const MXD=(()=>{let F=null;try{F=new Intl.DateTimeFormat('en-US',{timeZone:'America/Mexico_City',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',second:'numeric',hourCycle:'h23'})}catch(e){}
+  return t=>{const d=new Date(t==null?Date.now():t);if(!F)return new Date(d.toLocaleString('en-US',{timeZone:'America/Mexico_City'}));
+    const o={};F.formatToParts(d).forEach(p=>{o[p.type]=p.value});return new Date(+o.year,+o.month-1,+o.day,(+o.hour)%24,+o.minute,+o.second)}})();
 const DK=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const UID=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 /* lista compartida y cifrada en el gist (se combina por id) */
@@ -4073,7 +4081,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const hero=document.getElementById('inicio'); if(!hero)return;
   const b=document.createElement('button'); b.className='th-btn'; b.textContent='🎨'; b.setAttribute('aria-label','Cambiar tema'); hero.append(b);
   const sh=document.createElement('div'); sh.className='th-sheet';
-  sh.innerHTML='<div class="th-box"><h3>Elige un tema 🎨</h3><p>se queda guardado en este celular</p><div class="th-grid"></div><div class="th-sub">✨ Lo que flota en el fondo</div><div class="th-emo"></div><form class="th-own"><input maxlength="40" placeholder="o escribe tus emojis, ej. 🐻🍕💗"><button>Usar</button></form><button class="btn small" style="margin-top:16px">Listo ♥</button></div>';
+  sh.innerHTML='<div class="th-box"><h3>Elige un tema 🎨</h3><p>se queda guardado en este celular</p><div class="th-grid"></div><div class="th-sub">✨ Lo que flota en el fondo</div><div class="th-emo"></div><form class="th-own"><input maxlength="40" placeholder="o escribe tus emojis, ej. 🐻🍕💗"><button>Usar</button></form><label class="th-lite"><span><b>⚡ Modo ligero</b><small>más rápido en celulares sencillos: menos efectos y animaciones</small></span><input type="checkbox"></label><button class="btn small" style="margin-top:16px">Listo ♥</button></div>';
+  {const lc=sh.querySelector('.th-lite input');lc.checked=!!window.LITE;lc.onchange=()=>{try{localStorage.setItem('modo-ligero',lc.checked?'1':'0')}catch(e){}location.reload()}}
   document.body.append(sh);
   const grid=sh.querySelector('.th-grid'), cur=()=>{try{return localStorage.getItem('tema')||'vino'}catch(e){return 'vino'}};
   function paint(){grid.innerHTML='';TEMAS.forEach(([k,n,,bg,c])=>{const o=document.createElement('button');o.className='th-op'+(cur()===k?' sel':'');
@@ -4912,7 +4921,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const gVis=(t,k)=>[...document.querySelectorAll('main section')].some(s=>s.dataset.tab===t&&s.dataset.grp===k&&!s.classList.contains('oculta'));
   const gOf=t=>{const gs=GRP[t];if(!gs)return null;if(gs.some(g=>g[0]===curG[t])&&gVis(t,curG[t]))return curG[t];const v=gs.find(g=>gVis(t,g[0]));return (v||gs[0])[0]};
   const subBar=document.createElement('div'); subBar.className='subtabs'; document.querySelector('main').prepend(subBar);
-  {const sc=()=>subBar.classList.toggle('sc',window.scrollY>4);window.addEventListener('scroll',sc,{passive:true});sc()}
+  {let on=null,q=false;const sc=()=>{q=false;const v=window.scrollY>4;if(v!==on){on=v;subBar.classList.toggle('sc',v)}};window.addEventListener('scroll',()=>{if(!q){q=true;requestAnimationFrame(sc)}},{passive:true});sc()}
   const PK={botella:'botella',cartames:'cartames',dibujo:'pizarra',fotocom:'momentos',fotoreto:'fotoreto',likes:'buzon',notas:'buzon',pregunta:'pregunta',probable:'probable',resumen:'resumen',reto:'reto',voz:'voz'};
   const sidOf=x=>x.sid||PK[x.k]||(/^dt-/.test(x.k)?'detalles':/^pj-/.test(x.k)?'parajon':(!x.act&&document.getElementById(x.k))?x.k:null);
   let DOT=new Set();
@@ -5266,8 +5275,11 @@ function heart(burst){
   H.appendChild(h);
   setTimeout(()=>h.remove(),14000);
 }
-setInterval(()=>heart(false),900);
-function burst(n=30){for(let i=0;i<n;i++)setTimeout(()=>heart(true),i*40)}
+const LITE=window.LITE=(()=>{try{const f=localStorage.getItem('modo-ligero');if(f==='1')return true;if(f==='0')return false}catch(e){}
+  const m=navigator.deviceMemory, c=navigator.hardwareConcurrency;return (m&&m<=4)||(c&&c<=4)||false})();
+if(LITE)document.documentElement.classList.add('lite');
+setInterval(()=>{if(!document.hidden&&(!LITE||document.querySelectorAll('#hearts .fh').length<9))heart(false)},LITE?1600:900);
+function burst(n=30){if(LITE)n=Math.ceil(n/2);for(let i=0;i<n;i++)setTimeout(()=>heart(true),i*(LITE?60:40))}
 document.getElementById('beat').addEventListener('click',()=>burst(40));
 
 /* ====== Carta ====== */
