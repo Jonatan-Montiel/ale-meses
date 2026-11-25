@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-IUpCpslv7Zkg+1W8PdUfaQGwgXtrlw/vR6Jd4OR5fbI='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-0m/g6GU8v5ldk1nM5h6Y+bpou7de4Z8Idh0bQ7cblKE='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -798,6 +798,7 @@
   html.lite .subtabs.sc{background:color-mix(in srgb,var(--bartop,#5e1532) 92%,transparent)}
   html.lite .pr-dot,html.lite .bell.has,html.lite .cap-ico,html.lite .rch-fire,html.lite .hh{animation:none!important}
   html.lite #hearts .fh{will-change:transform}
+  .th-box .ver-w{margin-top:10px}.th-box .ver{background:rgba(120,40,70,.07)!important;border:0;color:#3d1f2a}.th-box .ver span{opacity:.7}.th-box .ver a{color:#b3204f}
   .th-out .logout{display:block;width:100%;margin:10px 0 0;text-align:left;padding:12px 14px;border-radius:14px;background:rgba(120,40,70,.07);border:0;color:#7a2244;font:800 14px 'Nunito',sans-serif;cursor:pointer}
   body.light .th-out .logout{background:rgba(0,0,0,.05)}
   .th-lite{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding:12px 14px;border-radius:14px;background:rgba(120,40,70,.07);text-align:left;cursor:pointer}.th-lite small{display:block;font-size:12px;opacity:.7;margin-top:2px}.th-lite input{width:22px;height:22px;accent-color:var(--rose,#e8577f);flex:none}
@@ -1162,6 +1163,11 @@
   .tb-ch button{border:1px solid rgba(247,198,211,.3);background:rgba(255,255,255,.08);color:inherit;border-radius:999px;padding:6px 10px;font:700 12.5px 'Nunito';cursor:pointer}
   .tb-ch button.ok{opacity:.55;text-decoration:line-through;cursor:default}
   body.light .tb-ch button{background:#fff;border-color:rgba(120,40,70,.18);color:#3d1f2a}
+  .pr-sheet{position:fixed;inset:0;z-index:45;background:rgba(10,2,6,.6);display:none;align-items:flex-end;justify-content:center}.pr-sheet.open{display:flex}
+  .pr-sbox{position:relative;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;overscroll-behavior:contain;background:radial-gradient(120% 60% at 50% 0%,var(--p1,#6b1838),var(--p2,#2a0a18) 70%);border:1px solid rgba(247,198,211,.2);border-bottom:0;border-radius:26px 26px 0 0;padding:14px 16px calc(24px + env(safe-area-inset-bottom));animation:pop .35s}
+  body.light .pr-sbox{background:linear-gradient(180deg,var(--bartop,#fff7f3),#fff 70%);color:#3d1f2a}
+  .pr-sbox #presencia{padding:0;margin:0;min-height:0}.pr-sbox #presencia>h2{margin-top:6px}.pr-x{position:absolute;top:12px;right:14px;z-index:2}
+  .pr-b{position:relative}.pr-b.live::after{content:'';position:absolute;right:2px;top:2px;width:10px;height:10px;border-radius:50%;background:#3ddc84;box-shadow:0 0 0 2px rgba(0,0,0,.35)}
   .pr-card{background:rgba(255,255,255,.06);border:1px solid rgba(247,198,211,.18);border-radius:18px;padding:14px 16px;margin:10px 0}
   .pr-card h4{margin:0 0 8px;font-size:15px}.pr-card small{opacity:.7;font-size:12.5px}
   .pr-on{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}.pr-on b{flex:1;font-size:15px}.pr-on small{width:100%;padding-left:22px}
@@ -1179,7 +1185,7 @@
   body.zb main,body.zb .subtabs{animation:zbS .45s ease-in-out 3}
   .zb-toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:99;background:rgba(30,6,16,.9);color:#fff;border-radius:22px;padding:18px 24px;font:800 18px 'Nunito',sans-serif;text-align:center;box-shadow:0 14px 40px rgba(0,0,0,.5);animation:pop .4s}
   .nb-vis{font-size:11.5px;opacity:.6}.nb-vis.ok{opacity:1;color:#fff;font-weight:800}
-  #presencia>h2::before{content:'👀'}
+  #presencia>h2::before{content:'👀';margin-right:8px}
   .tb-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .tb-t{position:relative;text-align:left;background:rgba(255,247,240,.07);border:1px solid rgba(247,198,211,.18);border-radius:20px;padding:14px;color:inherit;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-height:104px}
   .tb-t .tb-i{font-size:24px;line-height:1}
@@ -4101,6 +4107,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const b=document.createElement('button'); b.className='th-btn'; b.textContent='🎨'; b.setAttribute('aria-label','Cambiar tema'); hero.append(b);
   const sh=document.createElement('div'); sh.className='th-sheet';
   sh.innerHTML='<div class="th-box"><h3>Elige un tema 🎨</h3><p>se queda guardado en este celular</p><div class="th-grid"></div><div class="th-sub">✨ Lo que flota en el fondo</div><div class="th-emo"></div><form class="th-own"><input maxlength="40" placeholder="o escribe tus emojis, ej. 🐻🍕💗"><button>Usar</button></form><div class="th-sub">⚙️ Este celular</div><label class="th-lite"><span><b>⚡ Modo ligero</b><small>más rápido en celulares sencillos: menos efectos y animaciones</small></span><input type="checkbox"></label><div class="th-out"></div><button class="btn small" style="margin-top:16px">Listo ♥</button></div>';
+  {const vb=document.getElementById('verBox'),w=sh.querySelector('.th-out');if(vb&&w&&!vb.classList.contains('oculta'))w.before(vb)}
   {const lb=document.getElementById('logoutBtn'),w=sh.querySelector('.th-out');if(lb&&w){const p=lb.parentNode;w.append(lb);if(p&&!p.children.length)p.remove()}}
   {const lc=sh.querySelector('.th-lite input');const sync=()=>{lc.checked=document.documentElement.classList.contains('lite')};sync();window.addEventListener('lite',sync);
    lc.onchange=()=>{try{localStorage.setItem('modo-ligero',lc.checked?'1':'0')}catch(e){}window.LITE=lc.checked;document.documentElement.classList.toggle('lite',lc.checked)}}
@@ -4572,6 +4579,12 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
 /* ====== Saber si el otro está usando la app (en línea, visto, ruta, resumen, días sin entrar) ====== */
 (function(){
   const sec=document.getElementById('presencia'); if(!sec)return;
+  // vive en su propia hoja (botón 👀 arriba), no en Inicio
+  const sheet=document.createElement('div'); sheet.className='pr-sheet'; const sbox=document.createElement('div'); sbox.className='pr-sbox';
+  const x=document.createElement('button'); x.className='pend-x pr-x'; x.setAttribute('aria-label','Cerrar'); x.textContent='×'; sbox.append(x,sec); sheet.append(sbox); document.body.append(sheet);
+  const isOpen=()=>sheet.classList.contains('open');
+  window.PR_OPEN=()=>{render();sheet.classList.add('open');poll()};
+  const prClose=()=>sheet.classList.remove('open'); x.onclick=prClose; sheet.addEventListener('click',e=>{if(e.target===sheet)prClose()});
   const me=VIEWER(), oth=me==='yo'?'ella':'yo', nm=w=>w==='yo'?C.yo:C.ella, $=id=>document.getElementById(id);
   const AC=(C.actividad&&typeof C.actividad==='object')?C.actividad:{};
   // F(f,w): ¿w puede ver eso del otro?  Por defecto Jon sí y Ale no
@@ -4636,7 +4649,9 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
   const fmtMs=ms=>{const m=Math.round(ms/6e4);return m<1?'<1 min':m<60?m+' min':Math.floor(m/60)+' h '+(m%60?m%60+' min':'')};
   function render(){
-    const any=FEATS.some(veo); sec.hidden=!any; if(!any)return;
+    const any=FEATS.some(veo); window.PR_ON=any; sec.hidden=!any;
+    {const on=any&&veo('online')&&enLinea(); if(on!==window.PR_LIVE){window.PR_LIVE=on;window.TABNAV&&TABNAV.refresh()}}
+    if(!any)return;
     const box=$('prBox'); box.innerHTML='';
     // en línea / última vez
     const lv=visto(), sinDatos=!lv;
@@ -4677,11 +4692,11 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
       else L.forEach(([id,t,a])=>{const v=lvOf(id),r=mk('div','pr-vi');r.append(mk('span',null,t));r.append(mk('em',v>=a?'ok':'',v>=a?'✓✓ visto '+fmtHora(v):'✓ enviado'));c.append(r)});
       box.append(c)}
     // aviso en la campana si lleva días sin entrar
-    if(veo('inactiva')&&!sinDatos&&Date.now()-lv>dias*864e5)PEND.set('uso-inactiva',{n:1,t:'😢 '+nm(oth)+' lleva '+Math.floor((Date.now()-lv)/864e5)+' días sin entrar',sid:'presencia',go:()=>GOTO('presencia')});
+    if(veo('inactiva')&&!sinDatos&&Date.now()-lv>dias*864e5)PEND.set('uso-inactiva',{n:1,t:'😢 '+nm(oth)+' lleva '+Math.floor((Date.now()-lv)/864e5)+' días sin entrar',go:()=>PR_OPEN()});
     else PEND.set('uso-inactiva',null);
   }
   render(); setTimeout(poll,2500);
-  setInterval(()=>{if(!document.hidden&&!sec.classList.contains('tab-off'))poll()},30e3);
+  setInterval(()=>{if(!document.hidden&&(isOpen()||veo('online')))poll()},isOpen()?30e3:30e3);
   setInterval(()=>{if(!document.hidden)render()},60e3);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
 })();
@@ -4938,7 +4953,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
 /* ====== Pestañas ====== */
 (function(){
   const J=VIEWER()==='yo';
-  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','presencia','aniversario','sanvalentin','cumple','cumpleyo','racha','resumen','insignias','animo','termo','sello','distancia','horoscopo','pregunta','extrano','tablero','noches','undia','mapa','final']],
+  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','resumen','insignias','animo','termo','sello','distancia','horoscopo','pregunta','extrano','tablero','noches','undia','mapa','final']],
     ['nosotros','💑','Nosotros',['detalles','cancion','momentos','albumes','polaroid','historia','diario','cielo','constelacion','arbol','sorpresas','capsula']],
     ['cartas','💌','Cartas',['carta','cartames','abrela','buzon','voz','botella','pizarra','escribir','razones','galleta','medidor','abrazo','tregua']],
     ['juegos','🎮','Juegos',['probable','fotoreto','elige','debo','corazones','rasca','vales','memorama','rompecabezas','adivina','ruleta','comida']],
@@ -4973,6 +4988,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     subBar.innerHTML=''; const gs=GRP[cur]||[], g=gOf(cur);
     gs.filter(([k])=>[...document.querySelectorAll('main section')].some(s=>s.dataset.tab===cur&&s.dataset.grp===k&&!s.classList.contains('oculta'))).forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.className=(k===g?'cur':'')+([...DOT].some(id=>{const s=document.getElementById(id);return s&&s.dataset.tab===cur&&s.dataset.grp===k})&&k!==g?' dot':'');b.onclick=()=>setGrp(cur,k);subBar.append(b)});
     const ix=document.createElement('button');ix.type='button';ix.className='st-idx';ix.textContent='🔎';ix.setAttribute('aria-label','Todas las secciones');ix.onclick=()=>window.IDX_OPEN&&IDX_OPEN();subBar.append(ix);
+    if(window.PR_ON){const pb=document.createElement('button');pb.type='button';pb.className='st-idx pr-b'+(window.PR_LIVE?' live':'');pb.textContent='👀';pb.setAttribute('aria-label','Cómo vamos');pb.onclick=()=>window.PR_OPEN&&PR_OPEN();subBar.append(pb)}
     const tb=document.createElement('button');tb.type='button';tb.className='st-idx';tb.textContent='🎨';tb.setAttribute('aria-label','Cambiar tema');tb.onclick=()=>window.TEMA_OPEN&&TEMA_OPEN();subBar.append(tb);
     subBar.classList.remove('tight');requestAnimationFrame(()=>{if(subBar.scrollWidth>subBar.clientWidth+1)subBar.classList.add('tight')});
   }
