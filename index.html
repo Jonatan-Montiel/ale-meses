@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fHqAnNvMmr78V0JpACFZaUWxmM0RfALc0XWtACGY3hY='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fcTPEPBVTxdD6j4wUXkRTb8KedXCbvY0FFc5spcwfY8='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1469,13 +1469,6 @@
     <div class="sub">elige uno y ve cómo se va llenando el mes 🗓️</div>
     <div class="card"><div class="sl-pick" id="slPick"></div><div class="sl-st" id="slSt"></div></div>
     <div class="card sl-cal" id="slCal"></div>
-  </section>
-
-  <!-- DISTANCIA -->
-  <section id="distancia">
-    <h2>¿Qué tan lejos estamos?</h2>
-    <div class="sub">para el widget de distancia 📍</div>
-    <div id="dsBox"></div>
   </section>
 
   <!-- HORÓSCOPO -->
@@ -3954,7 +3947,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     d.innerHTML=`<b>💗 Hay una versión nueva de la app</b><span>trae widgets nuevos · de preferencia con wifi</span><a href="${url}" target="_blank" rel="noopener">Actualizar</a><button aria-label="Cerrar">✕</button>`;
     d.querySelector('button').onclick=()=>d.remove(); document.body.append(d)};
   window.__showUpd=()=>{if(!document.body.classList.contains('locked'))show();else window.addEventListener('unlocked',()=>setTimeout(show,2500),{once:true})};
-  if(!A.setLoc){window.addEventListener('unlocked',()=>setTimeout(show,2500)); if(!document.body.classList.contains('locked'))setTimeout(show,2500)}
+  if(!A.appVersion){window.addEventListener('unlocked',()=>setTimeout(show,2500)); if(!document.body.classList.contains('locked'))setTimeout(show,2500)}
 })();
 
 /* ====== Versiones de la app (la mía, la del otro y la más nueva) ====== */
@@ -4010,26 +4003,10 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   render();
 })();
 
-/* ====== Widgets de la app: distancia, cómo está el otro y cuenta regresiva ====== */
+/* ====== Widgets de la app: cómo está el otro y cuenta regresiva ====== */
 (function(){
   const A=window.AndroidApp, me=VIEWER(), oth=me==='yo'?'ella':'yo', nm=w=>w==='yo'?C.yo:C.ella, $=id=>document.getElementById(id);
   const L=k=>{try{const v=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(v)?v:[]}catch(e){return []}};
-  // --- sección «Distancia» (para prender o apagar compartir la ubicación) ---
-  const box=$('dsBox');
-  function paint(){
-    if(!box)return;
-    if(!(A&&A.setLoc)){box.innerHTML=`<div class="card" style="text-align:center;font-size:14.5px">📍 El widget de distancia funciona en la app de Android. ${window.AndroidApp?'Actualiza la app para usarlo.':''}</div>`;return}
-    const st=A.locState(), [k,txt]=String(A.distText()).split('|'), on=st!=='off';
-    box.innerHTML=`<div class="card ds">
-      <div class="ds-vis"><span class="dt a">A</span><span class="ln">${k==='juntos'?'─── ❤️ ───':k==='lejos'?'~~~ 💗 ~~~':'· · · 🤍 · · ·'}</span><span class="dt j">J</span></div>
-      <div class="ds-t">${esc(txt)}</div>
-      <label class="ds-sw"><span>Compartir mi ubicación con ${esc(nm(oth))}</span><input type="checkbox" ${on?'checked':''}><i></i></label>
-      <div class="ds-n">${st==='noperm'?'⚠️ Falta darle permiso de ubicación a la app.':st==='nobg'?'⚠️ Para que se actualice con la app cerrada, elige «Permitir todo el tiempo». <button class="pq-ed" id="dsBg">Abrir permiso</button>':on?'✅ Prendido · se actualiza cada 15–30 min':'Apagado · '+esc(nm(oth))+' verá que lo pausaste'}</div>
-      <div class="ds-p">🔒 Solo se comparte la <b>distancia</b>, nunca tu dirección ni un mapa. Va cifrada y la puedes apagar cuando quieras. Para que funcione, los dos tienen que tenerla prendida.</div></div>`;
-    box.querySelector('input').onchange=e=>{A.setLoc(e.target.checked);setTimeout(paint,800);setTimeout(paint,5000)};
-    const bb=$('dsBg'); if(bb)bb.onclick=()=>A.askBgLoc&&A.askBgLoc();
-  }
-  window.__locUpd=paint; paint(); setInterval(paint,60000); document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(paint,1500)});
   if(!(A&&A.setInfo))return;
   // --- datos para los widgets «Cómo está» y «Cuenta regresiva» ---
   let last='';
@@ -5037,7 +5014,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
 /* ====== Pestañas ====== */
 (function(){
   const J=VIEWER()==='yo';
-  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','resumen','insignias','animo','termo','sello','distancia','horoscopo','pregunta','extrano','tablero','noches','undia','mapa','final']],
+  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','resumen','insignias','animo','termo','sello','horoscopo','pregunta','extrano','tablero','noches','undia','mapa','final']],
     ['nosotros','💑','Nosotros',['detalles','cancion','momentos','albumes','polaroid','historia','diario','cielo','constelacion','arbol','sorpresas','capsula']],
     ['cartas','💌','Cartas',['carta','cartames','abrela','buzon','voz','botella','pizarra','escribir','razones','galleta','medidor','abrazo','tregua']],
     ['juegos','🎮','Juegos',['probable','fotoreto','elige','debo','corazones','rasca','vales','memorama','rompecabezas','adivina','ruleta','comida']],
@@ -5487,7 +5464,7 @@ function REACT(btn,x,w,save,what){
   safe(()=>{
     const tb=$('tablero'); if(!tb||tb.classList.contains('oculta'))return; // si ocultan «Hoy», las secciones del día se ven normales
     const D=[['animo','🌤️','Cómo te sientes'],['termo','🌡️','Cuánto me extrañas'],['sello','🗓️','Sello del día'],['pregunta','💭','Pregunta del día'],
-      ['noches','🌙','Buenas noches'],['extrano','🥺','Te extraño'],['horoscopo','🔮','Horóscopo'],['distancia','📍','Distancia']];
+      ['noches','🌙','Buenas noches'],['extrano','🥺','Te extraño'],['horoscopo','🔮','Horóscopo']];
     let last=tb, open=null;
     const close=()=>{if(open){const s=$(open);if(s)s.classList.remove('dash-open');open=null}};
     D.forEach(([id])=>{const s=$(id);if(!s)return;s.classList.add('dash-sec');last.after(s);last=s;
@@ -5509,7 +5486,6 @@ function REACT(btn,x,w,save,what){
       noches:()=>{const m=nc(ME()),o=nc(OT());return m&&o?['🌕 los dos','ok']:m?['✓ falta '+NM(OT()),'ok']:o?[NM(OT())+' ya te la dio 🥰','new']:['🌑 dásela al dormir','']},
       extrano:()=>{const n=LSA('extrano-cache').filter(x=>!x.x&&x.w===OT()&&dayOf(x.a)===td()).length;return n?[NM(OT())+' te extrañó '+(n===1?'1 vez':n+' veces')+' hoy','']:['toca si me extrañas','']},
       horoscopo:()=>['lo que dicen los astros hoy',''],
-      distancia:()=>{try{if(window.AndroidApp&&AndroidApp.distText){const t=String(AndroidApp.distText()).split('|')[1];if(t)return [t,'']}}catch(e){}return ['en la app 📱','']}
     };
     const notaHoy=()=>!!(lastBy('notas-cache',ME())||lastBy('voz-cache',ME()));
     const P=[['entrar','👋','Entrar',()=>true],['animo','🌤️','Ánimo',()=>!!lastBy('animo-cache',ME())],['termo','🌡️','Termómetro',()=>!!tm(ME())],
