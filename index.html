@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-VanW67+yg+EbSFcqoM5fMroHckELaalOQRUGL7xWa58='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-o+EIfs1yrleeP1ixgSXCkpr4TPbwTxT7Fr+6/+iWzxw='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -842,7 +842,7 @@
   html.lite .subtabs.sc{background:color-mix(in srgb,var(--bartop,#5e1532) 92%,transparent)}
   html.lite .pr-dot,html.lite .bell.has,html.lite .cap-ico,html.lite .rch-fire,html.lite .hh{animation:none!important}
   html.lite #hearts .fh{will-change:transform}
-  .ver-chk{margin-top:8px;justify-self:start;border:0;border-radius:999px;padding:8px 14px;background:var(--rose,#e8577f);color:#fff;font:800 13px 'Nunito',sans-serif;cursor:pointer}.ver-chk:disabled{opacity:.6}.ver-msg{font-size:12.5px}
+  .ver-chk{margin-top:8px;justify-self:start;border:0;border-radius:999px;padding:8px 14px;background:var(--rose,#e8577f);color:#fff;font:800 13px 'Nunito',sans-serif;cursor:pointer}.ver-chk:disabled{opacity:.6}.ver-msg{font-size:12.5px}.ver-ask{margin-top:8px;justify-self:start;border:1.5px solid var(--rose,#e8577f);border-radius:999px;padding:7px 13px;background:transparent;color:var(--rose,#e8577f);font:800 13px 'Nunito',sans-serif;cursor:pointer}.ver-ask:disabled{opacity:.6}
   .th-box .ver-w{margin-top:10px}.th-box .ver{background:rgba(120,40,70,.07)!important;border:0;color:#3d1f2a}.th-box .ver span{opacity:.7}.th-box .ver a{color:#b3204f}
   .th-out .logout{display:block;width:100%;margin:10px 0 0;text-align:left;padding:12px 14px;border-radius:14px;background:rgba(120,40,70,.07);border:0;color:#7a2244;font:800 14px 'Nunito',sans-serif;cursor:pointer}
   body.light .th-out .logout{background:rgba(0,0,0,.05)}
@@ -4028,10 +4028,37 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
       ${hbl}
       ${latest?`<div>La más nueva: <b>v${latest}</b></div>`:''}
       ${A&&latest&&num(mv)<latest?`<a href="${url(me)}" target="_blank" rel="noopener">⬇️ Actualizar mi app</a>`:''}
-      ${A?'<button type="button" class="ver-chk">🔄 Buscar actualización</button><div class="ver-msg"></div>':''}</div>`;
+      ${A?'<button type="button" class="ver-chk">🔄 Buscar actualización</button><div class="ver-msg"></div>':''}
+      <button type="button" class="ver-ask">📲 Pedirle a ${esc(nm(oth))} que actualice</button><div class="ver-ask-msg ver-msg">${askMsg}</div></div>`;
     const ck=box.querySelector('.ver-chk'); if(ck)ck.onclick=chk;
+    const ak=box.querySelector('.ver-ask'); if(ak){ak.onclick=ask;askTick()}
     const bar=document.getElementById('updBar'); if(A&&latest&&num(mv)<latest&&!bar&&window.__showUpd)window.__showUpd();
   }
+  // Jon le pide a Ale (por notificación) que actualice; al tocarla se abre la app y busca la actualización sola
+  let askUntil=0, askMsg='', askT=null;
+  function askTick(){const b=box.querySelector('.ver-ask'),m=box.querySelector('.ver-ask-msg');if(!b)return;
+    const left=Math.ceil((askUntil-Date.now())/1000);
+    if(left>0){b.disabled=true;b.textContent='⏳ Espera '+left+' s para volver a pedir';clearTimeout(askT);askT=setTimeout(askTick,1000)}
+    else{b.disabled=false;b.textContent='📲 Pedirle a '+nm(oth)+' que actualice'}
+    if(m)m.textContent=askMsg}
+  async function ask(){
+    if(Date.now()<askUntil)return;
+    const tp=(AV.ntfyElla||'').trim();
+    if(!tp){askMsg='Primero configura los avisos de '+nm(oth)+' en ✏️ Editar → Avisos';askTick();return}
+    askUntil=Date.now()+60000;askMsg='Enviando…';askTick();
+    try{await NTFY({topic:tp,title:'📲 Actualiza nuestra app',message:C.yo+' te pide que actualices la app 💗 · toca aquí y se descarga la versión nueva',tags:['love_letter'],priority:5,click:location.origin+location.pathname+'?ir=actualizar'});askMsg='✅ Aviso enviado a '+nm(oth)}
+    catch(e){askUntil=0;askMsg='No se pudo enviar el aviso. Revisa tu internet e intenta otra vez.'}
+    askTick()}
+  // deep link «actualizar»: abre la hoja 🎨, baja a la tarjeta de versiones y busca la actualización sola
+  let goAt=0;
+  function verGo(){
+    if(document.body.classList.contains('locked')){window.addEventListener('unlocked',()=>setTimeout(verGo,900),{once:true});return}
+    if(Date.now()-goAt<3000)return; goAt=Date.now();
+    try{window.TEMA_OPEN&&TEMA_OPEN()}catch(e){}
+    setTimeout(()=>{try{box.scrollIntoView({behavior:'smooth',block:'center'})}catch(e){}
+      if(A&&me==='ella'){chk()}},500)}
+  window.VER_GO=verGo; window.VER_CHK=()=>{if(A)return chk()};
+  if(/[?&]ir=actualizar\b/.test(location.search))setTimeout(verGo,1200);
   // botón «Buscar actualización»: pregunta la versión más nueva en ese momento y, si hay, la descarga
   async function chk(){const b=box.querySelector('.ver-chk'),m=box.querySelector('.ver-msg');if(!b)return;b.disabled=true;b.textContent='🔄 Buscando…';m.textContent='';
     let v=0;for(const u of ['dl/version.json','https://raw.githubusercontent.com/Jonatan-Montiel/ale-meses/main/dl/version.json']){try{const r=await fetch(u+'?t='+Date.now(),{cache:'no-store'});if(r.ok){const j=await r.json();v=+j.vc||0;if(v)break}}catch(e){}}
@@ -4908,7 +4935,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   const save=()=>{try{localStorage.setItem('act-visto',JSON.stringify([...seen].slice(-300)))}catch(e){}};
   const sk=x=>x.id+'@'+(x.u||0);
   // al tocar una notificación del celular la app manda «n:tipo\nmensaje»
-  window.GO_ANY=g=>{g=String(g||'');if(g.startsWith('n:')){const i=g.indexOf('\n');ir({k:g.slice(2,i<0?undefined:i),t:i<0?'':g.slice(i+1)})}else GOTO(g)};
+  window.GO_ANY=g=>{g=String(g||'');if(/^(n:)?actualizar(\n|$)/.test(g)&&window.VER_GO)return window.VER_GO();if(g.startsWith('n:')){const i=g.indexOf('\n');ir({k:g.slice(2,i<0?undefined:i),t:i<0?'':g.slice(i+1)})}else GOTO(g)};
   const sidA=x=>{const t=x.t||'';if(x.k==='entrada')return null;if(x.k==='like')return /notita/.test(t)?'buzon':'voz';if(x.k==='nota')return 'buzon';if(x.k==='detalle')return 'detalles';if(x.k==='parajon')return /cumpleaños/.test(t)?'cumpleyo':'parajon';if(x.k==='especial')return /año en números/.test(t)?'aniversario':'sanvalentin';return SEC[x.k]||null};
   function ir(x){const t=x.t||'';
     if(x.k==='like')return GOTO(/notita/.test(t)?'buzon':'voz');
