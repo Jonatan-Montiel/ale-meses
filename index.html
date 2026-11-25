@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-o+EIfs1yrleeP1ixgSXCkpr4TPbwTxT7Fr+6/+iWzxw='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Y0rJeKkrHohOIQXv3cvWYTZ9VyLtKWiol67Q7i1zaLM='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -334,6 +334,18 @@
   .sec-ed .ed-add{width:100%;display:block}
   .sec-ed-f{margin-top:10px}.sec-ed-f .ed-status{margin:4px 0 0;color:#f7c6d3}
   body.light .sec-ed{background:rgba(42,10,24,.88);border-color:rgba(247,198,211,.55)}
+  .sec-ed-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.sec-ed-f .ed-status{flex:1 1 100%}
+  .sec-ed-f .ed-btn.pv-b{background:rgba(255,255,255,.12);border:1.5px solid rgba(247,198,211,.4);color:#fff7f0}
+  .ed-only{outline:2px dashed rgba(247,198,211,.6);outline-offset:-2px;opacity:.9;border-radius:14px}
+  .ed-only-ban{background:rgba(247,198,211,.18);border:1px dashed rgba(247,198,211,.6);color:#fff7f0;font:700 12px 'Nunito',sans-serif;border-radius:12px;padding:7px 12px;margin:0 0 10px;text-align:center}
+  .ale-pv{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;background:var(--wine,#2a0a18)}
+  .ale-pv-h{display:flex;align-items:center;gap:10px;padding:10px 12px;background:linear-gradient(135deg,var(--bartop,#5e1532),var(--rose,#e8577f));color:#fff;font:800 14px 'Nunito',sans-serif}
+  .ale-pv-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ale-pv-x{background:rgba(255,255,255,.22);color:#fff;border:0;border-radius:999px;width:34px;height:34px;font-size:16px;cursor:pointer}
+  .ale-pv-n{background:linear-gradient(rgba(255,214,110,.18),rgba(255,214,110,.18)),#2a0a18;color:#fff7f0;font:700 12.5px 'Nunito',sans-serif;padding:7px 12px;text-align:center}
+  .ale-pv-f{flex:1;width:100%;height:100%;border:0;display:block}
+  body.ale-pv-open{overflow:hidden}
+  .pv-pill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:9000;background:#10b981;color:#fff;font:800 12px 'Nunito',sans-serif;border-radius:999px;padding:6px 14px;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none;white-space:nowrap}
   /* Editor con el estilo de la página */
   .ed-panel{background:radial-gradient(120% 60% at 50% 0%,#5a1430 0%,#2a0a18 60%,#1a050e 100%)!important;color:var(--cream)!important;border-left:1px solid rgba(247,198,211,.18)}
   .ed-head{border-bottom:1px solid rgba(247,198,211,.15)!important}
@@ -2125,6 +2137,15 @@
 </nav>
 
 <script>
+const PV_MODE=/[?&]pv=1\b/.test(location.search);
+/* Vista previa «así lo ve Ale» (iframe del editor): solo lectura, sin escribir nada ni avisar */
+if(PV_MODE){try{
+  Storage.prototype.setItem=function(){};Storage.prototype.removeItem=function(){};Storage.prototype.clear=function(){};
+  try{Object.defineProperty(window,'AndroidApp',{value:undefined,configurable:true})}catch(e){}
+  try{Object.defineProperty(window,'caches',{value:undefined,configurable:true})}catch(e){}
+  const _f=window.fetch;window.fetch=function(u,o){const m=String((o&&o.method)||(u&&u.method)||'GET').toUpperCase();if(m!=='GET'&&m!=='HEAD')return Promise.reject(new Error('vista previa'));return _f.apply(this,arguments)};
+  navigator.sendBeacon=()=>false;
+}catch(e){}}
 {const f=document.getElementById('fontCss');if(f)f.rel='stylesheet'}
 /* ====== Temas ====== */
 const TEMAS=[['vino','Vino','#5a1430','radial-gradient(circle at 50% 0,#7a1d40,#2a0a18)','rgba(255,255,255,.18)'],
@@ -2203,6 +2224,7 @@ const GG=(()=>{
   async function text(f){if(!f)return null;if(f.truncated&&f.raw_url)return await (await fetch(f.raw_url)).text();return f.content}
   async function pull(name,force){const g=await gist(force);const t=await text((g.files||{})[name]);if(!t)return null;return JSON.parse(new TextDecoder().decode(await decBuf(unb64(t).buffer)))}
   async function push(name,obj){
+    if(PV_MODE)return;
     const enc=await encBuf(new TextEncoder().encode(JSON.stringify(obj)));
     const r=await fetch(`https://api.github.com/gists/${K.gist}`,{method:'PATCH',headers:Object.assign({'Content-Type':'application/json'},H()),body:JSON.stringify({files:{[name]:{content:b64(enc)}}})});
     if(!r.ok)throw new Error(r.status); gc=null;
@@ -2265,7 +2287,7 @@ function ACT_LOG(t,k,w){if((k==='entrada'||k==='secreto')&&w!=='ella')return;try
 function APK_URL(w){const f=w==='yo'?'nuestro-lugar-jon.apk':'nuestro-lugar.apk';
   return window.AndroidApp?'https://github.com/Jonatan-Montiel/ale-meses/releases/download/apk/'+f:location.origin+location.pathname.replace(/[^/]*$/,'')+'dl/'+f}
 function NTFY_ENC(w){try{const L=JSON.parse(localStorage.getItem('versiones-cache')||'[]');const x=L.find(y=>y.id===w&&!y.x);return !!x&&(+String(x.v).replace(/\D/g,'')||0)>=26}catch(e){return false}}
-function NTFY(o){o=Object.assign({},o);o.topic=String(o.topic||'').trim();if(!o.topic)return Promise.resolve({ok:false});
+function NTFY(o){if(PV_MODE)return Promise.resolve({ok:false});o=Object.assign({},o);o.topic=String(o.topic||'').trim();if(!o.topic)return Promise.resolve({ok:false});
   const go=b=>fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify(b)});
   let av={};try{av=AV||{}}catch(e){}
   const who=o.topic===String(av.ntfy||'').trim()?'yo':o.topic===String(av.ntfyElla||'').trim()?'ella':null;
@@ -2302,7 +2324,7 @@ function avisar(txt,tipo){
   const title=({zumbido:'📳 ¡Zumbido!',noches:'🌙 Buenas noches',tregua:'🕊️ Botón de tregua',lista:'🛒 Nuestra lista',bingo:'🎯 Bingo de citas',historia:'📜 Nuestra historia',botella:'🍾 Mensaje en una botella',debo:'😘 Me debes…',dibujo:'🎨 Un dibujito',corazones:'💗 Corazones escondidos',insignia:'🏅 ¡Nueva insignia!',fotoreto:'📸 Reto de fotos',sello:'🗓️ El sello del día',probable:'🤔 ¿Quién es más probable?',fotocom:'📸 Nuestras fotos',detalle:'💝 Un detalle para ti',termo:'🌡️ ¿Cuánto te extraña?',vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',especial:'💝 Fecha especial',parajon:'💙 Para '+C.yo,extrano:'🥺 Te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ Le gustó',cumple:'🎂 Cumpleaños',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
   NTFY({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname+'?ir='+encodeURIComponent(tipo||'')}).catch(()=>{});
 }
-const VIEWER=()=>{if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
+const VIEWER=()=>{if(PV_MODE)return 'ella';if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
 /* textos en masculino cuando es Jon */
 const MASC=(()=>{const W={enamorada:'enamorado',cansada:'cansado',estresada:'estresado',enojada:'enojado',querida:'querido',contenta:'contento',emocionada:'emocionado',nerviosa:'nervioso',preocupada:'preocupado',aburrida:'aburrido',agradecida:'agradecido',tranquila:'tranquilo',sola:'solo',lista:'listo',consentida:'consentido',ilusionada:'ilusionado',orgullosa:'orgulloso',enferma:'enfermo',relajada:'relajado',motivada:'motivado',celosa:'celoso',apapachada:'apapachado',amada:'amado',bonita:'guapo',hermosa:'guapo'};
   const re=new RegExp('\\b('+Object.keys(W).join('|')+')\\b','gi');
@@ -2551,11 +2573,11 @@ galRender();
   window.__bioOk=()=>{if(!open){v='';paint();ok()}};
   // después de guardar en el editor, la página se recarga: no vuelvas a pedir el código
   let edU=0; try{edU=+(sessionStorage.getItem('ed-unlock')||0);sessionStorage.removeItem('ed-unlock')}catch(e){}
-  if(EDIT&&edU>Date.now()){lock.style.display='none';lock.classList.add('out');document.body.classList.remove('locked');open=true;setTimeout(()=>{try{last=Date.now()}catch(e){}window.dispatchEvent(new Event('unlocked'))},50)}
+  if(PV_MODE||(EDIT&&edU>Date.now())){lock.style.display='none';lock.classList.add('out');document.body.classList.remove('locked');open=true;setTimeout(()=>{try{last=Date.now()}catch(e){}window.dispatchEvent(new Event('unlocked'))},50)}
   else if(hasBio()){bioB.hidden=false;bioB.onclick=askBio;setTimeout(askBio,500)}
   /* ---- Volver a bloquear si se deja sin usar o al regresar de otra app ---- */
   function relock(){
-    if(!open||!document.getElementById('lock'))return; open=false; v=''; paint();
+    if(PV_MODE||!open||!document.getElementById('lock'))return; open=false; v=''; paint();
     document.querySelectorAll('.lb.open,.modal.open,.secret.open,.credits.open').forEach(e=>e.classList.remove('open'));
     document.getElementById('lockIco').textContent='🔒'; msg.textContent='';
     lock.style.display=''; void lock.offsetWidth; lock.classList.remove('out'); document.body.classList.add('locked'); checkWait(); setTimeout(askBio,400);
@@ -5215,7 +5237,13 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
     window.dispatchEvent(new Event('resize'));
     dots();
   }
-  TABS.forEach(([k,i,n])=>{if(![...document.querySelectorAll('main section')].some(s=>s.dataset.tab===k&&!s.classList.contains('oculta')))return;const b=document.createElement('button');b.dataset.k=k;b.innerHTML=`<span>${i}</span>${esc(n)}`;b.onclick=()=>setTab(k);nav.append(b)});
+  function buildNav(){
+    nav.querySelectorAll('button[data-k]').forEach(b=>b.remove());
+    const ed=nav.querySelector('.tab-ed');
+    TABS.forEach(([k,i,n])=>{if(![...document.querySelectorAll('main section')].some(s=>s.dataset.tab===k&&!s.classList.contains('oculta')))return;const b=document.createElement('button');b.dataset.k=k;b.innerHTML=`<span>${i}</span>${esc(n)}`;b.onclick=()=>setTab(k);if(ed)nav.insertBefore(b,ed);else nav.append(b)});
+  }
+  buildNav();
+  window.TABNAV.rebuild=()=>{buildNav();nav.querySelectorAll('button[data-k]').forEach(b=>b.classList.toggle('cur',b.dataset.k===cur));apply();dots()};
   const orig=Element.prototype.scrollIntoView;
   Element.prototype.scrollIntoView=function(...a){try{const s=this.closest&&this.closest('main section');
     if(s&&(this.closest('.oculta')||!nav.querySelector('button[data-k="'+s.dataset.tab+'"]'))){setTab('inicio');window.scrollTo(0,0);return}
@@ -5950,7 +5978,7 @@ function REACT(btn,x,w,save,what){
    CARGA DEL CONTENIDO (content.json en tu repo de GitHub)
    ===================================================================== */
 const DEFAULTS = {"ella": "", "yo": "", "inicio": "2026-01-01", "pin": "0000", "pistas": [], "saludos": {"manana": "", "tarde": "", "noche": ""}, "mensajesDia": [], "horoscopo": ["Hoy {ella} tendrá un antojo repentino de tacos y {yo} no podrá decir que no 🌮", "Los astros dicen que hoy un abrazo de {yo} curará cualquier cosa 🤗", "Hoy {ella} va a sonreír por algo que {yo} diga sin querer 😄", "Venus recomienda una siesta juntos lo antes posible 😴", "Se aproxima un mensaje inesperado que les alegrará el día 💌", "Hoy {yo} tendrá una idea romántica… y probablemente la olvide antes de la noche 🙈", "Mercurio retrógrado provoca discusiones sobre qué comer. Solución: pizza 🍕", "Hoy es buen día para decir «te extraño» aunque se hayan visto ayer 🥺", "Las estrellas indican que {ella} ganará cualquier discusión hoy. No lo intentes, {yo} 😅", "Hoy la luna favorece las fotos juntos. Tómense al menos una 📸", "Un beso sorpresa hoy tiene 100% de probabilidad de éxito 😘", "Hoy {ella} merece un detallito. El universo ya avisó a {yo} 🎁", "Cuidado: hoy hay alto riesgo de ver «solo un capítulo más» 📺", "Los astros ven una cita en el futuro cercano. Vayan planeándola 🗓️", "Hoy es día de cantar una canción juntos, aunque desafinen 🎤", "Júpiter dice que hoy se van a reír de algo muy tonto 😂", "Hoy {yo} debería contar un chiste malo. Es parte del destino 🤡", "Se avecina un antojo dulce a medianoche 🍫", "Hoy el amor está en el aire… y también el olor a comida rica 😋", "Los astros recomiendan decirse algo bonito antes de dormir 🌙", "Hoy {ella} estará más bonita que de costumbre (y eso ya es mucho) ✨", "Hoy {yo} va a pensar en {ella} más veces de las que admite 💭", "Saturno sugiere cero celulares durante la cena de hoy 📵", "Hoy es buen día para planear un viaje, aunque sea a la tienda de la esquina ✈️", "Las estrellas confirman: siguen siendo la mejor pareja del universo 💞"], "retosFoto": ["Algo rojo ❤️", "Tu lugar favorito de la casa", "Una selfie haciendo cara chistosa 🤪", "Lo que estás comiendo ahorita", "El cielo de hoy ☁️", "Algo que te recuerde a mí", "Tu vista desde la ventana", "Algo con forma de corazón", "Tu bebida favorita ☕", "Una sombra divertida", "Algo amarillo 💛", "Tus zapatos de hoy 👟", "Algo que te hizo sonreír", "Un perrito o gatito 🐶", "Algo viejito o antiguo", "Una flor o planta 🌸", "Tu outfit de hoy", "Algo que quieras regalarme", "Un atardecer o amanecer 🌅", "Tu rincón para relajarte"], "probable": ["se quede dormido viendo una peli", "llegue tarde a una cita", "coma lo que el otro dejó en el plato", "llore con una película", "se pierda aunque use el GPS", "se ría en el momento menos indicado", "diga «te lo dije»", "pida postre aunque ya esté lleno", "se le olvide dónde dejó las llaves", "se tarde más en arreglarse", "cante en la regadera", "haga un berrinche por hambre", "se enoje jugando un juego de mesa", "planee una sorpresa", "gaste de más en una tienda", "se duerma primero", "se despierte de malas", "adopte una mascota sin avisar", "pida perdón primero", "organice un viaje espontáneo", "tome más fotos en una salida", "se coma la última papa", "mande un mensaje y luego lo borre", "cuente un chiste malo", "se ponga celoso por algo pequeño", "diga «te amo» primero en el día", "se emocione más en Navidad", "se asuste con una película de terror", "se le antoje algo dulce a medianoche", "deje la ropa tirada", "se tarde en contestar un mensaje", "baile en público", "se enferme por no abrigarse", "pida comida a domicilio en lugar de cocinar", "olvide una fecha importante", "se ría de su propio chiste", "haga una lista para todo", "quiera ver «solo un capítulo más»", "hable dormido", "se quede callado cuando está enojado"], "buenasNoches": ["Descansa mucho, mi amor. Sueña bonito 🌙", "Ya es tarde, preciosa. A dormir, que mañana te sigo queriendo igual 💤", "Cierra los ojos y piensa en mí. Buenas noches, {ella} 💗", "Gracias por un día más a tu lado. Que descanses 🌙✨", "Te mando un beso de buenas noches 😘"], "cancion": {"titulo": "", "artista": "", "link": ""}, "carta": "", "abrela": [], "cartaSola": "", "fotos": [], "fotoPolaroid": 1, "polaroidTexto": "", "fotoRompecabezas": 1, "razones": [], "fortunas": [], "rasca": {"emoji": "", "titulo": "", "texto": ""}, "vales": [], "ruleta": [], "lista": [], "horaCielo": "21:00", "sorpresas": [], "sorpresasExtra": [], "capsula": {"fecha": "2030-01-01", "texto": ""}, "secreto": "", "fraseFinal": "", "mensajitos": [], "creditos": [], "whatsapp": {"numero": "", "mensajes": []}, "reinicio": "1", "kanban": {}, "racha": [{"dias": "15", "emoji": "🎟️", "titulo": "Cita sorpresa", "texto": "Por 15 días seguidos: una cita que yo planeo completita, tú solo llegas."}, {"dias": "45", "emoji": "🍰", "titulo": "Tu postre favorito", "texto": "Por 45 días seguidos: te llevo tu postre favorito a donde estés."}, {"dias": "100", "emoji": "👑", "titulo": "Un día de reina", "texto": "Por 100 días seguidos: un día entero dedicado a ti y tú pones todas las reglas."}], "animo": [{"emoji": "😊", "nombre": "Feliz", "respuesta": "¡Me encanta verte feliz! Que nada te quite esa sonrisa hoy 💗"}, {"emoji": "🥰", "nombre": "Enamorada", "respuesta": "Yo también, mi amor. Cada día más 🥰"}, {"emoji": "😴", "nombre": "Cansada", "respuesta": "Descansa tantito, preciosa. Hoy te mereces una siesta y muchos apapachos 💤"}, {"emoji": "😔", "nombre": "Triste", "respuesta": "Aquí estoy para ti, siempre. Te mando un abrazo enorme 🤗 y si quieres, háblame."}, {"emoji": "😣", "nombre": "Estresada", "respuesta": "Respira hondo… tú puedes con todo. Y si no, aquí estoy para ayudarte 💪💗"}, {"emoji": "😤", "nombre": "Enojada", "respuesta": "Ay, mi amor… cuéntame qué pasó, te escucho. (Y si fui yo, perdóname 🙈)"}], "cartasMes": [{"mes": "8", "titulo": "Ocho meses contigo", "texto": "Mi amor:\n\nHoy cumplimos ocho meses y todavía me sorprende lo bonito que se siente estar contigo. Gracias por cada risa, cada abrazo y por hacer que los días normales se sientan especiales.\n\nNo sé qué nos traiga el siguiente mes, pero sé que lo quiero vivir contigo.\n\nTe amo mucho, {ella}."}, {"mes": "9", "titulo": "Nueve meses de nosotros", "texto": "Mi vida:\n\nNueve meses ya. Cada mes que pasa te conozco un poquito más y te quiero un poquito más también.\n\nGracias por elegirme todos los días. Yo te elijo a ti, hoy y siempre.\n\nCon todo mi amor."}], "comida": ["🌮 Tacos", "🍕 Pizza", "🍣 Sushi", "🍔 Hamburguesas", "🍜 Ramen", "🍝 Pasta", "🥗 Algo sanito", "🌯 Burritos", "🍗 Alitas", "🥘 Comida casera"], "preguntas": ["¿Qué fue lo primero que pensaste de mí cuando me conociste?", "¿Cuál ha sido tu momento favorito conmigo hasta ahora?", "Si pudiéramos irnos de viaje mañana, ¿a dónde iríamos?", "¿Qué canción te recuerda a mí?", "¿Qué es lo que más te gusta de nosotros?", "¿Cuál sería nuestra cita perfecta?", "¿Qué es algo que nunca me has contado?", "¿Qué comida te gustaría que cocináramos juntos?", "¿En qué momento supiste que te gustaba?", "¿Qué sueño te gustaría que cumpliéramos juntos?", "¿Qué es lo más bonito que he hecho por ti?", "Si fuéramos una película, ¿cómo se llamaría?", "¿Qué te hace sentir más querida?", "¿Cómo te imaginas que estaremos en un año?", "¿Qué es algo pequeño que hago y que te encanta?", "¿Cuál es tu recuerdo favorito de nuestra primera cita?", "Si pudieras revivir un día conmigo, ¿cuál sería?", "¿Qué apodo te gustaría que te dijera?", "¿Qué es algo nuevo que quieras que aprendamos juntos?", "¿Qué te da más risa de mí?", "¿Qué es lo que más extrañas de mí cuando no estamos juntos?", "¿Qué lugar te gustaría que conociéramos en la ciudad?", "¿Qué tres palabras nos describen como pareja?", "¿Cuál es tu plan ideal para un domingo conmigo?", "¿Qué te gustaría que hiciéramos en nuestro aniversario?", "¿Qué es algo que admiras de mí?", "¿Qué te gustaría que hiciera más seguido?", "¿Cuál es la foto nuestra que más te gusta y por qué?", "Si tuviéramos una mascota, ¿cómo se llamaría?", "¿Qué quieres decirme hoy que no me hayas dicho?"], "retos": ["Cocinar juntos una receta que nunca hayamos hecho 🍳", "Tomarnos una foto juntos en un lugar nuevo 📸", "Tener una cita sin celulares 📵", "Escribirnos una carta a mano y dárnosla en persona ✉️", "Ver el atardecer juntos 🌅", "Probar un postre que nunca hayamos probado 🍰", "Hacer una noche de juegos de mesa 🎲", "Caminar por un lugar de la ciudad que no conozcamos 🚶", "Bailar juntos una canción en casa 💃", "Hacer un picnic 🧺", "Ver una película que elija el otro, sin quejarnos 🎬", "Darnos un masaje 💆", "Ir a desayunar a un lugar nuevo 🥞", "Decirnos 3 cosas que admiramos del otro 💗", "Hacer una manualidad juntos ✂️", "Visitar un museo 🏛️", "Prepararle el desayuno sorpresa al otro ☕", "Planear juntos nuestro próximo viaje ✈️", "Recrear nuestra primera cita 💕", "Hacer juntos algo que nos dé un poquito de miedo 🎢"], "cumple": "", "cartaCumple": "Feliz cumpleaños, mi amor 🎂\n\nHoy celebro que existes y que la vida me regaló la suerte de encontrarte. Gracias por tu risa, por tu forma de ver el mundo y por hacerme tan feliz todos los días.\n\nQue este año te traiga todo lo que sueñas, y que me dejes estar a tu lado para verte cumplirlo.\n\nTe amo muchísimo, {ella}. Hoy y siempre.", "cumpleYo": "", "cartaSanValentin": "Mi amor:\n\nFeliz San Valentín. Gracias por llenar mis días de risas, de abrazos y de cosas bonitas. Contigo todo se siente fácil y todo vale la pena.\n\nHoy, y todos los días, te elijo a ti.\n\nTe amo, {ella}."};
-const EDIT = /[?&]editar\b/.test(location.search) || location.hash==='#editar';
+const EDIT = !PV_MODE && (/[?&]editar\b/.test(location.search) || location.hash==='#editar');
 const LS={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
 function ghRepo(){
   try{const o=JSON.parse(LS.get('gh-repo')||'null'); if(o&&o.owner&&o.repo) return o}catch(e){}
@@ -6061,6 +6089,12 @@ let CUR=null;
   if(EDIT){
     initEditor();
   }
+  if(PV_MODE){
+    document.body.append(h('div',{class:'pv-pill'},'👁️ Vista previa · así lo ve '+(CUR.ella||'Ale')));
+    const ir=(new URLSearchParams(location.search).get('ir')||'').trim(), ps=(new URLSearchParams(location.search).get('pvshow')||'').trim();
+    if(ps){const el=document.getElementById(ps);if(el){const fix=()=>{if(el.hidden||el.classList.contains('oculta')){el.hidden=false;el.classList.remove('oculta');try{window.TABNAV&&TABNAV.rebuild&&TABNAV.rebuild()}catch(e){}}};fix();try{new MutationObserver(fix).observe(el,{attributes:true,attributeFilter:['hidden','class']})}catch(e){}}}
+    if(ir)window.addEventListener('unlocked',()=>setTimeout(()=>{try{const sc=document.getElementById(ir);if(!sc)return;if(window.DUO_GO&&sc.querySelector(':scope>.dp-chips'))DUO_GO(ir,'a');else(window.GO_ANY||window.GOTO||(()=>sc.scrollIntoView({behavior:'smooth'})))(ir)}catch(e){}},800),{once:true});
+  }
 })();
 
 /* =====================================================================
@@ -6081,7 +6115,7 @@ const SCHEMA=[
   {t:'¿Quién es más probable que…?',sec:'probable',f:[['probable','Preguntas (una distinta cada día; escribe solo el final, ej. «se quede dormido viendo una peli»)','list']]},
   {t:'Modo noche (11 pm – 5 am)',sec:'noches',f:[['buenasNoches','Mensajes de buenas noches para Ale (cambia uno cada noche)','list']]},
   {t:'Cumpleaños de Ale',sec:'cumple',f:[['cumple','Fecha de su cumpleaños (el año no importa)','date'],['cartaCumple','Carta de cumpleaños (se abre solo ese día) · deja una línea vacía entre párrafos','textarea',8]]},
-  {t:'Cumpleaños de Jon',f:[['cumpleYo','Tu fecha de cumpleaños (el año no importa)','date']]},
+  {t:'Cumpleaños de Jon',sec:'cumpleyo',f:[['cumpleYo','Tu fecha de cumpleaños (el año no importa)','date']]},
   {t:'Fechas especiales',sec:'sanvalentin',f:[['cartaSanValentin','Carta de San Valentín para Ale (se abre el 14 de febrero)','textarea',6]]},
   {t:'Racha de visitas',sec:'racha',f:[['racha','Premios por días seguidos','objlist',[['dias','Días seguidos (número)','text'],['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
   {t:'¿Cómo te sientes hoy?',sec:'animo',f:[['animo','Caritas y lo que le respondes','objlist',[['emoji','Emoji','text'],['nombre','Cómo se siente','text'],['respuesta','Lo que le respondes','textarea',2]]]]},
@@ -6119,11 +6153,25 @@ function initEditor(){
   // ¿esta entrada se edita dentro de su sección de la página? (si no existe o está oculta/vacía, va al panel)
   function inlineEl(e){
     if(!e.sec||!e.f)return null;
-    const el=document.getElementById(e.sec); if(!el||el.hidden)return null;
-    const O=(CUR.ocultas&&typeof CUR.ocultas==='object')?CUR.ocultas:{};
-    if(O[e.sec]==='dos'||el.classList.contains('oculta'))return null;
-    return el;
+    return document.getElementById(e.sec)||null;
   }
+  // en modo edición todas las secciones con contenido se pueden editar: si está oculta, se muestra SOLO para Jon
+  const ED_O=(CUR.ocultas&&typeof CUR.ocultas==='object')?CUR.ocultas:{};
+  const edWhy=(el,id)=>ED_O[id]==='dos'?'está oculta para los dos':el.hidden?'todavía no tiene contenido o solo aparece en su fecha':ED_O[id]==='ella'?'Ale no la ve':'';
+  function edShow(el,id){
+    const why=edWhy(el,id), wasHid=el.hidden||el.classList.contains('oculta');
+    if(wasHid){el.hidden=false;el.classList.remove('oculta');el.classList.add('ed-only')}
+    if(!why&&!wasHid)return;
+    let ban=el.querySelector(':scope>.ed-only-ban');
+    if(!ban){ban=h('div',{class:'ed-only-ban'});el.prepend(ban)}
+    ban.textContent='👁️ Solo tú ves esta sección para editarla · '+(why||'está oculta');
+  }
+  {const seen=new Set();
+   SCHEMA.forEach(e=>{if(!e.sec||!e.f||seen.has(e.sec))return;seen.add(e.sec);const el=document.getElementById(e.sec);if(!el)return;
+     edShow(el,e.sec);
+     // algunos módulos vuelven a ocultarla más tarde (p. ej. por fecha): se mantiene visible para Jon
+     try{let busy=false;new MutationObserver(()=>{if(busy)return;if(!(el.hidden||el.classList.contains('oculta')))return;busy=true;edShow(el,e.sec);try{window.TABNAV&&TABNAV.rebuild&&TABNAV.rebuild()}catch(x){}busy=false}).observe(el,{attributes:true,attributeFilter:['hidden','class']})}catch(x){}});
+   try{window.TABNAV&&TABNAV.rebuild&&TABNAV.rebuild()}catch(x){}}
   function grpShown(i){for(let j=i+1;j<SCHEMA.length&&!SCHEMA[j].g;j++){if(!inlineEl(SCHEMA[j]))return true}return false}
   let D=JSON.parse(JSON.stringify(CUR)), dirty=false;
   const markDirty=()=>{dirty=true;saveBtn.textContent='Guardar cambios •'};
@@ -6139,6 +6187,19 @@ function initEditor(){
     body, h('div',{class:'ed-foot'},status,saveBtn));
   document.body.append(fab,panel);
   {const nav=document.querySelector('nav'); if(nav){const eb=h('button',{class:'tab-ed','aria-label':'Editar',onclick:()=>openPanel(true)});eb.innerHTML='<span>✏️</span>Editar';nav.append(eb);document.body.classList.add('ed-nav')}}
+  function openPV(id,title){
+    document.querySelectorAll('.ale-pv').forEach(e=>e.remove());
+    const close=()=>{ov.remove();document.body.classList.remove('ale-pv-open');document.removeEventListener('keydown',esc2)};
+    const esc2=ev=>{if(ev.key==='Escape')close()};
+    const el0=document.getElementById(id), Oo=(CUR.ocultas&&typeof CUR.ocultas==='object')?CUR.ocultas:{};
+    const hidAle=Oo[id]==='ella'||Oo[id]==='dos', hidDate=!hidAle&&!!el0&&el0.classList.contains('ed-only'), force=hidAle||hidDate;
+    const fr=h('iframe',{class:'ale-pv-f',title:'Vista previa',src:location.pathname+'?ver=ella&pv=1&ir='+encodeURIComponent(id)+(force?'&pvshow='+encodeURIComponent(id):'')+location.hash});
+    const ov=h('div',{class:'ale-pv'},
+      h('div',{class:'ale-pv-h'},h('div',{class:'ale-pv-t'},'Así lo ve '+(CUR.ella||'Ale')+' · '+title),h('button',{class:'ale-pv-x',type:'button','aria-label':'Cerrar',onclick:close},'✕')),
+      force?h('div',{class:'ale-pv-n'},hidAle?'🙈 '+(CUR.ella||'Ale')+' no ve esta sección ahora (está oculta para ella). Así se vería si la muestras:':'📅 Esta sección solo le aparece en su fecha; así se verá:'):null,
+      dirty?h('div',{class:'ale-pv-n'},'Tienes cambios sin guardar; aquí se ve lo último guardado'):null,fr);
+    document.body.append(ov);document.body.classList.add('ale-pv-open');document.addEventListener('keydown',esc2);
+  }
   function openPanel(v){panel.classList.toggle('open',v);try{sessionStorage.setItem('ed-open',v?'1':'')}catch(e){}}
   const inSt=[], inBtn=[];
   const say=(t,kind)=>{status.textContent=t;status.className='ed-status '+(kind||'');inSt.forEach(e=>{e.textContent=t;e.className='ed-status '+(kind||'')})};
@@ -6192,9 +6253,10 @@ function initEditor(){
         const st=h('div',{class:'ed-status'},'Se aplica al guardar · la app se recarga');
         const sb=h('button',{class:'ed-btn',onclick:()=>save(sec.sec)},'💾 Guardar cambios');
         inSt.push(st); inBtn.push(sb);
+        const pvb=h('button',{class:'ed-btn pv-b',type:'button',onclick:()=>openPV(sec.sec,sec.t)},'👁️ Ver como lo ve '+(CUR.ella||'Ale'));
         const card=h('div',{class:'sec-ed'+(open?' open':'')});
         const hd=h('button',{class:'sec-ed-h',type:'button',onclick:()=>{card.classList.toggle('open');try{sessionStorage.setItem(key,card.classList.contains('open')?'1':'')}catch(e){};const fit=()=>card.querySelectorAll('textarea').forEach(t=>autosize(t));fit();requestAnimationFrame(fit);setTimeout(fit,120)}},'✏️ Editar · '+sec.t);
-        card.append(hd,h('div',{class:'sec-ed-b'},sec.f.map(fd=>field(fd,true)),h('div',{class:'sec-ed-f'},sb,st)));
+        card.append(hd,h('div',{class:'sec-ed-b'},sec.f.map(fd=>field(fd,true)),h('div',{class:'sec-ed-f'},sb,pvb,st)));
         host.append(card);
         {const fitC=()=>{if(card.classList.contains('open'))card.querySelectorAll('textarea').forEach(t=>autosize(t))};
           try{document.fonts&&document.fonts.ready.then(()=>{fitC();setTimeout(fitC,150)})}catch(e){}
