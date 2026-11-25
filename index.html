@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-3WvJ/Cy1EWpShby3u/TjwHFoH7w7+XbJzgKgADrpptc='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fcSU+Za8Dng5ZCJ96YdAbkJuAmSnXULtClYfkErRrVM='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -186,6 +186,7 @@
   /* Día / noche */
   body.morning{background:radial-gradient(120% 80% at 50% 0%, #d4577a 0%, #7a1d40 50%, #2a0a18 100%) fixed}
   body.night{background:radial-gradient(120% 80% at 50% 0%, #3a1f5c 0%, #241036 50%, #0c0514 100%) fixed}
+  body.night:not([data-t]){--bartop:#3a1f5c}
   .greet{font-family:'Fraunces',serif;font-size:20px;margin-bottom:14px;opacity:.95}
   .tap-heart{position:fixed;z-index:60;pointer-events:none;font-size:20px;animation:tapUp 1s ease-out forwards;transform:translate(-50%,-50%)}
   @keyframes tapUp{to{transform:translate(-50%,-160%) scale(1.6);opacity:0}}
@@ -2079,6 +2080,7 @@ function applyTema(t){
   const m=document.querySelector('meta[name=theme-color]'); if(m)m.content=TEMAS.find(x=>x[0]===t)[2];
   // en la app: barra de arriba y de abajo del mismo color que el tema
   const BAR={vino:['#5e1532','#1e0610',0,0],noche:['#232860','#070a1c',0,0],atardecer:['#ff9f7a','#2b0f33',1,0],pastel:['#fff6f0','#f8d3df',1,1],minimal:['#faf8f7','#faf8f7',1,1],oceano:['#174e66','#04141f',0,0],bosque:['#274c35','#08140d',0,0],galaxia:['#3e2266','#0b0516',0,0],lavanda:['#f7f2ff','#dccffb',1,1],durazno:['#fff6ee','#ffc9a8',1,1]}[t];
+  if(t==='vino'&&document.body.classList.contains('night')){BAR[0]='#3a1f5c';BAR[1]='#0c0514';if(m)m.content='#3a1f5c'}
   try{const A=window.AndroidApp;if(BAR&&A){
     if(A.setEdge){A.setEdge(BAR[1],!!BAR[2],!!BAR[3]);const i=+A.statusInset()||0;if(i>0)document.documentElement.style.setProperty('--sat',i+'px')}
     else if(A.setBars)A.setBars(BAR[0],BAR[1],!!BAR[2],!!BAR[3])}}catch(e){}
@@ -2848,6 +2850,7 @@ makeBoard({avTipo:'aprender',avNew:'📚 '+C.ella+' quiere que aprendamos:',avDo
   else if(h>=12&&h<19){g=FILL(C.saludos.tarde);cls=''}
   else{g=FILL(C.saludos.noche);cls='night'}
   document.getElementById('greet').textContent=g; if(cls)document.body.classList.add(cls);
+  if(cls==='night'&&!document.body.dataset.t)try{applyTema('vino')}catch(e){}
 })();
 
 /* ====== Corazones al tocar ====== */
