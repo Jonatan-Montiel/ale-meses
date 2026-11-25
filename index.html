@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-IExqQHXcrzLvaGFFvL37IF1FBrjYsk/sIQATlLAWWeI='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-83OGn8xxpQdSZH3J0a2hliFB6bvyHpOm6azHLtpGokQ='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2207,6 +2207,10 @@ const AV_LAST={};
 const ACT_Q=window.ACT_Q=[];
 function ACT_LOG(t,k,w){if((k==='entrada'||k==='secreto')&&w!=='ella')return;try{window.ACT_PUT?ACT_PUT(t,k,w):ACT_Q.push([t,k,w])}catch(e){}}
 /* ntfy: si la app del que recibe ya sabe descifrar (v26+), el aviso viaja cifrado con la llave */
+/* link para bajar la app: dentro de la app de Android tiene que ser de otro sitio (GitHub) para que se abra en el navegador y se descargue;
+   un link de la misma página se quedaba cargando dentro de la app y no pasaba nada */
+function APK_URL(w){const f=w==='yo'?'nuestro-lugar-jon.apk':'nuestro-lugar.apk';
+  return window.AndroidApp?'https://github.com/Jonatan-Montiel/ale-meses/releases/download/apk/'+f:location.origin+location.pathname.replace(/[^/]*$/,'')+'dl/'+f}
 function NTFY_ENC(w){try{const L=JSON.parse(localStorage.getItem('versiones-cache')||'[]');const x=L.find(y=>y.id===w&&!y.x);return !!x&&(+String(x.v).replace(/\D/g,'')||0)>=26}catch(e){return false}}
 function NTFY(o){o=Object.assign({},o);o.topic=String(o.topic||'').trim();if(!o.topic)return Promise.resolve({ok:false});
   const go=b=>fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify(b)});
@@ -3929,7 +3933,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
 /* ====== Aviso de versión nueva de la app (por si el de la app no salió) ====== */
 (function(){
   const A=window.AndroidApp; if(!A)return;
-  const url=location.origin+location.pathname.replace(/[^/]*$/,'')+'dl/'+(VIEWER()==='yo'?'nuestro-lugar-jon.apk':'nuestro-lugar.apk');
+  const url=APK_URL(VIEWER());
   const show=()=>{if(document.getElementById('updBar'))return;const d=document.createElement('div');d.id='updBar';d.className='upd-bar';
     d.innerHTML=`<b>💗 Hay una versión nueva de la app</b><span>trae widgets nuevos · de preferencia con wifi</span><a href="${url}" target="_blank" rel="noopener">Actualizar</a><button aria-label="Cerrar">✕</button>`;
     d.querySelector('button').onclick=()=>d.remove(); document.body.append(d)};
@@ -3943,7 +3947,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const mine=()=>{if(!A)return 'web';try{if(A.appVersion)return String(A.appVersion())}catch(e){}return A.setLoc?'21':A.saveKey?'17':A.setWidget?'12':'11'};
   const S=SHARED('versiones.bin','v','versiones-cache',10,render);
   let latest=0; try{const c=JSON.parse(localStorage.getItem('ver-latest')||'{}');if(Date.now()-(c.t||0)<30*6e4)latest=c.v||0}catch(e){}
-  const url=w=>location.origin+location.pathname.replace(/[^/]*$/,'')+'dl/'+(w==='yo'?'nuestro-lugar-jon.apk':'nuestro-lugar.apk');
+  const url=w=>APK_URL(w);
   const lbl=v=>v==='web'?'navegador (sin app)':'v'+v+((A&&!A.appVersion&&v===mine()&&v!=='web')?' o más vieja':'');
   // señal de «app instalada» que manda la app del otro cada ~30 min (cifrada, por ntfy; ntfy la guarda 12 h)
   let hb=null, hbDone=false;
