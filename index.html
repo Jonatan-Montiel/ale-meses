@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-5SdqPfwLw5qOt7u6iR8gpja0EQ4PpKabDKJJ4NjlW/U='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-VanW67+yg+EbSFcqoM5fMroHckELaalOQRUGL7xWa58='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -311,6 +311,29 @@
   .ed-foot{padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #f0e2dc;background:#fffaf7}
   .ed-status{font-size:13px;min-height:18px;margin-bottom:8px;color:#7a6168}
   .ed-status.ok{color:#0f8a5f}.ed-status.bad{color:#c0263f}
+  /* Edición dentro de cada sección (solo Jon) */
+  .sec-ed{border:1.5px dashed rgba(247,198,211,.35);border-radius:18px;margin:18px auto 0;max-width:560px;background:rgba(255,255,255,.05);color:#fff7f0;text-align:left;box-sizing:border-box;width:calc(100% - 32px)}
+  .sec-ed-h{display:block;width:100%;text-align:left;background:none;border:0;color:#fff7f0;font:700 14.5px 'Nunito',sans-serif;padding:13px 16px;cursor:pointer}
+  .sec-ed-b{display:none;padding:2px 16px 16px}
+  .sec-ed.open .sec-ed-b{display:block}
+  .sec-ed .ed-lab>span,.sec-ed .ed-flab{color:#f7c6d3}
+  .sec-ed .ed-in{background:rgba(255,255,255,.08)!important;border:1.5px solid rgba(247,198,211,.3)!important;color:#fff!important;color-scheme:dark}
+  .sec-ed textarea.ed-in{min-height:58px}
+  .sec-ed .pj-sc{scrollbar-gutter:stable}
+  .sec-ed .ed-in::placeholder{color:rgba(255,255,255,.4)}
+  .sec-ed .ed-in:focus{border-color:var(--rose)!important;box-shadow:0 0 0 3px rgba(232,93,132,.25)!important}
+  .sec-ed .pj-sc{max-height:360px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(232,87,127,.55) transparent;padding:2px 4px 6px 2px;margin:0 -2px 10px 0;border-radius:16px}
+  .sec-ed .pj-sc::-webkit-scrollbar{width:5px}.sec-ed .pj-sc::-webkit-scrollbar-thumb{background:rgba(232,87,127,.5);border-radius:99px}.sec-ed .pj-sc::-webkit-scrollbar-track{background:transparent}
+  .sec-ed .pj-sc.more{-webkit-mask-image:linear-gradient(#000 calc(100% - 38px),transparent);mask-image:linear-gradient(#000 calc(100% - 38px),transparent)}
+  .sec-ed .sec-cnt{font-size:12px;color:rgba(247,198,211,.75);margin:0 0 6px}
+  .sec-ed .ed-list{display:block}.sec-ed .pj-sc{display:grid;gap:8px}
+  .sec-ed .ed-row{flex-direction:column;gap:4px;align-items:stretch}
+  .sec-ed .ed-row .ed-in{flex:none}
+  .sec-ed .ed-row .ed-tools,.sec-ed .ed-card-tools .ed-tools{justify-content:flex-end}
+  .sec-ed .ed-tool{width:28px;height:28px;font-size:13px}
+  .sec-ed .ed-add{width:100%;display:block}
+  .sec-ed-f{margin-top:10px}.sec-ed-f .ed-status{margin:4px 0 0;color:#f7c6d3}
+  body.light .sec-ed{background:rgba(42,10,24,.88);border-color:rgba(247,198,211,.55)}
   /* Editor con el estilo de la página */
   .ed-panel{background:radial-gradient(120% 60% at 50% 0%,#5a1430 0%,#2a0a18 60%,#1a050e 100%)!important;color:var(--cream)!important;border-left:1px solid rgba(247,198,211,.18)}
   .ed-head{border-bottom:1px solid rgba(247,198,211,.15)!important}
@@ -6022,36 +6045,36 @@ const SCHEMA=[
   {t:'Ocultar secciones',special:'ocultas'},
   {t:'Saber si usa la app',special:'actividad'},
   {t:'Nombres, fecha y candado',f:[['ella','Su nombre','text'],['yo','Tu nombre (firma)','text'],['inicio','Fecha en que empezó todo','date'],['pin','Código del candado (4 números)','text']]},
-  {t:'Saludos según la hora',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
+  {t:'Saludos según la hora',sec:'inicio',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
   {g:'🏠 Inicio'},
-  {t:'Mensaje del día',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2]]},
-  {t:'Horóscopo del amor',f:[['horoscopo','Predicciones (salen dos distintas cada día; puedes usar {ella} y {yo})','list']]},
-  {t:'Corazones escondidos',f:[['corazonesN','¿Cuántos corazones esconder cada mes? (3 a 12, normalmente 6)','text'],['premioCorazones','Premio cuando los encuentre todos (opcional)','textarea',2]]},
-  {t:'Reto de fotos (uno por semana)',f:[['retosFoto','Temas (cambia cada lunes)','list']]},
-  {t:'¿Quién es más probable que…?',f:[['probable','Preguntas (una distinta cada día; escribe solo el final, ej. «se quede dormido viendo una peli»)','list']]},
-  {t:'Modo noche (11 pm – 5 am)',f:[['buenasNoches','Mensajes de buenas noches para Ale (cambia uno cada noche)','list']]},
-  {t:'Cumpleaños de Ale',f:[['cumple','Fecha de su cumpleaños (el año no importa)','date'],['cartaCumple','Carta de cumpleaños (se abre solo ese día) · deja una línea vacía entre párrafos','textarea',8]]},
+  {t:'Mensaje del día',sec:'hoy',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2]]},
+  {t:'Horóscopo del amor',sec:'horoscopo',f:[['horoscopo','Predicciones (salen dos distintas cada día; puedes usar {ella} y {yo})','list']]},
+  {t:'Corazones escondidos',sec:'corazones',f:[['corazonesN','¿Cuántos corazones esconder cada mes? (3 a 12, normalmente 6)','text'],['premioCorazones','Premio cuando los encuentre todos (opcional)','textarea',2]]},
+  {t:'Reto de fotos (uno por semana)',sec:'fotoreto',f:[['retosFoto','Temas (cambia cada lunes)','list']]},
+  {t:'¿Quién es más probable que…?',sec:'probable',f:[['probable','Preguntas (una distinta cada día; escribe solo el final, ej. «se quede dormido viendo una peli»)','list']]},
+  {t:'Modo noche (11 pm – 5 am)',sec:'noches',f:[['buenasNoches','Mensajes de buenas noches para Ale (cambia uno cada noche)','list']]},
+  {t:'Cumpleaños de Ale',sec:'cumple',f:[['cumple','Fecha de su cumpleaños (el año no importa)','date'],['cartaCumple','Carta de cumpleaños (se abre solo ese día) · deja una línea vacía entre párrafos','textarea',8]]},
   {t:'Cumpleaños de Jon',f:[['cumpleYo','Tu fecha de cumpleaños (el año no importa)','date']]},
-  {t:'Fechas especiales',f:[['cartaSanValentin','Carta de San Valentín para Ale (se abre el 14 de febrero)','textarea',6]]},
-  {t:'Racha de visitas',f:[['racha','Premios por días seguidos','objlist',[['dias','Días seguidos (número)','text'],['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
-  {t:'¿Cómo te sientes hoy?',f:[['animo','Caritas y lo que le respondes','objlist',[['emoji','Emoji','text'],['nombre','Cómo se siente','text'],['respuesta','Lo que le respondes','textarea',2]]]]},
-  {t:'Pregunta del día',f:[['preguntas','Preguntas (sale una distinta cada día, en orden)','list']]},
-  {t:'Frase final y mensajitos',f:[['fraseFinal','Frase final · *palabra* = cursiva rosa','textarea',3],['mensajitos','Mensajitos del botón «un poquito más de amor»','list']]},
-  {t:'WhatsApp',f:[['whatsapp.numero','Tu número (con lada, ej. 5255…)','text'],['whatsapp.numeroElla','Número de Ale (para que tú le mandes mensajes; con lada, ej. 5255…)','text'],['whatsapp.mensajes','Botones (los usan los dos: Ale te los manda a ti y tú se los mandas a ella)','objlist',[['emoji','Emoji','text'],['boton','Texto del botón','text'],['mensaje','Mensaje que se envía','textarea',2]]]]},
+  {t:'Fechas especiales',sec:'sanvalentin',f:[['cartaSanValentin','Carta de San Valentín para Ale (se abre el 14 de febrero)','textarea',6]]},
+  {t:'Racha de visitas',sec:'racha',f:[['racha','Premios por días seguidos','objlist',[['dias','Días seguidos (número)','text'],['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
+  {t:'¿Cómo te sientes hoy?',sec:'animo',f:[['animo','Caritas y lo que le respondes','objlist',[['emoji','Emoji','text'],['nombre','Cómo se siente','text'],['respuesta','Lo que le respondes','textarea',2]]]]},
+  {t:'Pregunta del día',sec:'pregunta',f:[['preguntas','Preguntas (sale una distinta cada día, en orden)','list']]},
+  {t:'Frase final y mensajitos',sec:'final',f:[['fraseFinal','Frase final · *palabra* = cursiva rosa','textarea',3],['mensajitos','Mensajitos del botón «un poquito más de amor»','list']]},
+  {t:'WhatsApp',sec:'final',f:[['whatsapp.numero','Tu número (con lada, ej. 5255…)','text'],['whatsapp.numeroElla','Número de Ale (para que tú le mandes mensajes; con lada, ej. 5255…)','text'],['whatsapp.mensajes','Botones (los usan los dos: Ale te los manda a ti y tú se los mandas a ella)','objlist',[['emoji','Emoji','text'],['boton','Texto del botón','text'],['mensaje','Mensaje que se envía','textarea',2]]]]},
   {g:'💑 Nosotros'},
-  {t:'Nuestra canción',f:[['cancion.titulo','Título','text'],['cancion.artista','Artista','text'],['cancion.link','Link (Spotify, YouTube…)','text']]},
-  {t:'Fotos',f:[['fotos','Galería (también se usan en el memorama y los créditos)','photos'],['polaroidTexto','Texto al revelar la polaroid (la foto sale al azar)','text'],['fotoRompecabezas','Número de foto para el rompecabezas','number']]},
-  {t:'El cielo de esa noche',f:[['horaCielo','Hora del cielo (el día que empezó todo)','time']]},
-  {t:'Créditos de película',f:[['creditos','Créditos','objlist',[['rol','Rol','text'],['quien','Quién / qué','text']]]]},
+  {t:'Nuestra canción',sec:'cancion',f:[['cancion.titulo','Título','text'],['cancion.artista','Artista','text'],['cancion.link','Link (Spotify, YouTube…)','text']]},
+  {t:'Fotos',sec:'momentos',f:[['fotos','Galería (también se usan en el memorama y los créditos)','photos'],['polaroidTexto','Texto al revelar la polaroid (la foto sale al azar)','text'],['fotoRompecabezas','Número de foto para el rompecabezas','number']]},
+  {t:'El cielo de esa noche',sec:'cielo',f:[['horaCielo','Hora del cielo (el día que empezó todo)','time']]},
+  {t:'Créditos de película',sec:'final',f:[['creditos','Créditos','objlist',[['rol','Rol','text'],['quien','Quién / qué','text']]]]},
   {g:'💌 Cartas'},
-  {t:'Carta que se escribe sola',f:[['cartaSola','Texto','textarea',9]]},
-  {t:'Mensaje secreto (easter egg)',f:[['secreto','Texto','textarea',4]]},
+  {t:'Carta que se escribe sola',sec:'escribir',f:[['cartaSola','Texto','textarea',9]]},
+  {t:'Mensaje secreto (easter egg)',sec:'final',f:[['secreto','Texto','textarea',4]]},
   {g:'🎮 Juegos'},
-  {t:'Ruleta de citas',f:[['ruleta','Opciones (máximo 12)','list']]},
-  {t:'Rueda de la comida',f:[['comida','Opciones (máximo 12)','list']]},
+  {t:'Ruleta de citas',sec:'ruleta',f:[['ruleta','Opciones (máximo 12)','list']]},
+  {t:'Rueda de la comida',sec:'comida',f:[['comida','Opciones (máximo 12)','list']]},
   {g:'📝 Planes'},
-  {t:'Reto de la semana',f:[['retos','Retos (sale uno distinto cada lunes, en orden)','list']]},
-  {t:'Bingo de citas',f:[['bingo','Citas de la tarjeta (16; si pones menos, se completan con ideas)','list'],['premioBingo','Premio por hacer línea','textarea',2],['premioBingoTodo','Premio por llenar toda la tarjeta','textarea',2]]},
+  {t:'Reto de la semana',sec:'reto',f:[['retos','Retos (sale uno distinto cada lunes, en orden)','list']]},
+  {t:'Bingo de citas',sec:'bingo',f:[['bingo','Citas de la tarjeta (16; si pones menos, se completan con ideas)','list'],['premioBingo','Premio por hacer línea','textarea',2],['premioBingoTodo','Premio por llenar toda la tarjeta','textarea',2]]},
   {t:'Planes, fotos, vales, notitas y eventos de Ale',special:'kanban'},
   {g:'🔧 Ajustes'},
   {t:'Avisos a tu celular',special:'avisos'},
@@ -6063,9 +6086,18 @@ const setP=(o,p,v)=>{const ks=p.split('.');let a=o;ks.slice(0,-1).forEach(k=>{if
 function h(tag,attrs,...kids){const e=document.createElement(tag);for(const k in (attrs||{})){const v=attrs[k];if(k==='class')e.className=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(k==='html')e.innerHTML=v;else if(v!==false&&v!=null)e.setAttribute(k,v===true?'':v)}kids.flat().forEach(c=>{if(c!=null)e.append(c.nodeType?c:document.createTextNode(c))});return e}
 function b64utf8(str){const by=new TextEncoder().encode(str);let s='';for(let i=0;i<by.length;i+=0x8000)s+=String.fromCharCode.apply(null,by.subarray(i,i+0x8000));return btoa(s)}
 function b64buf(buf){const by=new Uint8Array(buf);let s='';for(let i=0;i<by.length;i+=0x8000)s+=String.fromCharCode.apply(null,by.subarray(i,i+0x8000));return btoa(s)}
-function autosize(t){t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px'}
+function autosize(t){t.style.height='auto';if(!t.offsetParent)return;t.style.height=(t.scrollHeight+(t.offsetHeight-t.clientHeight)+1)+'px'}
 
 function initEditor(){
+  // ¿esta entrada se edita dentro de su sección de la página? (si no existe o está oculta/vacía, va al panel)
+  function inlineEl(e){
+    if(!e.sec||!e.f)return null;
+    const el=document.getElementById(e.sec); if(!el||el.hidden)return null;
+    const O=(CUR.ocultas&&typeof CUR.ocultas==='object')?CUR.ocultas:{};
+    if(O[e.sec]==='dos'||el.classList.contains('oculta'))return null;
+    return el;
+  }
+  function grpShown(i){for(let j=i+1;j<SCHEMA.length&&!SCHEMA[j].g;j++){if(!inlineEl(SCHEMA[j]))return true}return false}
   let D=JSON.parse(JSON.stringify(CUR)), dirty=false;
   const markDirty=()=>{dirty=true;saveBtn.textContent='Guardar cambios •'};
   document.body.classList.add('editing');
@@ -6081,12 +6113,13 @@ function initEditor(){
   document.body.append(fab,panel);
   {const nav=document.querySelector('nav'); if(nav){const eb=h('button',{class:'tab-ed','aria-label':'Editar',onclick:()=>openPanel(true)});eb.innerHTML='<span>✏️</span>Editar';nav.append(eb);document.body.classList.add('ed-nav')}}
   function openPanel(v){panel.classList.toggle('open',v);try{sessionStorage.setItem('ed-open',v?'1':'')}catch(e){}}
-  const say=(t,kind)=>{status.textContent=t;status.className='ed-status '+(kind||'')};
+  const inSt=[], inBtn=[];
+  const say=(t,kind)=>{status.textContent=t;status.className='ed-status '+(kind||'');inSt.forEach(e=>{e.textContent=t;e.className='ed-status '+(kind||'')})};
   window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
 
   // Ayuda de comodines
   if(!KEY_B64) body.append(h('div',{class:'ed-help',html:'⚠️ Abre esta página con tu link de edición completo (el que trae <b>#k=…</b>) para poder guardar.'}));
-  body.append(h('div',{class:'ed-jump'},...SCHEMA.filter(x=>x.g).map(x=>h('button',{onclick:()=>{const e=document.getElementById('edg-'+x.g.replace(/[^a-záéíóúñ]/gi,''));if(e)body.scrollTo({top:e.offsetTop-8,behavior:'smooth'})}},x.g))));
+  body.append(h('div',{class:'ed-jump'},...SCHEMA.filter((x,i)=>x.g&&grpShown(i)).map(x=>h('button',{onclick:()=>{const e=document.getElementById('edg-'+x.g.replace(/[^a-záéíóúñ]/gi,''));if(e)body.scrollTo({top:e.offsetTop-8,behavior:'smooth'})}},x.g))));
   body.append(h('div',{class:'ed-help',html:'Puedes escribir <b>{ella}</b>, <b>{yo}</b>, <b>{meses}</b> (ej. «8 meses»), <b>{Meses}</b> (ej. «Ocho meses») y <b>{toques}</b>: se actualizan solos cada mes.'}));
 
   // Conexión GitHub
@@ -6125,8 +6158,24 @@ function initEditor(){
   
 
   // Secciones de contenido
-  SCHEMA.forEach(sec=>{
-    if(sec.g){const gid='edg-'+sec.g.replace(/[^a-záéíóúñ]/gi,'');body.append(h('div',{class:'ed-group',id:gid},sec.g));return}
+  SCHEMA.forEach((sec,si)=>{
+    {const host=inlineEl(sec);
+      if(host){
+        const key='sec-ed-'+sec.t; let open=false; try{open=sessionStorage.getItem(key)==='1'}catch(e){}
+        const st=h('div',{class:'ed-status'},'Se aplica al guardar · la app se recarga');
+        const sb=h('button',{class:'ed-btn',onclick:()=>save(sec.sec)},'💾 Guardar cambios');
+        inSt.push(st); inBtn.push(sb);
+        const card=h('div',{class:'sec-ed'+(open?' open':'')});
+        const hd=h('button',{class:'sec-ed-h',type:'button',onclick:()=>{card.classList.toggle('open');try{sessionStorage.setItem(key,card.classList.contains('open')?'1':'')}catch(e){};const fit=()=>card.querySelectorAll('textarea').forEach(t=>autosize(t));fit();requestAnimationFrame(fit);setTimeout(fit,120)}},'✏️ Editar · '+sec.t);
+        card.append(hd,h('div',{class:'sec-ed-b'},sec.f.map(fd=>field(fd,true)),h('div',{class:'sec-ed-f'},sb,st)));
+        host.append(card);
+        {const fitC=()=>{if(card.classList.contains('open'))card.querySelectorAll('textarea').forEach(t=>autosize(t))};
+          try{document.fonts&&document.fonts.ready.then(()=>{fitC();setTimeout(fitC,150)})}catch(e){}
+          window.addEventListener('resize',fitC);
+          card.addEventListener('focusin',e=>{if(e.target&&e.target.tagName==='TEXTAREA')autosize(e.target)})}
+        return;
+      }}
+    if(sec.g){if(!grpShown(si))return;const gid='edg-'+sec.g.replace(/[^a-záéíóúñ]/gi,'');body.append(h('div',{class:'ed-group',id:gid},sec.g));return}
     if(sec.special==='inactiva'){
       const st=h('div',{class:'ed-note'});
       const tg=h('button',{class:'ed-btn',style:'display:block;margin:6px 0'});
@@ -6389,7 +6438,13 @@ function initEditor(){
       h('button',{class:'ed-sec-h',onclick:()=>{s.classList.toggle('open');try{sessionStorage.setItem(key,s.classList.contains('open')?'1':'')}catch(e){};s.querySelectorAll('textarea').forEach(autosize)}},h('span',null,title),h('i',null,'⌄')),content);
     return s;
   }
-  function field([path,label,type,extra]){
+  function scBox(box,n,unit){
+    const c=h('div',{class:'sec-cnt'},n+' '+(n===1?unit.slice(0,-1).replace(/^frase$/,'frase'):unit));
+    const sc=h('div',{class:'pj-sc sc-ed-sc'});
+    const upd=()=>sc.classList.toggle('more',sc.scrollHeight-sc.scrollTop-sc.clientHeight>6);
+    sc.addEventListener('scroll',upd,{passive:true}); box.append(c,sc); setTimeout(upd,60); sc._upd=upd; return sc;
+  }
+  function field([path,label,type,extra],inl){
     const wrap=h('div',{class:'ed-field'});
     const lab=h('div',{class:'ed-flab'},label);
     if(type==='text'||type==='date'||type==='time'||type==='number'){
@@ -6402,23 +6457,25 @@ function initEditor(){
       wrap.append(h('label',{class:'ed-lab'},h('span',null,label),t));
     }else if(type==='list'){
       wrap.append(lab); const box=h('div',{class:'ed-list'}); wrap.append(box);
-      const render=()=>{box.innerHTML='';const arr=getP(D,path)||[];
+      const render=(goEnd)=>{box.innerHTML='';const arr=getP(D,path)||[];const it=inl?scBox(box,arr.length,'frases'):box;
         arr.forEach((v,i)=>{const t=h('textarea',{class:'ed-in',rows:1});t.value=v;
           t.addEventListener('input',()=>{arr[i]=t.value;markDirty();autosize(t)});
-          box.append(h('div',{class:'ed-row'},t,tools(arr,i,render)));setTimeout(()=>autosize(t))});
-        box.append(h('button',{class:'ed-add',onclick:()=>{arr.push('');setP(D,path,arr);markDirty();render();const last=box.querySelectorAll('textarea');last[last.length-1]?.focus()}},'+ Agregar'))};
+          it.append(h('div',{class:'ed-row'},t,tools(arr,i,render)));setTimeout(()=>autosize(t))});
+        box.append(h('button',{class:'ed-add',onclick:()=>{arr.push('');setP(D,path,arr);markDirty();render(true);const last=box.querySelectorAll('textarea');last[last.length-1]?.focus()}},'+ Agregar'));
+        if(inl&&goEnd===true)setTimeout(()=>{it.scrollTop=it.scrollHeight;it._upd()},30)};
       if(!getP(D,path))setP(D,path,[]); render();
     }else if(type==='objlist'){
       wrap.append(lab); const box=h('div',{class:'ed-list'}); wrap.append(box);
-      const render=()=>{box.innerHTML='';const arr=getP(D,path)||[];
+      const render=(goEnd)=>{box.innerHTML='';const arr=getP(D,path)||[];const it=inl?scBox(box,arr.length,'elementos'):box;
         arr.forEach((o,i)=>{const card=h('div',{class:'ed-card'});
           extra.forEach(([k,l,tp,rows])=>{
             const inp=tp==='textarea'?h('textarea',{class:'ed-in',rows:rows||3}):h('input',{class:'ed-in',type:tp==='date'?'date':'text'});
             inp.value=o[k]??''; inp.addEventListener('input',()=>{o[k]=inp.value;markDirty();if(tp==='textarea')autosize(inp)});
             card.append(h('label',{class:'ed-lab'+(k==='emoji'?' emoji':'')},h('span',null,l),inp)); if(tp==='textarea')setTimeout(()=>autosize(inp));
           });
-          card.append(h('div',{class:'ed-card-tools'},h('span',null,'#'+(i+1)),tools(arr,i,render)));box.append(card)});
-        box.append(h('button',{class:'ed-add',onclick:()=>{const n={};extra.forEach(([k])=>n[k]='');arr.push(n);setP(D,path,arr);markDirty();render()}},'+ Agregar'))};
+          card.append(h('div',{class:'ed-card-tools'},h('span',null,'#'+(i+1)),tools(arr,i,render)));it.append(card)});
+        box.append(h('button',{class:'ed-add',onclick:()=>{const n={};extra.forEach(([k])=>n[k]='');arr.push(n);setP(D,path,arr);markDirty();render(true)}},'+ Agregar'));
+        if(inl&&goEnd===true)setTimeout(()=>{it.scrollTop=it.scrollHeight;it._upd()},30)};
       if(!getP(D,path))setP(D,path,[]); render();
     }else if(type==='photos'){
       wrap.append(lab); const grid=h('div',{class:'ed-photos'}); const msg=h('div',{class:'ed-note'});
@@ -6464,12 +6521,12 @@ function initEditor(){
     cv.getContext('2d').drawImage(bmp,0,0,cv.width,cv.height);
     return await new Promise(ok=>cv.toBlob(ok,'image/jpeg',.82));
   }
-  async function save(){
+  async function save(back){
     const R=ghRepo(),t=ghToken();
     if(!R||!t){say('Primero conecta GitHub en «🔑 Conexión con GitHub».','bad');conSec.classList.add('open');conSec.scrollIntoView({behavior:'smooth'});return}
     if(!/^\d{4}-\d{2}-\d{2}$/.test(D.inicio||'')){say('Revisa la fecha en que empezó todo.','bad');return}
     if(D.cancion&&D.cancion.link&&!/^https:\/\//.test(D.cancion.link)){say('El link de la canción debe empezar con https://','bad');return}
-    saveBtn.disabled=true;say('Guardando…');
+    saveBtn.disabled=true;inBtn.forEach(b=>b.disabled=true);say('Guardando…');
     try{
       const url=`https://api.github.com/repos/${R.owner}/${R.repo}/contents/data.bin`;
       let sha; const g=await fetch(url+`?ref=${encodeURIComponent(R.branch||'main')}&t=${Date.now()}`,{headers:ghH(t),cache:'no-store'});
@@ -6479,11 +6536,12 @@ function initEditor(){
       const p=await fetch(url,{method:'PUT',headers:Object.assign(ghH(t),{'Content-Type':'application/json'}),body:JSON.stringify(bodyJ)});
       if(!p.ok){const m={401:'el token no es válido',403:'el token no tiene permiso de escritura',404:'no encontré el repositorio',409:'alguien guardó al mismo tiempo, intenta otra vez',422:'GitHub rechazó el archivo'}[p.status]||('GitHub respondió '+p.status);throw new Error(m)}
       dirty=false; say('✅ ¡Guardado! Actualizando la página…','ok');
-      try{sessionStorage.setItem('ed-open','1');sessionStorage.setItem('ed-unlock',String(Date.now()+60000))}catch(e){}
+      try{sessionStorage.setItem('ed-open',back?'':'1');if(back)sessionStorage.setItem('ed-sec-back',back);sessionStorage.setItem('ed-unlock',String(Date.now()+60000))}catch(e){}
       setTimeout(()=>location.reload(),900);
-    }catch(e){say('No se pudo guardar: '+e.message+'.','bad');saveBtn.disabled=false}
+    }catch(e){say('No se pudo guardar: '+e.message+'.','bad');saveBtn.disabled=false;inBtn.forEach(b=>b.disabled=false)}
   }
   try{if(sessionStorage.getItem('ed-open')==='1')openPanel(true)}catch(e){}
+  try{const bk=sessionStorage.getItem('ed-sec-back'); if(bk){sessionStorage.removeItem('ed-sec-back');setTimeout(()=>{try{window.GOTO&&GOTO(bk)}catch(e){}},700)}}catch(e){}
   if(!ghRepo()) say('Abre «🔑 Conexión con GitHub» para conectar tu repositorio.');
 }
 
