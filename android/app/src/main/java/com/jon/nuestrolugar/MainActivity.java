@@ -70,8 +70,20 @@ public class MainActivity extends Activity {
     String base() { String h = sp == null ? BASE : sp.getString("host", BASE); return MIRROR.equals(h) ? MIRROR : BASE; }
     String other() { return BASE.equals(base()) ? MIRROR : BASE; }
     String home() { return home(base()); }
-    String home(String b) { String k = sp == null ? "" : sp.getString("k", ""); return (IS_JON ? b + "?editar" : b) + (k.isEmpty() ? "" : "#k=" + k); }
-    static boolean ours(String u) { return u != null && (u.startsWith(BASE) || u.startsWith(MIRROR)); }
+    String home(String b) { String k = sp == null ? "" : SecureKey.get(this); return (IS_JON ? b + "?editar" : b) + (k.isEmpty() ? "" : "#k=" + k); }
+    static boolean ours(String u) {
+        if (u == null || !(u.startsWith(BASE) || u.startsWith(MIRROR))) return false;
+        try {
+            Uri p = Uri.parse(u); String h = p.getHost();
+            if (!"https".equals(p.getScheme()) || h == null || p.getUserInfo() != null) return false;
+            if (h.equals("ale-meses.vercel.app")) return true;
+            String path = p.getPath() == null ? "" : p.getPath();
+            return h.equals("jonatan-montiel.github.io") && (path.equals("/ale-meses") || path.startsWith("/ale-meses/"));
+        } catch (Exception e) { return false; }
+    }
+    /** URL actual de la WebView principal (la actualiza onPageStarted/onPageFinished); el puente solo responde si es nuestra. */
+    volatile String bridgeUrl = null;
+    boolean fromOurPage() { return ours(bridgeUrl); }
     String goTo = null; JSONArray share = null; boolean pageReady = false;
     long loadedAt = 0, pausedAt = 0;
     WebView wv;
@@ -82,6 +94,7 @@ public class MainActivity extends Activity {
     PermissionRequest pendingPerm;
     SharedPreferences sp;
     boolean badLink = false;
+    android.app.AlertDialog relinkDialog = null;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -311,7 +324,8 @@ public class MainActivity extends Activity {
             int i = s.indexOf("#k=");
             if (i < 0) { err.setText("Ese no es el link correcto. Pídele a Jon el link especial 💗"); return; }
             String k = s.substring(i + 3).replaceAll("[^A-Za-z0-9_-].*$", "");
-            sp.edit().putBoolean("linked", true).putString("k", k).apply();
+            sp.edit().putBoolean("linked", true).apply();
+            SecureKey.put(this, k);
             showWeb(home());
             loadedAt = System.currentTimeMillis();
         });
@@ -343,12 +357,16 @@ public class MainActivity extends Activity {
             public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) {
                 Uri u = r.getUrl();
                 if (ours(u.toString())) return false;
-                try { startActivity(new Intent(Intent.ACTION_VIEW, u)); } catch (Exception ignored) { }
+                // Navegación a otro origen: se abre fuera de la app (solo http/https/mailto/tel), nunca en la WebView.
+                try {
+                    String sc = u.getScheme();
+                    if ("https".equals(sc) || "http".equals(sc) || "mailto".equals(sc) || "tel".equals(sc)) startActivity(new Intent(Intent.ACTION_VIEW, u));
+                } catch (Exception ignored) { }
                 return true;
             }
 
             @Override
-            public void onPageStarted(WebView v, String url, Bitmap fav) { if (ours(url)) dl("empezó a cargar"); }
+            public void onPageStarted(WebView v, String url, Bitmap fav) { bridgeUrl = url; if (ours(url)) dl("empezó a cargar"); }
 
             @Override
             public void onReceivedHttpError(WebView v, WebResourceRequest r, WebResourceResponse e) {
@@ -373,6 +391,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageFinished(final WebView v, String url) {
+                bridgeUrl = url;
                 if (edgeOn) pushInset();
                 if (loadErr || !ours(url)) return;
                 dl("terminó de cargar");
@@ -400,7 +419,7 @@ public class MainActivity extends Activity {
             @Override
             public void onPermissionRequest(final PermissionRequest req) {
                 runOnUiThread(() -> {
-                    String o = req.getOrigin().toString(); if (!o.startsWith("https://jonatan-montiel.github.io") && !o.startsWith("https://ale-meses.vercel.app")) { req.deny(); return; }
+                    String o = req.getOrigin().toString().replaceAll("/+$", ""); if (!o.equals("https://jonatan-montiel.github.io") && !o.equals("https://ale-meses.vercel.app")) { req.deny(); return; }
                     if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) req.grant(req.getResources());
                     else { pendingPerm = req; requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 2); }
                 });
@@ -565,26 +584,26 @@ public class MainActivity extends Activity {
 
     class Bridge {
         @JavascriptInterface
-        public void setEdge(String bot, boolean lightTop, boolean lightBot) {
+        public void setEdge(String bot, boolean lightTop, boolean lightBot) { if (!fromOurPage()) { return; }
             if (bot == null || !bot.matches("#[0-9a-fA-F]{6}")) return;
             sp.edit().putBoolean("edge", true).putString("barBot", bot).putBoolean("barLT", lightTop).putBoolean("barLB", lightBot).apply();
             runOnUiThread(() -> applyEdge(bot, lightTop, lightBot));
         }
         @JavascriptInterface
-        public int statusInset() { return topInsetDp(); }
+        public int statusInset() { if (!fromOurPage()) { return 0; } return topInsetDp(); }
         @JavascriptInterface
-        public void setBars(String top, String bot, boolean lightTop, boolean lightBot) {
+        public void setBars(String top, String bot, boolean lightTop, boolean lightBot) { if (!fromOurPage()) { return; }
             if (top == null || bot == null || !top.matches("#[0-9a-fA-F]{6}") || !bot.matches("#[0-9a-fA-F]{6}")) return;
             sp.edit().putString("barTop", top).putString("barBot", bot).putBoolean("barLT", lightTop).putBoolean("barLB", lightBot).apply();
             runOnUiThread(() -> applyBars(top, bot, lightTop, lightBot));
         }
         @JavascriptInterface
-        public int appVersion() { try { android.content.pm.PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0); return (int) (Build.VERSION.SDK_INT >= 28 ? pi.getLongVersionCode() : pi.versionCode); } catch (Exception e) { return 0; } }
+        public int appVersion() { if (!fromOurPage()) { return 0; } try { android.content.pm.PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0); return (int) (Build.VERSION.SDK_INT >= 28 ? pi.getLongVersionCode() : pi.versionCode); } catch (Exception e) { return 0; } }
 
         /* ---- Widgets: distancia, cómo está y cuenta regresiva ---- */
 
         @JavascriptInterface
-        public void setInfo(String key, String json) {
+        public void setInfo(String key, String json) { if (!fromOurPage()) { return; }
             if (!"cuenta".equals(key) && !"estado".equals(key)) return;
             try {
                 if ("estado".equals(key)) { org.json.JSONObject n = new org.json.JSONObject(json), o = new org.json.JSONObject(sp.getString("estado", "{}")); if (n.optString("d").equals(o.optString("d"))) { java.util.Iterator<String> it = o.keys(); while (it.hasNext()) { String k = it.next(); if (!n.has(k)) n.put(k, o.get(k)); } } json = n.toString(); }
@@ -595,7 +614,7 @@ public class MainActivity extends Activity {
 
         /* ---- Compartir en WhatsApp, Facebook, Instagram… ---- */
         @JavascriptInterface
-        public boolean shareImage(String b64, String text) {
+        public boolean shareImage(String b64, String text) { if (!fromOurPage()) { return false; }
             try {
                 byte[] data = Base64.decode(b64.replaceFirst("^data:[^,]*,", ""), Base64.DEFAULT);
                 java.io.File dir = new java.io.File(getCacheDir(), "share"); dir.mkdirs();
@@ -613,7 +632,7 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
-        public boolean shareText(String text) {
+        public boolean shareText(String text) { if (!fromOurPage()) { return false; }
             try {
                 final Intent ch = Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), "Compartir 💗");
                 runOnUiThread(() -> { try { startActivity(ch); } catch (Exception ignored) { } });
@@ -622,16 +641,16 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
-        public void saveKey(String k) { if (k != null && k.matches("[A-Za-z0-9_-]{40,}") && !k.equals(sp.getString("k", ""))) sp.edit().putString("k", k).apply(); }
+        public void saveKey(String k) { if (!fromOurPage()) { return; } if (k != null && k.matches("[A-Za-z0-9_-]{40,}") && !k.equals(SecureKey.get(MainActivity.this))) SecureKey.put(MainActivity.this, k); }
 
         @JavascriptInterface
-        public void diag(String m) { dl("página: " + m); }
+        public void diag(String m) { if (!fromOurPage()) { return; } dl("página: " + m); }
 
         @JavascriptInterface
-        public void retry() { runOnUiThread(() -> { triedOther = false; curHost = base(); loadHome(null, false); }); }
+        public void retry() { if (!fromOurPage()) { return; } runOnUiThread(() -> { triedOther = false; curHost = base(); loadHome(null, false); }); }
 
         @JavascriptInterface
-        public void setTopic(String t) {
+        public void setTopic(String t) { if (!fromOurPage()) { return; }
             String nt = t == null ? "" : t.trim();
             boolean changed = !nt.equals(sp.getString("topic", ""));
             sp.edit().putString("topic", nt).apply();
@@ -642,33 +661,48 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void relink() {
-            sp.edit().clear().apply();
-            stopService(new Intent(MainActivity.this, StreamService.class));
-            runOnUiThread(MainActivity.this::showLinkScreen);
+            if (!fromOurPage()) { return; }
+            runOnUiThread(() -> {
+                if (isFinishing() || relinkDialog != null) return;
+                try {
+                    relinkDialog = new android.app.AlertDialog.Builder(MainActivity.this)
+                        .setTitle("¿Desvincular?")
+                        .setMessage("Se borrará el link especial guardado en este celular y tendrás que pegarlo otra vez.")
+                        .setNegativeButton("Cancelar", null)
+                        .setPositiveButton("Desvincular", (d, w) -> {
+                            SecureKey.wipe(MainActivity.this);
+                            sp.edit().clear().apply();
+                            stopService(new Intent(MainActivity.this, StreamService.class));
+                            showLinkScreen();
+                        })
+                        .setOnDismissListener(d -> relinkDialog = null)
+                        .show();
+                } catch (Exception e) { relinkDialog = null; }
+            });
         }
 
         @JavascriptInterface
-        public boolean isApp() { return true; }
+        public boolean isApp() { if (!fromOurPage()) { return false; } return true; }
 
         @JavascriptInterface
-        public boolean hasBio() { return bioAvailable(); }
+        public boolean hasBio() { if (!fromOurPage()) { return false; } return bioAvailable(); }
         @JavascriptInterface
-        public void setWidget(String json) { sp.edit().putString("widget", json).apply(); Widget.refresh(MainActivity.this); }
+        public void setWidget(String json) { if (!fromOurPage()) { return; } sp.edit().putString("widget", json).apply(); Widget.refresh(MainActivity.this); }
 
         @JavascriptInterface
-        public void setRacha(int n) { sp.edit().putInt("racha", n).apply(); }
+        public void setRacha(int n) { if (!fromOurPage()) { return; } sp.edit().putInt("racha", n).apply(); }
 
         @JavascriptInterface
-        public void visited() { sp.edit().putString("visto", Reminder.today()).apply(); }
+        public void visited() { if (!fromOurPage()) { return; } sp.edit().putString("visto", Reminder.today()).apply(); }
 
         @JavascriptInterface
-        public void setOther(String topic, String myName) { sp.edit().putString("other", topic == null ? "" : topic.trim()).putString("myName", myName == null ? "" : myName).apply(); }
+        public void setOther(String topic, String myName) { if (!fromOurPage()) { return; } sp.edit().putString("other", topic == null ? "" : topic.trim()).putString("myName", myName == null ? "" : myName).apply(); }
 
         @JavascriptInterface
-        public int takeExtrano() { int n = sp.getInt("pendExtrano", 0); sp.edit().putInt("pendExtrano", 0).apply(); return n; }
+        public int takeExtrano() { if (!fromOurPage()) { return 0; } int n = sp.getInt("pendExtrano", 0); sp.edit().putInt("pendExtrano", 0).apply(); return n; }
 
         @JavascriptInterface
-        public String saveFile(String name, String text) {
+        public String saveFile(String name, String text) { if (!fromOurPage()) { return ""; }
             try {
                 byte[] data = text.getBytes("UTF-8");
                 if (Build.VERSION.SDK_INT >= 29) {
@@ -689,6 +723,6 @@ public class MainActivity extends Activity {
 
 
         @JavascriptInterface
-        public void bio() { runOnUiThread(MainActivity.this::askBio); }
+        public void bio() { if (!fromOurPage()) { return; } runOnUiThread(MainActivity.this::askBio); }
     }
 }

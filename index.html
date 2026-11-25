@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-71C7duDjlqrIMbjDL750FbaskO4gmAjTfPxd9d8ydoI='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-l3UIXWlkWcwEi7F8ongpmWNWYm9cOonvsA6J4VZijJ4='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1391,6 +1391,12 @@
   .re-pk{display:inline-flex;flex-wrap:wrap;gap:4px;margin-left:4px}
   .re-pk button{background:rgba(255,255,255,.12);border:0;border-radius:999px;padding:3px 7px;font-size:13px;color:inherit;cursor:pointer}
   body.light .re-pk button{background:rgba(120,40,70,.08)}
+  /* foco visible con el teclado (donde antes se quitaba el contorno): sutil, acorde al diseño */
+  .ed-in:focus-visible,.kb-add input:focus-visible,.kb-t:focus-visible,.pq-in:focus-visible,.ds-add input:focus-visible,.ev-add input:focus-visible{outline:2px solid rgba(247,198,211,.6);outline-offset:1px}
+  .ed-in:focus-visible{outline-color:rgba(232,93,132,.55)}
+  body.light .kb-add input:focus-visible,body.light .kb-t:focus-visible,body.light .pq-in:focus-visible,body.light .ds-add input:focus-visible,body.light .ev-add input:focus-visible{outline-color:rgba(176,38,84,.5)}
+  button:focus-visible,a:focus-visible,summary:focus-visible,[role=button]:focus-visible{outline:2px solid rgba(247,198,211,.75);outline-offset:2px}
+  body.light button:focus-visible,body.light a:focus-visible,body.light summary:focus-visible{outline-color:rgba(176,38,84,.6)}
 </style>
 </head>
 <body class="locked">
@@ -2165,6 +2171,52 @@ if(PV_MODE){try{
   navigator.sendBeacon=()=>false;
 }catch(e){}}
 {const f=document.getElementById('fontCss');if(f)f.rel='stylesheet'}
+const b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* url(...) seguro para CSS (escapa comillas, barras y saltos de línea) */
+const cssUrl=u=>'url("'+String(u??'').replace(/["\\\n\r()]/g,m=>'\\'+m.charCodeAt(0).toString(16)+' ')+'")';
+/* repetir cada cierto tiempo solo con la página visible (y al volver a verla se actualiza al momento) */
+const everyVis=(f,ms)=>{setInterval(()=>{if(!document.hidden)f()},ms);document.addEventListener('visibilitychange',()=>{if(!document.hidden){try{f()}catch(e){}}})};
+/* ---- Accesibilidad sin cambiar el aspecto: nombres para campos/botones de solo ícono, diálogos y avisos de estado ---- */
+(function(){
+  const ICON={'📳':'Mandar un zumbido','👀':'Cómo vamos','🎨':'Cambiar tema','✏️':'Editar','🔎':'Buscar','✕':'Cerrar','×':'Cerrar','✖':'Cerrar','‹':'Anterior','›':'Siguiente','＋':'Agregar','+':'Agregar','✓':'Listo','➤':'Enviar','🗑️':'Borrar','↩':'Regresar','✎':'Editar','🔔':'Pendientes'};
+  const DEFT={date:'Fecha',time:'Hora','datetime-local':'Fecha y hora',file:'Elegir archivo',range:'Valor',number:'Cantidad',search:'Buscar',checkbox:'Opción'};
+  const LIVE='.kb-st,.memo-st,.tm-st,.sl-st,.ed-status';
+  function lab(el){
+    if(el.hasAttribute('aria-label')||el.hasAttribute('aria-labelledby')||el.type==='hidden')return;
+    if(el.labels&&el.labels.length&&[...el.labels].some(l=>(l.textContent||'').trim()))return;
+    let t=el.getAttribute('placeholder')||el.getAttribute('title')||'';
+    if(!t){const p=el.previousElementSibling;if(p&&!/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(p.tagName)){const x=(p.textContent||'').trim();if(x&&x.length<80)t=x}}
+    if(!t){const q=el.closest('.card,.paper,form,section');const d=q&&q.querySelector('.daily-l,h2,h3');if(d&&el.tagName==='TEXTAREA')t=(d.textContent||'').trim().slice(0,80)}
+    if(!t)t=DEFT[el.type]||(el.tagName==='SELECT'?'Elegir':'Escribir aquí');
+    el.setAttribute('aria-label',t.replace(/\s+/g,' ').trim());
+  }
+  function btn(b){
+    if(b.hasAttribute('aria-label')||b.hasAttribute('aria-labelledby'))return;
+    const x=(b.textContent||'').trim();if(!x||/[A-Za-zÁ-ÿ0-9]/.test(x))return;
+    const t=b.getAttribute('title')||ICON[x]||ICON[x.replace(/\uFE0F/g,'')];if(t)b.setAttribute('aria-label',t);
+  }
+  function pass(root){
+    if(!root||root.nodeType!==1)return;
+    const all=(sel)=>{const r=[...root.querySelectorAll(sel)];if(root.matches&&root.matches(sel))r.unshift(root);return r};
+    all('input,textarea,select').forEach(lab);
+    all('button').forEach(btn);
+    all('.modal,.lb,.secret').forEach(d=>{if(!d.hasAttribute('role'))d.setAttribute('role','dialog');if(!d.hasAttribute('aria-modal'))d.setAttribute('aria-modal','true');
+      if(d.classList.contains('lb')&&!d.hasAttribute('aria-label'))d.setAttribute('aria-label','Fotos')});
+    all(LIVE).forEach(e=>{if(!e.hasAttribute('aria-live'))e.setAttribute('aria-live','polite')});
+  }
+  let q=new Set(),raf=0;
+  const flush=()=>{raf=0;const L=[...q];q=new Set();L.forEach(n=>{try{pass(n)}catch(e){}})};
+  try{new MutationObserver(ms=>{ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)q.add(n)}));if(!raf)raf=requestAnimationFrame(flush)}).observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
+  pass(document.body||document.documentElement);
+  window.__a11y=pass;
+})();
+/* caché de blob: URLs con límite (LRU): al salir una entrada se libera su URL */
+function lruBlobs(max,onDrop){const m=new Map();const o={max,get(k){if(!m.has(k))return undefined;const v=m.get(k);m.delete(k);m.set(k,v);return v},
+  set(k,v){if(m.has(k)){const old=m.get(k);m.delete(k);if(old!==v){try{URL.revokeObjectURL(old)}catch(e){}}}m.set(k,v);while(m.size>o.max){const x=m.keys().next().value;const u=m.get(x);m.delete(x);try{onDrop&&onDrop(x,u)}catch(e){}try{URL.revokeObjectURL(u)}catch(e){}}return v},
+  has:k=>m.has(k),drop(k){if(m.has(k)){try{URL.revokeObjectURL(m.get(k))}catch(e){}m.delete(k)}}};return o}
+/* vista previa de una foto elegida: libera la URL de la anterior */
+const blobBg=(el,blob)=>{if(el._bu){try{URL.revokeObjectURL(el._bu)}catch(e){}}el._bu=URL.createObjectURL(blob);el.style.backgroundImage=cssUrl(el._bu)};
 /* ====== Temas ====== */
 const TEMAS=[['vino','Vino','#5a1430','radial-gradient(circle at 50% 0,#7a1d40,#2a0a18)','rgba(255,255,255,.18)'],
   ['noche','Noche estrellada','#141a3a','radial-gradient(circle at 50% 0,#2b2f6b,#070a1c)','rgba(207,200,255,.3)'],
@@ -2201,7 +2253,6 @@ const MW=NUMW[MONTHS]||String(MONTHS), MWC=MW.charAt(0).toUpperCase()+MW.slice(1
 const MESES=MONTHS===1?'mes':'meses';
 const TOQ=MONTHS===1?'Un toque para un mes':`${MWC} toques para ${MW} meses`;
 const FILL=x=>String(x??'').replace(/\{ella\}/g,C.ella).replace(/\{yo\}/g,C.yo).replace(/\{meses\}/g,MONTHS+' '+MESES).replace(/\{Meses\}/g,(MONTHS===1?'Un':MWC)+' '+MESES).replace(/\{toques\}/g,TOQ);
-const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const RICH=x=>esc(FILL(x)).replace(/\*([^*]+)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
 const INI=(C.ella[0]||'A').toUpperCase()+' ♥ '+(C.yo[0]||'J').toUpperCase();
 const SIGN='— '+C.yo+' ♥';
@@ -2227,47 +2278,84 @@ document.getElementById('finalQ').innerHTML=RICH(C.fraseFinal);
 const photoURL=p=>/^(https?:|data:|blob:)/.test(p)?p:p;
 /* ---- Datos compartidos (gist privado y cifrado) ---- */
 const GG=(()=>{
-  const K=C.kanban||{}, on=!!(K.gist&&K.token);
+  const K=C.kanban||{}, on=!!(K.gist&&K.token); window.__planesTok=K.token||'';
   const H=()=>({Authorization:'Bearer '+K.token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'});
-  const b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
   const unb64=t=>Uint8Array.from(atob(String(t).trim()),c=>c.charCodeAt(0));
-  let gc=null, gp=null, ga=0;
+  let gc=null, gp=null, ga=0, ifm=true;
+  /* errores con status; 401/403 de autenticación avisan (evento 'ggauth'), un 403 por límite de uso no */
+  const rateLim=r=>{try{return r.headers.get('x-ratelimit-remaining')==='0'||!!r.headers.get('retry-after')}catch(e){return false}};
+  const ERR=r=>{const e=new Error(r.status);e.status=r.status;e.auth=(r.status===401||r.status===403)&&!rateLim(r);if(e.auth)window.dispatchEvent(new Event('ggauth'));return e};
+  function doFetch(){
+    return fetch(`https://api.github.com/gists/${K.gist}?t=${Date.now()}`,{headers:H(),cache:'no-store'}).then(r=>{if(!r.ok)throw ERR(r);const et=r.headers.get('etag');return r.json().then(j=>{try{Object.defineProperty(j,'_etag',{value:et,enumerable:false})}catch(e){}return j})})
+      .then(j=>{gc=j;ga=Date.now();return j});
+  }
+  /* force: si hay una petición en vuelo (puede traer datos viejos) se espera a que termine y se pide una nueva */
   function gist(force){
     if(!force&&gc&&Date.now()-ga<5000)return Promise.resolve(gc);
-    if(gp)return gp;
-    gp=fetch(`https://api.github.com/gists/${K.gist}?t=${Date.now()}`,{headers:H(),cache:'no-store'}).then(r=>{if(r.status===401||r.status===403)window.dispatchEvent(new Event('ggauth'));if(!r.ok)throw new Error(r.status);return r.json()})
-      .then(j=>{gc=j;ga=Date.now();gp=null;return j},e=>{gp=null;throw e});
-    return gp;
+    if(gp&&!force)return gp;
+    const prev=gp, me=(prev?prev.catch(()=>{}):Promise.resolve()).then(doFetch);
+    gp=me; const clr=()=>{if(gp===me)gp=null}; me.then(clr,clr);
+    return me;
   }
   async function text(f){if(!f)return null;if(f.truncated&&f.raw_url)return await (await fetch(f.raw_url)).text();return f.content}
-  async function pull(name,force){const g=await gist(force);const t=await text((g.files||{})[name]);if(!t)return null;return JSON.parse(new TextDecoder().decode(await decBuf(unb64(t).buffer)))}
-  async function push(name,obj){
-    if(PV_MODE)return;
+  const dec=async t=>JSON.parse(new TextDecoder().decode(await decBuf(unb64(t).buffer)));
+  async function pull(name,force){const g=await gist(force);const t=await text((g.files||{})[name]);if(!t)return null;return dec(t)}
+  async function patch(name,obj,et){
     const enc=await encBuf(new TextEncoder().encode(JSON.stringify(obj)));
-    const r=await fetch(`https://api.github.com/gists/${K.gist}`,{method:'PATCH',headers:Object.assign({'Content-Type':'application/json'},H()),body:JSON.stringify({files:{[name]:{content:b64(enc)}}})});
-    if(!r.ok)throw new Error(r.status); gc=null;
+    const hd=Object.assign({'Content-Type':'application/json'},H()); if(et)hd['If-Match']=et;
+    const r=await fetch(`https://api.github.com/gists/${K.gist}`,{method:'PATCH',headers:hd,body:JSON.stringify({files:{[name]:{content:b64(enc)}}})});
+    gc=null; if(r.status!==412){if(!r.ok)throw ERR(r)} return r;
   }
+  async function push(name,obj){ if(PV_MODE)return; await patch(name,obj,null) }
+  /* leer-mezclar-escribir: GET fresco justo antes de escribir; fn(remoto|null) devuelve lo que se escribe.
+     Con ETag + If-Match se detecta si alguien escribió entre el GET y el PATCH (si GitHub no lo respeta, no pasa nada). */
+  async function update(name,fn){
+    if(PV_MODE)return;
+    let prevEt=null,used=false;
+    for(let i=0;i<3;i++){
+      const g=await gist(true), et=g._etag||null;
+      if(i>0&&used&&et&&et===prevEt)ifm=false; /* el gist no cambió y aun así 412: If-Match no sirve aquí */
+      const t=await text((g.files||{})[name]);
+      const obj=fn(t?await dec(t):null);
+      used=ifm&&!!et&&i<2; prevEt=et;
+      const r=await patch(name,obj,used?et:null);
+      if(r.status===412)continue;
+      return obj;
+    }
+    throw new Error('412');
+  }
+  /* reintentos con backoff exponencial (15s, 30s, 60s… máx 5 min); no con la página oculta ni con error de autenticación */
+  let authDead=false; const RT={}, RN={}, RP={};
+  window.addEventListener('ggauth',()=>{authDead=true}); window.addEventListener('ggtoken',()=>{authDead=false});
+  function retry(key,fn){
+    if(authDead||PV_MODE)return;
+    const n=RN[key]=(RN[key]||0)+1; clearTimeout(RT[key]); delete RP[key];
+    RT[key]=setTimeout(()=>{delete RT[key];if(authDead)return;if(document.hidden){RP[key]=fn;return}fn()},Math.min(300000,15000*Math.pow(2,n-1)));
+  }
+  const ok=key=>{RN[key]=0;clearTimeout(RT[key]);delete RT[key];delete RP[key]};
+  window.addEventListener('online',()=>{Object.keys(RN).forEach(k=>RN[k]=0)});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden||authDead)return;const p=Object.assign({},RP);Object.keys(p).forEach(k=>{delete RP[k];p[k]()})});
   const merge=(a,b)=>{const m={};[...(a||[]),...(b||[])].forEach(x=>{if(x&&x.id&&(!m[x.id]||(x.u||0)>(m[x.id].u||0)))m[x.id]=x});return Object.values(m)};
   async function shrink(f){
     let bmp; try{bmp=await createImageBitmap(f,{imageOrientation:'from-image'})}catch(e){
-      bmp=await new Promise((ok,ko)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ko(new Error('formato'));im.src=URL.createObjectURL(f)})}
+      bmp=await new Promise((ok,ko)=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{ok(im);URL.revokeObjectURL(u)};im.onerror=()=>{URL.revokeObjectURL(u);ko(new Error('formato'))};im.src=u})}
     const sc=Math.min(1,1200/Math.max(bmp.width,bmp.height)), cv=document.createElement('canvas');
     cv.width=Math.round(bmp.width*sc);cv.height=Math.round(bmp.height*sc);cv.getContext('2d').drawImage(bmp,0,0,cv.width,cv.height);
     return await new Promise(ok=>cv.toBlob(ok,'image/jpeg',.8));
   }
-  const PC={};
+  const PC=lruBlobs(60);
   async function newPhoto(blob){
     const enc=await encBuf(new Uint8Array(await blob.arrayBuffer()));
     const r=await fetch('https://api.github.com/gists',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H()),body:JSON.stringify({description:'♥',public:false,files:{'f.bin':{content:b64(enc)}}})});
-    if(!r.ok)throw new Error(r.status); const id=(await r.json()).id; PC[id]=URL.createObjectURL(blob); return id;
+    if(!r.ok)throw new Error(r.status); const id=(await r.json()).id; PC.set(id,URL.createObjectURL(blob)); return id;
   }
   async function photo(id,type){
-    if(PC[id])return PC[id];
+    if(PC.has(id))return PC.get(id);
     const r=await fetch(`https://api.github.com/gists/${id}`,{headers:H(),cache:'no-store'}); if(!r.ok)throw new Error(r.status);
     const t=await text(((await r.json()).files||{})['f.bin']); if(!t)throw new Error('vacía');
-    return PC[id]=URL.createObjectURL(new Blob([await decBuf(unb64(t).buffer)],{type:type||'image/jpeg'}));
+    return PC.set(id,URL.createObjectURL(new Blob([await decBuf(unb64(t).buffer)],{type:type||'image/jpeg'})));
   }
-  return window.__GG={on,pull,push,merge,shrink,newPhoto,photo};
+  return window.__GG={on,pull,push,update,retry,ok,merge,shrink,newPhoto,photo};
 })();
 /* ---- Juegos de una sola vez (rasca y gana, ruleta): se guardan y se sincronizan ---- */
 const JUEGOS=(()=>{
@@ -2282,7 +2370,7 @@ const JUEGOS=(()=>{
       return Object.assign({},a,{u:Math.max(a.u||0,b.u||0),used:Object.values(m).sort((p,q)=>p.at-q.at)})}
     return (b.u||0)>(a.u||0)?b:a;
   }
-  async function push(){ if(!GG.on)return; try{const r=await GG.pull('juegos.bin',true)||{}; ['rasca','ruleta'].forEach(n=>{st[n]=mergeOne(n,st[n],r[n])}); save(); await GG.push('juegos.bin',st)}catch(e){setTimeout(push,15000)} }
+  async function push(){ if(!GG.on)return; try{await GG.update('juegos.bin',r=>{r=r||{};['rasca','ruleta'].forEach(n=>{st[n]=mergeOne(n,st[n],r[n])});save();return st});GG.ok('juegos')}catch(e){GG.retry('juegos',push)} }
   async function refresh(){ if(!GG.on)return; try{const r=await GG.pull('juegos.bin')||{}; const before=JSON.stringify(st); ['rasca','ruleta'].forEach(n=>{st[n]=mergeOne(n,st[n],r[n])}); if(JSON.stringify(st)!==before){save();subs.forEach(f=>f())}}catch(e){} }
   function set(n,v){st[n]=Object.assign({k:keyOf(n),u:Date.now(),at:Date.now()},v);save();push()}
   setTimeout(refresh,300); document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
@@ -2307,12 +2395,18 @@ function APK_URL(w){const f=w==='yo'?'nuestro-lugar-jon.apk':'nuestro-lugar.apk'
 function NTFY_ENC(w){try{const L=JSON.parse(localStorage.getItem('versiones-cache')||'[]');const x=L.find(y=>y.id===w&&!y.x);return !!x&&(+String(x.v).replace(/\D/g,'')||0)>=26}catch(e){return false}}
 function NTFY(o){if(PV_MODE)return Promise.resolve({ok:false});o=Object.assign({},o);o.topic=String(o.topic||'').trim();if(!o.topic)return Promise.resolve({ok:false});
   const go=b=>fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify(b)});
+  const gen=()=>{const g={topic:o.topic,title:'💗 Nuestro lugar',message:'Tienes algo nuevo en Nuestro lugar 💌',priority:o.priority||4};if(o.delay)g.delay=o.delay;try{g.click=location.origin+location.pathname}catch(e){}return go(g)};
   let av={};try{av=AV||{}}catch(e){}
   const who=o.topic===String(av.ntfy||'').trim()?'yo':o.topic===String(av.ntfyElla||'').trim()?'ella':null;
-  if(!who||!NTFY_ENC(who))return go(o);
+  /* si la app que recibe no sabe descifrar (< v26 o se desconoce) NO viaja el texto: solo un aviso genérico.
+     o.claro=true es solo para avisos del sistema sin contenido personal (p. ej. «actualiza la app», pruebas del editor) */
+  if(!who||!NTFY_ENC(who)){
+    if(o.claro){delete o.claro;return go(o)}
+    return gen()}
   let ir='';try{ir=new URL(o.click||'').searchParams.get('ir')||''}catch(e){}
   return encBuf(new TextEncoder().encode(JSON.stringify({t:o.title||'',m:o.message||'',ir}))).then(b=>{let x='';b.forEach(c=>x+=String.fromCharCode(c));
-    const e={topic:o.topic,title:'💗 Nuestro lugar',message:'nl1:'+btoa(x),priority:o.priority||4};if(o.delay)e.delay=o.delay;return go(e)},()=>go(o))}
+    const e={topic:o.topic,title:'💗 Nuestro lugar',message:'nl1:'+btoa(x),priority:o.priority||4};if(o.delay)e.delay=o.delay;return go(e)},()=>{if(o.claro){delete o.claro;return go(o)}return gen()})}
+window.NTFY=NTFY;
 /* Jon puede pausar los avisos que le llegan a Ale (solo en su dispositivo) */
 const MUTE_E={get(){let u=0;try{u=+localStorage.getItem('mute-ella')||0}catch(e){}if(u&&u<Date.now()){try{localStorage.removeItem('mute-ella')}catch(e){}u=0}return u},
   on(){return !!this.get()},
@@ -2343,6 +2437,29 @@ function avisar(txt,tipo){
   NTFY({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname+'?ir='+encodeURIComponent(tipo||'')}).catch(()=>{});
 }
 const VIEWER=()=>{if(PV_MODE)return 'ella';if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
+/* ---- Aviso a Jon cuando un token de GitHub está por vencer (≤30, ≤7, ≤1 días o vencido); un aviso por umbral ---- */
+(function(){
+  if(PV_MODE)return;
+  const TH=[30,7,1,0];
+  async function claim(key){ /* para «Planes Ale» (lo abren Ale y Jon): campo compartido en el gist para no avisar dos veces */
+    if(!GG.on)return true; let first=true;
+    try{await GG.update('tokaviso.bin',r=>{r=(r&&typeof r==='object')?r:{};if(r[key]){first=false;return r}r[key]=Date.now();return r})}catch(e){return true}
+    return first;
+  }
+  async function chk(k){
+    let e;try{e=TOK.info(k,C)}catch(x){return} if(!e||e.days>30)return;
+    const crossed=TH.filter(t=>e.days<=t), tgt=crossed[crossed.length-1], lk=t=>'tok-aviso-'+k+'-'+t;
+    let seen='';try{seen=localStorage.getItem(lk(tgt))||''}catch(x){}
+    if(seen===e.ymd)return;
+    const mark=()=>{try{crossed.forEach(t=>localStorage.setItem(lk(t),e.ymd))}catch(x){}};
+    mark();
+    if(!AV.ntfy)return;
+    if(k==='planes'&&!(await claim('planes-'+e.ymd+'-'+tgt)))return;
+    /* directo a ntfy (no con avisar(): desde el celular de Jon avisar() también le llegaría a Ale) */
+    NTFY({topic:AV.ntfy.trim(),title:'🔑 Token por vencer',message:TOK.text(e),tags:['key'],priority:4,claro:true,click:location.origin+location.pathname}).catch(()=>{});
+  }
+  setTimeout(()=>{chk('planes');chk('editor')},6000);
+})();
 /* textos en masculino cuando es Jon */
 const MASC=(()=>{const W={enamorada:'enamorado',cansada:'cansado',estresada:'estresado',enojada:'enojado',querida:'querido',contenta:'contento',emocionada:'emocionado',nerviosa:'nervioso',preocupada:'preocupado',aburrida:'aburrido',agradecida:'agradecido',tranquila:'tranquilo',sola:'solo',lista:'listo',consentida:'consentido',ilusionada:'ilusionado',orgullosa:'orgulloso',enferma:'enfermo',relajada:'relajado',motivada:'motivado',celosa:'celoso',apapachada:'apapachado',amada:'amado',bonita:'guapo',hermosa:'guapo'};
   const re=new RegExp('\\b('+Object.keys(W).join('|')+')\\b','gi');
@@ -2366,7 +2483,7 @@ function SHARED(file,field,LK,max,onChange){
   prune();
   let busy=false,again=false;
   let sync=async function(){ if(!GG.on)return; if(busy){again=true;return} busy=true;
-    try{const r=await GG.pull(file,true)||{}; L=GG.merge(L,r[field]); keep(); await GG.push(file,{[field]:L}); try{localStorage.removeItem(LK+'-pend')}catch(_){} onChange()}catch(e){setTimeout(sync,15000)}
+    try{await GG.update(file,r=>{L=GG.merge(L,(r||{})[field]);keep();return {[field]:L}}); GG.ok('sh:'+file); try{localStorage.removeItem(LK+'-pend')}catch(_){} onChange()}catch(e){GG.retry('sh:'+file,()=>sync())}
     busy=false; if(again){again=false;sync()} };
   async function refresh(){ if(!GG.on)return; try{const r=await GG.pull(file)||{}; const b=JSON.stringify(L); L=GG.merge(L,r[field]); keep(); if(JSON.stringify(L)!==b)onChange()}catch(e){} }
   setTimeout(refresh,400); document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
@@ -2394,7 +2511,7 @@ const GAL={items:PHOTOS.map((src,i)=>({src,own:false,id:'r:'+((C.fotoPaths||[])[
 {let rz=null;window.__fotoSwap=(ph,u)=>{if(!u||u===ph)return;
   PHOTOS.forEach((x,k)=>{if(x===ph)PHOTOS[k]=u});(C.fotos||[]).forEach((x,k)=>{if(x===ph)C.fotos[k]=u});
   GAL.items.forEach(x=>{if(x.src===ph)x.src=u});(GAL.repo||[]).forEach(x=>{if(x.src===ph)x.src=u});
-  document.querySelectorAll('img').forEach(im=>{if(im.getAttribute('src')===ph)im.src=u});
+  document.querySelectorAll('img').forEach(im=>{if(im.getAttribute('src')===ph)im.src=u;else if(im.dataset.s===ph)im.dataset.s=u});
   const tag=ph.slice(ph.indexOf('#'));document.querySelectorAll('[style*="'+tag+'"]').forEach(e=>{e.style.backgroundImage=e.style.backgroundImage.split(ph).join(u)});
   window.dispatchEvent(new CustomEvent('foto-lista',{detail:{ph,u}}));clearTimeout(rz);rz=setTimeout(()=>window.dispatchEvent(new Event('resize')),300)}}
 const car=document.getElementById('car');
@@ -2420,7 +2537,7 @@ function galRender(keep){
   carPad(); if(keep)car.scrollLeft=sl;
   frame.innerHTML=''; dots.innerHTML='';
   const sh=galShown();
-  sh.forEach(it=>{const im=new Image();im.src=it.src;frame.appendChild(im)});
+  sh.forEach(it=>{const im=new Image();im.dataset.s=it.src;im.alt='';im.decoding='async';frame.appendChild(im)});
   if(sh.length<=20)sh.forEach(()=>dots.appendChild(document.createElement('i')));
   carCount();
 }
@@ -2439,7 +2556,10 @@ let carVis=false; new IntersectionObserver(es=>es.forEach(e=>carVis=e.isIntersec
 setInterval(()=>{if(carVis&&!document.hidden&&Date.now()-lastTouch>7000&&GAL.items.length>1&&!lb.classList.contains('open'))carGo(carIdx<GAL.items.length-1?carIdx+1:0)},4500);
 function show(i){
   const n=galShown().length; if(!n)return; cur=(i+n)%n;
-  frame.querySelectorAll('img').forEach((im,k)=>{im.classList.remove('on');if(k===cur){void im.offsetWidth;im.classList.add('on')}});
+  const ims=frame.querySelectorAll('img');
+  /* solo se cargan la foto actual y sus vecinas */
+  [cur,cur+1,cur-1].forEach(k=>{const im=ims[(k+n)%n];if(im&&!im.getAttribute('src')&&im.dataset.s)im.src=im.dataset.s});
+  ims.forEach((im,k)=>{im.classList.remove('on');if(k===cur){void im.offsetWidth;im.classList.add('on')}});
   dots.querySelectorAll('i').forEach((d,k)=>d.classList.toggle('on',k===cur));
   lb.querySelector('.lb-count').textContent=`${cur+1} / ${n}`;
 }
@@ -2462,7 +2582,6 @@ galRender();
   const st=document.getElementById('carSt'), add=document.getElementById('carAdd'), file=document.getElementById('carFile');
   add.hidden=false;
   let idx=[];
-  const b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
   const unb64=t=>Uint8Array.from(atob(t.trim()),c=>c.charCodeAt(0));
   async function gistFile(id,name){
     const r=await fetch(`https://api.github.com/gists/${id}?t=${Date.now()}`,{headers:H(),cache:'no-store'}); if(!r.ok)throw new Error(r.status);
@@ -2470,19 +2589,18 @@ galRender();
     if(f.truncated&&f.raw_url)return await (await fetch(f.raw_url)).text();
     return f.content;
   }
-  async function pullIdx(){const t=await gistFile(K.gist,'fotos.bin');if(!t)return [];return JSON.parse(new TextDecoder().decode(await decBuf(unb64(t).buffer))).fotos||[]}
-  const merge=(a,b)=>{const m={};[...a,...b].forEach(x=>{if(!m[x.id]||(x.u||0)>(m[x.id].u||0))m[x.id]=x});return Object.values(m)};
-  async function pushIdx(){
-    idx=merge(idx,await pullIdx());
-    const enc=await encBuf(new TextEncoder().encode(JSON.stringify({fotos:idx})));
-    const r=await fetch(`https://api.github.com/gists/${K.gist}`,{method:'PATCH',headers:Object.assign({'Content-Type':'application/json'},H()),body:JSON.stringify({files:{'fotos.bin':{content:b64(enc)}}})});
-    if(!r.ok)throw new Error(r.status);
-  }
+  async function pullIdx(force){const o=await GG.pull('fotos.bin',force);return (o&&o.fotos)||[]}
+  const merge=(a,b)=>{const m={};[...a,...b].forEach(x=>{if(x&&x.id&&(!m[x.id]||(x.u||0)>(m[x.id].u||0)))m[x.id]=x});return Object.values(m)};
+  /* GET fresco + mezcla por id justo antes de escribir (así subidas simultáneas no pierden entradas) */
+  async function pushIdx(){ await GG.update('fotos.bin',r=>{idx=merge(idx,(r&&r.fotos)||[]);return {fotos:idx}}) }
+  const blobUrl=u=>typeof u==='string'&&u.startsWith('blob:');
+  const dropUrl=u=>{if(blobUrl(u)){try{URL.revokeObjectURL(u)}catch(e){}}};
   const cacheKey='fotos-ale-cache';
   function apply(){
     const own=idx.filter(x=>!x.x&&!String(x.id).startsWith('r:')).sort((a,b)=>b.a-a.a);
     const hid=new Set(idx.filter(x=>x.x&&String(x.id).startsWith('r:')).map(x=>x.id));
     const old={}; GAL.items.filter(x=>x.own).forEach(x=>old[x.id]=x.src);
+    const keepIds=new Set(own.map(x=>x.id)); Object.keys(old).forEach(k=>{if(!keepIds.has(k))dropUrl(old[k])});
     GAL.items=[...own.map(x=>({own:true,id:x.id,a:x.a,src:old[x.id]||''})),...GAL.repo.filter(x=>!hid.has(x.id))];
     carIdx=Math.min(carIdx,Math.max(0,GAL.items.length-1));
     galRender(true); own.forEach(x=>{if(!old[x.id])load(x.id)});
@@ -2491,7 +2609,7 @@ galRender();
   function load(id){q=q.then(async()=>{try{
       const t=await gistFile(id,'f.bin'); if(!t)return;
       const url=URL.createObjectURL(new Blob([await decBuf(unb64(t).buffer)],{type:'image/jpeg'}));
-      const it=GAL.items.find(x=>x.id===id); if(it){it.src=url;galRender(true)}
+      const it=GAL.items.find(x=>x.id===id); if(it){it.src=url;galRender(true)}else dropUrl(url)
     }catch(e){}})}
   GAL.remove=async id=>{
     const isRepo=String(id).startsWith('r:');
@@ -2501,7 +2619,7 @@ galRender();
   };
   async function shrinkImg(f){
     let bmp; try{bmp=await createImageBitmap(f,{imageOrientation:'from-image'})}catch(e){
-      bmp=await new Promise((ok,ko)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ko(new Error('formato'));im.src=URL.createObjectURL(f)})}
+      bmp=await new Promise((ok,ko)=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{ok(im);URL.revokeObjectURL(u)};im.onerror=()=>{URL.revokeObjectURL(u);ko(new Error('formato'))};im.src=u})}
     const sc=Math.min(1,1200/Math.max(bmp.width,bmp.height)), cv=document.createElement('canvas');
     cv.width=Math.round(bmp.width*sc);cv.height=Math.round(bmp.height*sc);cv.getContext('2d').drawImage(bmp,0,0,cv.width,cv.height);
     return await new Promise(ok=>cv.toBlob(ok,'image/jpeg',.8));
@@ -2512,8 +2630,9 @@ galRender();
     // otra app puede mandar fotos: se suben solo si tú confirmas
     const q=document.createElement('div');q.className='sh-ask';const n=fs.length;
     q.innerHTML=`<b>📷 ¿Subir ${n} ${n===1?'foto compartida':'fotos compartidas'} a nuestras fotos?</b><div class="sh-th"></div><div class="sh-b"><button class="no">Cancelar</button><button class="si">Subir</button></div>`;
-    const th=q.querySelector('.sh-th');fs.slice(0,6).forEach(f=>{const im=new Image();im.src=URL.createObjectURL(f);th.append(im)});
-    q.querySelector('.no').onclick=()=>q.remove();q.querySelector('.si').onclick=()=>{q.remove();upFiles(fs)};
+    const th=q.querySelector('.sh-th'),tu=[];fs.slice(0,6).forEach(f=>{const im=new Image(),u=URL.createObjectURL(f);tu.push(u);im.src=u;th.append(im)});
+    const rv=()=>tu.forEach(u=>{try{URL.revokeObjectURL(u)}catch(e){}});
+    q.querySelector('.no').onclick=()=>{q.remove();rv()};q.querySelector('.si').onclick=()=>{q.remove();rv();upFiles(fs)};
     document.body.append(q)};
   async function upFiles(fs){
     if(!fs.length)return; add.disabled=true;
@@ -2533,7 +2652,7 @@ galRender();
     if(okN){avisar(`📷 ${C.ella} subió ${okN===1?'una foto':okN+' fotos'} al carrusel`,'foto');try{await pushIdx();st.textContent=okN===1?'¡Foto agregada! 💗':`¡${okN} fotos agregadas! 💗`;burst(25)}catch(e){st.textContent='Las fotos se subieron pero no se pudieron registrar. Intenta de nuevo.'}}
     add.disabled=false;
   }
-  pullIdx().then(r=>{idx=r;apply()}).catch(()=>{});
+  pullIdx().then(r=>{idx=merge(idx,r);apply()}).catch(()=>{});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullIdx().then(r=>{const b=JSON.stringify(idx);idx=merge(idx,r);if(JSON.stringify(idx)!==b)apply()}).catch(()=>{})});
 })();
 
@@ -2664,7 +2783,7 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
     document.getElementById('kM').textContent=Math.floor(s%3600/60);
     document.getElementById('kS').textContent=s%60;
   }
-  tick(); setInterval(tick,1000);
+  tick(); everyVis(tick,1000);
   const m=document.createElement('div'); m.className='modal';
   m.innerHTML='<div class="paper"><button class="x" aria-label="Cerrar">×</button><div class="when-t">Para mi amor del futuro ⏳</div><p class="ctxt"></p><p class="sign"></p></div>';
   document.body.appendChild(m);
@@ -2783,7 +2902,7 @@ const MEMO=(()=>{
   let cur=null, cb=null, blob=null;
   document.getElementById('memoX').onclick=()=>m.classList.remove('open'); m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')});
   file.onchange=async()=>{const f=file.files[0];file.value='';if(!f)return;st.textContent='Preparando foto…';
-    try{blob=await GG.shrink(f);img.style.display='block';img.style.backgroundImage=`url("${URL.createObjectURL(blob)}")`;pick.textContent='📷 Cambiar foto';st.textContent=''}catch(e){st.textContent='No pude leer esa foto, prueba con otra'}};
+    try{blob=await GG.shrink(f);img.style.display='block';blobBg(img,blob);pick.textContent='📷 Cambiar foto';st.textContent=''}catch(e){st.textContent='No pude leer esa foto, prueba con otra'}};
   save.onclick=async()=>{
     if(!cur)return; save.disabled=true; st.textContent='Guardando…';
     try{ avisar(`📷 ${C.ella} guardó un recuerdo de: ${cur.t}`,'recuerdo'); if(blob)cur.ph=await GG.newPhoto(blob); cur.n=txt.value.trim().slice(0,300); cur.u=Date.now(); m.classList.remove('open'); burst(25); cb&&cb(); }
@@ -2866,27 +2985,13 @@ function makeBoard(B){
     cards.push({id:uid(),t:v,c:'p',a:nowT(),u:nowT()}); avisar(`${B.avNew} ${v}`,B.avTipo); i.value=''; burst(10); changed();
   });
   /* --- sincronización cifrada (gist privado) --- */
-  const GH={Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
-  const auth=()=>Object.assign({Authorization:'Bearer '+CFG.token},GH);
-  async function pull(){
-    const r=await fetch(`https://api.github.com/gists/${CFG.gist}?t=${nowT()}`,{headers:auth(),cache:'no-store'});
-    if(!r.ok)throw new Error(r.status);
-    const j=await r.json(), f=j.files&&j.files[FILE]; if(!f||!f.content)return [];
-    let txt=f.content; if(f.truncated&&f.raw_url){txt=await (await fetch(f.raw_url,{headers:auth()})).text()}
-    const u=Uint8Array.from(atob(txt.trim()),c=>c.charCodeAt(0));
-    return JSON.parse(new TextDecoder().decode(await decBuf(u.buffer))).cards||[];
-  }
-  async function push(){
-    const enc=await encBuf(new TextEncoder().encode(JSON.stringify({cards})));
-    let bin='';for(let i=0;i<enc.length;i+=0x8000)bin+=String.fromCharCode.apply(null,enc.subarray(i,i+0x8000));
-    const r=await fetch(`https://api.github.com/gists/${CFG.gist}`,{method:'PATCH',headers:Object.assign({'Content-Type':'application/json'},auth()),body:JSON.stringify({files:{[FILE]:{content:btoa(bin)}}})});
-    if(!r.ok)throw new Error(r.status);
-  }
+  /* misma ruta que el resto (GG): GET fresco + mezcla justo antes de escribir; formato {cards} intacto */
+  const pull=async()=>{const r=await GG.pull(FILE);return (r&&r.cards)||[]};
   let timer=null, busy=false, again=false;
   async function sync(){
     if(!remote)return; if(busy){again=true;return} busy=true; say('Guardando…');
-    try{cards=merge(cards,await pull());await push();keep();render();say('☁️ Guardado · '+C.yo+' también lo ve')}
-    catch(e){say(navigator.onLine===false?'Sin internet: se guardará cuando vuelvas a tener conexión':'No se pudo guardar ahorita, lo intento de nuevo en un momento');setTimeout(sync,15000)}
+    try{await GG.update(FILE,r=>{cards=merge(cards,(r&&r.cards)||[]);return {cards}});GG.ok('kb:'+FILE);keep();render();say('☁️ Guardado · '+C.yo+' también lo ve')}
+    catch(e){say(navigator.onLine===false?'Sin internet: se guardará cuando vuelvas a tener conexión':'No se pudo guardar ahorita, lo intento de nuevo en un momento');GG.retry('kb:'+FILE,sync)}
     busy=false; if(again){again=false;sync()}
   }
   function changed(){keep();render(); if(remote){clearTimeout(timer);timer=setTimeout(sync,700)} else say('Guardado en este celular')}
@@ -2983,7 +3088,7 @@ document.addEventListener('pointerdown',e=>{
   const p=document.getElementById('pola'), img=document.getElementById('polaImg'), cap=document.getElementById('polaCap'), sub=document.getElementById('polaSub');
   let last=-1, busy=false;
   const pool=()=>{const g=(typeof galShown==='function')?galShown().map(x=>x.src):[];return g.length?g:PHOTOS};
-  function pick(){const L=pool();if(!L.length)return;let k;do{k=Math.floor(Math.random()*L.length)}while(L.length>1&&k===last);last=k;img.style.backgroundImage=`url("${L[k]}")`}
+  function pick(){const L=pool();if(!L.length)return;let k;do{k=Math.floor(Math.random()*L.length)}while(L.length>1&&k===last);last=k;img.style.backgroundImage=cssUrl(L[k])}
   pick();
   p.addEventListener('click',()=>{
     if(busy)return;
@@ -3020,7 +3125,7 @@ document.addEventListener('pointerdown',e=>{
     const cards=[...pick,...pick].sort(()=>Math.random()-.5);
     cards.forEach(ph=>{
       const c=document.createElement('div'); c.className='mc'; c.dataset.ph=ph;
-      c.innerHTML=`<div class="bk">💗</div><div class="fr" style="background-image:url('${PHOTOS[ph]}')"></div>`;
+      c.innerHTML='<div class="bk">💗</div><div class="fr"></div>'; c.querySelector('.fr').style.backgroundImage=cssUrl(PHOTOS[ph]);
       c.onclick=()=>flip(c); m.appendChild(c);
     });
   }
@@ -3052,7 +3157,7 @@ document.addEventListener('pointerdown',e=>{
     z.innerHTML='';
     order.forEach((p,i)=>{
       const d=document.createElement('div'); d.className='pz'+(sel===i?' sel':'');
-      d.style.backgroundImage=`url("${PHOTOS[IMGI]}")`;
+      d.style.backgroundImage=cssUrl(PHOTOS[IMGI]);
       d.style.backgroundPosition=`${(p%3)*50}% ${Math.floor(p/3)*50}%`;
       d.onclick=()=>tap(i); z.appendChild(d);
     });
@@ -3153,7 +3258,7 @@ document.addEventListener('pointerdown',e=>{
   const roll=document.getElementById('crRoll'), bgs=document.getElementById('crBgs'), box=document.getElementById('credits');
   roll.innerHTML='<h3>'+MONTHS+' '+MESES+'</h3><div class="cr-sub">una historia de amor</div>'+CR.map(([k,v])=>`<div class="r"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join('')+'<div class="end">Continuará… ♥</div>';
   const ix=PHOTOS.map((_,i)=>i).slice(0,10);
-  ix.forEach(i=>{const d=document.createElement('div');d.className='cr-bg';d.style.backgroundImage=`url("${PHOTOS[i]}")`;bgs.appendChild(d)});
+  ix.forEach(i=>{const d=document.createElement('div');d.className='cr-bg';d.style.backgroundImage=cssUrl(PHOTOS[i]);bgs.appendChild(d)});
   let t=null, k=0;
   function close(){box.classList.remove('open');clearInterval(t)}
   document.getElementById('crBtn').onclick=()=>{
@@ -3276,7 +3381,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     el.classList.toggle('used',on); el.querySelector('.c-btn').textContent=on?'Usado':'Canjear';
     el.querySelector('.c-when').textContent=on&&x.t?('Canjeado el '+fmtDia(x.t)):''})}
   const mergeSt=(a,b)=>{const m=Object.assign({},a);Object.keys(b||{}).forEach(k=>{if(!m[k]||(b[k].u||0)>(m[k].u||0))m[k]=b[k]});return m};
-  async function sync(){ if(!GG.on)return; try{const r=await GG.pull('vales.bin',true); st=mergeSt(st,(r&&r.rk===VK)?r.v:{}); save(); paint(); await GG.push('vales.bin',{rk:VK,v:st})}catch(e){setTimeout(sync,15000)} }
+  async function sync(){ if(!GG.on)return; try{await GG.update('vales.bin',r=>{st=mergeSt(st,(r&&r.rk===VK)?r.v:{});save();return {rk:VK,v:st}}); paint(); GG.ok('vales')}catch(e){GG.retry('vales',sync)} }
   async function refresh(){ if(!GG.on)return; try{const r=await GG.pull('vales.bin'); if(r&&r.rk===VK){st=mergeSt(st,r.v);save();paint()}}catch(e){} }
   COUPONS.forEach(c=>{
     const k=key(c), el=document.createElement('div'); el.className='coupon'; els[k]=el;
@@ -3329,8 +3434,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   }
   let timer=null;
   async function sync(){ if(!GG.on)return; st.textContent='Enviando…';
-    try{const r=await GG.pull('notas.bin',true); notes=GG.merge(notes,r&&r.n); await GG.push('notas.bin',{n:notes}); keep(); render(); st.textContent='☁️ Enviada'}
-    catch(e){st.textContent='No se pudo enviar ahorita, lo intento de nuevo en un momento';setTimeout(sync,15000)} }
+    try{await GG.update('notas.bin',r=>{notes=GG.merge(notes,r&&r.n);return {n:notes}}); GG.ok('notas'); keep(); render(); st.textContent='☁️ Enviada'}
+    catch(e){st.textContent='No se pudo enviar ahorita, lo intento de nuevo en un momento';GG.retry('notas',sync)} }
   function changed(){keep();render();clearTimeout(timer);timer=setTimeout(sync,500)}
   async function refresh(){ if(!GG.on)return; try{const r=await GG.pull('notas.bin');const b=JSON.stringify(notes);notes=GG.merge(notes,r&&r.n);if(JSON.stringify(notes)!==b){keep();render()}}catch(e){} }
   document.getElementById('nbForm').addEventListener('submit',e=>{
@@ -3448,7 +3553,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const f=new File([blob],'nuestro-lugar.jpg',{type:'image/jpeg'});
     try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:text||''});return}}catch(e){if(e&&e.name==='AbortError')return}
     if(window.AndroidApp){alert('Actualiza la app (aviso «Hay una versión nueva») para poder compartir 💗');return}
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nuestro-lugar.jpg';document.body.append(a);a.click();a.remove();
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nuestro-lugar.jpg';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
   }
   async function shareText(text){
     try{if(window.AndroidApp&&AndroidApp.shareText){AndroidApp.shareText(text);return}}catch(e){}
@@ -3580,7 +3685,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     if(n===on)return; on=n; applyTema(n?'noche':tema());
   }
   document.getElementById('niteOff').onclick=()=>{try{off()?localStorage.removeItem(key()):localStorage.setItem(key(),'1')}catch(e){}on=null;apply()};
-  apply(); setInterval(apply,60000); document.addEventListener('visibilitychange',()=>{if(!document.hidden)apply()});
+  apply(); setInterval(()=>{if(!document.hidden)apply()},60000); document.addEventListener('visibilitychange',()=>{if(!document.hidden)apply()});
 })();
 
 /* ====== Termómetro: ¿cuánto me extrañas hoy? ====== */
@@ -3604,7 +3709,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   $('tmR').addEventListener('change',()=>{const v=+$('tmR').value,id='tm:'+me+':'+DK(MXD()),ex=S.all().find(x=>x.id===id);
     if(ex){ex.v=v;ex.x=0;ex.u=Date.now();S.save()}else S.add({id,k:'termo',w:me,v,a:Date.now(),u:Date.now()});
     if(v>=70)burst(10); avisar(`🌡️ ${C.ella} te extraña ${v}% hoy ${E(v)}`,'termo'); render()});
-  window.addEventListener('detalles',render); render(); setInterval(render,60000);
+  window.addEventListener('detalles',render); render(); everyVis(render,60000);
 })();
 
 /* ====== Detalles el uno para el otro: playlist, retos, fotos favoritas y antojos ====== */
@@ -3730,7 +3835,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     if(hist){const L=document.createElement('div');L.className='mp-h';const same=days.filter(x=>vote(x,me).v===vote(x,oth).v).length;
       L.innerHTML=`<div style="text-align:center">Coincidieron en <b>${same} de ${days.length}</b> 💞</div>`+days.slice(0,30).map(x=>{const a=vote(x,me),b=vote(x,oth);return `<div>${a.v===b.v?'✅':'❌'} …${esc(qOf(x))}<br><small style="opacity:.7">${fmtDia(new Date(x+'T12:00:00'))} · tú: ${esc(said(a.v,me))} · ${esc(nm(oth))}: ${esc(said(b.v,oth))}</small></div>`}).join('');hs.append(L)}
   }
-  render(); setInterval(render,60000);
+  render(); everyVis(render,60000);
 })();
 
 /* ====== Comentarios y ❤️ en las fotos del carrusel ====== */
@@ -3794,7 +3899,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const [pv,nx]=cal.querySelectorAll('.sl-mh button'); pv.onclick=()=>{mo=new Date(y,m-1,1);render()};
     nx.disabled=y===now.getFullYear()&&m===now.getMonth(); nx.style.opacity=nx.disabled?.3:1; nx.onclick=()=>{if(!nx.disabled){mo=new Date(y,m+1,1);render()}};
   }
-  render(); setInterval(render,60000);
+  render(); everyVis(render,60000);
 })();
 
 /* ====== Reto de fotos de la semana ====== */
@@ -4086,7 +4191,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const tp=(AV.ntfyElla||'').trim();
     if(!tp){askMsg='Primero configura los avisos de '+nm(oth)+' en ✏️ Editar → Avisos';askTick();return}
     askUntil=Date.now()+60000;askMsg='Enviando…';askTick();
-    try{await NTFY({topic:tp,title:'📲 Actualiza nuestra app',message:C.yo+' te pide que actualices la app 💗 · toca aquí y se descarga la versión nueva',tags:['love_letter'],priority:5,click:location.origin+location.pathname+'?ir=actualizar'});askMsg='✅ Aviso enviado a '+nm(oth)}
+    try{await NTFY({topic:tp,title:'📲 Actualiza nuestra app',message:C.yo+' te pide que actualices la app 💗 · toca aquí y se descarga la versión nueva',tags:['love_letter'],priority:5,claro:true,click:location.origin+location.pathname+'?ir=actualizar'});askMsg='✅ Aviso enviado a '+nm(oth)}
     catch(e){askUntil=0;askMsg='No se pudo enviar el aviso. Revisa tu internet e intenta otra vez.'}
     askTick()}
   // deep link «actualizar»: abre la hoja 🎨, baja a la tarjeta de versiones y busca la actualización sola
@@ -4286,7 +4391,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   let blob=null, showAll=false;
   $('diF').value=DK(MXD()); $('diF').max=DK(MXD());
   file.onchange=async()=>{const f=file.files[0];file.value='';if(!f)return;st.textContent='Preparando foto…';
-    try{blob=await GG.shrink(f);prev.style.backgroundImage=`url("${URL.createObjectURL(blob)}")`;prev.hidden=false;pick.textContent='📷 Cambiar foto';st.textContent=''}catch(e){st.textContent='No pude leer esa foto, prueba con otra'}};
+    try{blob=await GG.shrink(f);blobBg(prev,blob);prev.hidden=false;pick.textContent='📷 Cambiar foto';st.textContent=''}catch(e){st.textContent='No pude leer esa foto, prueba con otra'}};
   pick.onclick=()=>file.click();
   function render(){
     const live=S.all().filter(x=>!x.x&&NEWER(x,'rdi')).sort((a,b)=>(b.d||'').localeCompare(a.d||'')||b.a-a.a);
@@ -4341,7 +4446,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     box.innerHTML=h+'</div>';
     if(keepN&&$('rtNote'))$('rtNote').value=keepN;
     if(done&&done.ph){const ph=box.querySelector('.rt-ph');GG.photo(done.ph).then(u=>{ph.style.backgroundImage=`url("${u}")`;ph.textContent=''}).catch(()=>{})}
-    if(!done&&blob)$('rtPrev').style.backgroundImage=`url("${URL.createObjectURL(blob)}")`;
+    if(!done&&blob)blobBg($('rtPrev'),blob);
     const pk=$('rtPick'); if(pk)pk.onclick=()=>$('rtFile').click();
     const dn=$('rtDone'); if(dn)dn.onclick=async()=>{dn.disabled=true;$('rtSt').textContent='Guardando…';
       const n=$('rtNote').value.trim().slice(0,200);
@@ -4403,7 +4508,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   btn.onclick=()=>{S.add({id:UID(),w:me(),a:Date.now(),u:Date.now()});burst(14);btn.classList.remove('pop');void btn.offsetWidth;btn.classList.add('pop');
     avisar(`🥺 ${C.ella} te extraña`,'extrano')};
   try{if(window.AndroidApp&&AndroidApp.takeExtrano){const n=AndroidApp.takeExtrano();for(let i=0;i<n;i++)S.add({id:UID(),w:me(),a:Date.now()-i,u:Date.now()-i})}}catch(e){}
-  render(); setInterval(render,60000);
+  render(); everyVis(render,60000);
 })();
 
 /* ====== Nuestro recetario ====== */
@@ -4414,7 +4519,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   let best='', blob=null, openId=null;
   document.querySelectorAll('#rcBest button').forEach(b=>{b.textContent=b.dataset.w==='ella'?C.ella:b.dataset.w==='yo'?C.yo:'Empate 🤝';b.onclick=()=>{best=b.dataset.w;document.querySelectorAll('#rcBest button').forEach(x=>x.classList.toggle('sel',x===b))}});
   file.onchange=async()=>{const f=file.files[0];file.value='';if(!f)return;st.textContent='Preparando foto…';
-    try{blob=await GG.shrink(f);prev.style.backgroundImage=`url("${URL.createObjectURL(blob)}")`;prev.hidden=false;pick.textContent='📷 Cambiar foto';st.textContent=''}catch(e){st.textContent='No pude leer esa foto, prueba con otra'}};
+    try{blob=await GG.shrink(f);blobBg(prev,blob);prev.hidden=false;pick.textContent='📷 Cambiar foto';st.textContent=''}catch(e){st.textContent='No pude leer esa foto, prueba con otra'}};
   pick.onclick=()=>file.click(); if(!GG.on)pick.hidden=true;
   const crown=b=>b==='emp'?'🤝 ¡Empate! los dos la cocinaron delicioso':b?'👑 La cocinó mejor: '+esc(nm(b)):'';
   function render(){
@@ -4783,7 +4888,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       arr(C.mensajesDia).forEach(t=>{if(tx(t))put({k:'msg',t})});
       put({id:'mig-ella-1',k:'mig'});
       const L=S.all();out.forEach(x=>L.push(x));flag();S.save();
-    }catch(e){setTimeout(migrar,20000)}
+    }catch(e){GG.retry('migrar',migrar)}
   }
   setTimeout(migrar,2500);
 })();
@@ -4998,7 +5103,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       const k='act-'+x.id; shown.push(k);
       PEND.set(k,{n:1,t:txt(x),act:1,sid:sidA(x),del:()=>{seen.add(sk(x));save();show()},go:()=>{seen.add(sk(x));save();show();ir(x)}})});
   };
-  show(); setInterval(show,60000);
+  show(); everyVis(show,60000);
 })();
 
 /* ====== Pendientes en la pantalla del mensaje + campana ====== */
@@ -5228,7 +5333,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
     subBar.innerHTML=''; const gs=GRP[cur]||[], g=gOf(cur);
     gs.filter(([k])=>[...document.querySelectorAll('main section')].some(s=>s.dataset.tab===cur&&s.dataset.grp===k&&!isOff(s))).forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.className=(k===g?'cur':'')+([...DOT].some(id=>{const s=document.getElementById(id);return s&&s.dataset.tab===cur&&s.dataset.grp===k})&&k!==g?' dot':'');b.onclick=()=>setGrp(cur,k);subBar.append(b)});
     const ix=document.createElement('button');ix.type='button';ix.className='st-idx';ix.textContent='🔎';ix.setAttribute('aria-label','Todas las secciones');ix.onclick=()=>window.IDX_OPEN&&IDX_OPEN();subBar.append(ix);
-    {const zb=document.createElement('button');zb.type='button';zb.className='st-idx zb-b';zb.textContent='📳';zb.onclick=()=>window.ZUMBIDO&&ZUMBIDO();subBar.append(zb);window.ZB_PAINT&&setTimeout(ZB_PAINT)}
+    {const zb=document.createElement('button');zb.type='button';zb.className='st-idx zb-b';zb.textContent='📳';zb.setAttribute('aria-label','Mandar un zumbido');zb.onclick=()=>window.ZUMBIDO&&ZUMBIDO();subBar.append(zb);window.ZB_PAINT&&setTimeout(ZB_PAINT)}
     if(window.PR_ON){const pb=document.createElement('button');pb.type='button';pb.className='st-idx pr-b'+(window.PR_LIVE?' live':'');pb.textContent='👀';pb.setAttribute('aria-label','Cómo vamos');pb.onclick=()=>window.PR_OPEN&&PR_OPEN();subBar.append(pb)}
     const tb=document.createElement('button');tb.type='button';tb.className='st-idx';tb.textContent='🎨';tb.setAttribute('aria-label','Cambiar tema');tb.onclick=()=>window.TEMA_OPEN&&TEMA_OPEN();subBar.append(tb);
     subBar.classList.remove('tight');requestAnimationFrame(()=>{if(subBar.scrollWidth>subBar.clientWidth+1)subBar.classList.add('tight')});
@@ -5375,7 +5480,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
     rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
     rec.onstop=()=>{clearInterval(tick);stream.getTracks().forEach(t=>t.stop());secs=(Date.now()-t0)/1000;
       blob=new Blob(chunks,{type:(rec.mimeType||MT||'audio/webm').split(';')[0]});
-      btn.classList.remove('rec');btn.textContent='🎙️ Grabar otro';aud.src=URL.createObjectURL(blob);prev.hidden=false};
+      btn.classList.remove('rec');btn.textContent='🎙️ Grabar otro';if(aud._bu){try{URL.revokeObjectURL(aud._bu)}catch(e){}}aud.src=aud._bu=URL.createObjectURL(blob);prev.hidden=false};
     rec.start(); t0=Date.now(); btn.classList.add('rec'); prev.hidden=true;
     const up=()=>{const s=(Date.now()-t0)/1000;btn.textContent='⏹️ Detener · '+fmtT(s);if(s>=60)stop()};up();tick=setInterval(up,250);
   };
@@ -5469,8 +5574,8 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   }
   let timer=null;
   async function sync(){ if(!GG.on)return; st.textContent='Guardando…';
-    try{const r=await GG.pull('eventos.bin',true); evs=GG.merge(evs,r&&r.e); await GG.push('eventos.bin',{e:evs}); keep(); render(); st.textContent='☁️ Guardado · '+C.yo+' también lo ve'}
-    catch(e){st.textContent='No se pudo guardar ahorita, lo intento de nuevo en un momento';setTimeout(sync,15000)} }
+    try{await GG.update('eventos.bin',r=>{evs=GG.merge(evs,r&&r.e);return {e:evs}}); GG.ok('eventos'); keep(); render(); st.textContent='☁️ Guardado · '+C.yo+' también lo ve'}
+    catch(e){st.textContent='No se pudo guardar ahorita, lo intento de nuevo en un momento';GG.retry('eventos',sync)} }
   function changed(){keep();render();if(GG.on){clearTimeout(timer);timer=setTimeout(sync,600)}else st.textContent='Guardado en este celular'}
   async function refresh(){ if(!GG.on)return; try{const r=await GG.pull('eventos.bin');const b=JSON.stringify(evs);evs=GG.merge(evs,r&&r.e);if(JSON.stringify(evs)!==b){keep();render()}}catch(e){} }
   const fIn=document.getElementById('evF'); fIn.min=new Date().toISOString().slice(0,10);
@@ -5562,7 +5667,7 @@ function tick(){
     ? `¡Hoy cumplimos <strong>${k} meses</strong>!`
     : `Faltan <strong>${days} ${days===1?'día':'días'}</strong> para nuestros ${k} meses 💕`;
 }
-tick(); setInterval(tick,1000);
+tick(); everyVis(tick,1000);
 
 /* ====== Corazones flotantes ====== */
 const H = document.getElementById('hearts');
@@ -5718,7 +5823,7 @@ function REACT(btn,x,w,save,what){
       PEND.set('noches',{n:o&&!m?1:0,t:'🌙 '+NM(OT())+' te dio las buenas noches',go:()=>GOTO('noches')});
       window.TB_RENDER&&TB_RENDER();
     }
-    render(); setInterval(render,60000);
+    render(); everyVis(render,60000);
   });
 
   /* ---------- Un día como hoy ---------- */
@@ -5900,7 +6005,7 @@ function REACT(btn,x,w,save,what){
       box.append(c);
       PEND.set('tregua',{n:inc&&!inc.r?1:0,t:'🕊️ '+NM(OT())+': «'+(inc?(K[inc.k]||K.abrazo)[1]:'')+'»',go:()=>GOTO('tregua')});
     }
-    render(); setInterval(render,60000);
+    render(); everyVis(render,60000);
   });
 
   /* ---------- Lista compartida ---------- */
@@ -6019,6 +6124,35 @@ function ghRepo(){
   return null;
 }
 const ghToken=()=>LS.get('gh-token')||'';
+/* ---- Vencimiento de los dos tokens de GitHub (Planes Ale / Editor app Ale) ---- */
+const TOK=(()=>{
+  const DEF={planes:'2027-11-20',editor:'2027-11-22'}, NAME={planes:'Planes Ale',editor:'Editor app Ale'};
+  const MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const hash=t=>{let x=5381;t=String(t);for(let i=0;i<t.length;i++)x=((x<<5)+x+t.charCodeAt(i))|0;return String(x>>>0)}; /* huella corta: el token no se guarda */
+  const okD=v=>/^\d{4}-\d\d-\d\d$/.test(v||'');
+  const tokOf=(k,C)=>k==='editor'?ghToken():((C&&C.kanban&&C.kanban.token)||'');
+  /* fecha que GitHub informó para ESTE token (cabecera github-authentication-token-expiration), si se pudo leer */
+  function hdr(k,tok){try{if(!tok)return '';const o=JSON.parse(LS.get('tok-exp-'+k)||'null');return o&&o.f===hash(tok)&&okD(o.v)?o.v:''}catch(e){return ''}}
+  function ymd(k,C){const tok=tokOf(k,C);if(!tok)return '';const h=hdr(k,tok);if(h)return h;
+    const sv=k==='editor'?LS.get('gh-token-vence'):(C&&C.kanban&&C.kanban.vence);return okD(sv)?sv:DEF[k]}
+  const days=y=>Math.ceil((Date.parse(y+'T00:00:00-06:00')-Date.now())/864e5);
+  function info(k,C){const y=ymd(k,C);return y?{k,ymd:y,days:days(y),name:NAME[k]}:null}
+  const pretty=y=>{const a=y.split('-').map(Number);return a[2]+' '+MES[a[1]-1]+' '+a[0]};
+  const text=e=>e.days>0?`🔑 Tu token «${e.name}» vence en ${e.days} ${e.days===1?'día':'días'} (${pretty(e.ymd)}). Renuévalo en GitHub y pégalo en ✏️ Editar.`
+    :`🔑 Tu token «${e.name}» ya venció (${pretty(e.ymd)}). Renuévalo en GitHub y pégalo en ✏️ Editar.`;
+  function note(tok,v){const m=/^(\d{4}-\d\d-\d\d)/.exec(String(v||''));if(!m||!tok)return;
+    const k=tok===ghToken()?'editor':(window.__planesTok&&tok===window.__planesTok)?'planes':null;if(!k)return;
+    if(hdr(k,tok)===m[1])return;
+    LS.set('tok-exp-'+k,JSON.stringify({f:hash(tok),v:m[1]}));if(k==='editor')LS.set('gh-token-vence',m[1]);
+    try{window.dispatchEvent(new CustomEvent('tokexp',{detail:{k,v:m[1]}}))}catch(e){}}
+  return {DEF,NAME,info,text,pretty,note,hdr,ymd,okD};
+})();
+/* lee la cabecera de vencimiento de cualquier petición a api.github.com hecha con alguno de los dos tokens (si CORS la deja leer) */
+if(!PV_MODE){const _f=window.fetch;window.fetch=function(u,o){const p=_f.apply(this,arguments);
+  try{const url=String((u&&u.url)||u||'');if(url.startsWith('https://api.github.com/')){const hd=(o&&o.headers)||(u&&u.headers)||{};
+    const a=String((hd.get?hd.get('Authorization'):hd.Authorization)||''),tok=a.replace(/^Bearer\s+/i,'');
+    if(tok)p.then(r=>{try{const v=r.headers.get('github-authentication-token-expiration');if(v)TOK.note(tok,v)}catch(e){}},()=>{})}}catch(e){}
+  return p}}
 /* ---- Llave secreta: viaja en el link (#k=…), nunca en el repositorio ---- */
 const KEY_B64=(()=>{const m=location.hash.match(/k=([A-Za-z0-9_-]{40,})/);
   if(m){LS.set('app-key',m[1]);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}return m[1]}
@@ -6029,9 +6163,9 @@ const getKey=()=>KEYP||(KEYP=crypto.subtle.importKey('raw',b64uDec(KEY_B64),{nam
 async function decBuf(buf){const u=new Uint8Array(buf);return crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(0,12)},await getKey(),u.slice(12))}
 async function encBuf(bytes){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await getKey(),bytes));const o=new Uint8Array(12+ct.length);o.set(iv);o.set(ct,12);return o}
 const rawURL=(R,p)=>`https://raw.githubusercontent.com/${R.owner}/${R.repo}/${R.branch||'main'}/${p}`;
-const PHOTO_CACHE={};
+const PHOTO_CACHE=lruBlobs(60);
 async function photoBlobURL(p){
-  if(PHOTO_CACHE[p])return PHOTO_CACHE[p];
+  if(PHOTO_CACHE.has(p))return PHOTO_CACHE.get(p);
   if(!/\.bin$/.test(p))return p; // fotos antiguas sin cifrar
   // las fotos (cifradas) se guardan en el celular para no descargarlas cada vez que se abre
   let cs=null; try{cs=window.caches&&await caches.open('fotos-v1')}catch(e){}
@@ -6044,7 +6178,7 @@ async function photoBlobURL(p){
     try{cs&&await cs.put(p,new Response(buf.slice(0),{headers:{'Content-Type':'application/octet-stream'}}))}catch(e){}
   }
   let plain; try{plain=await decBuf(buf)}catch(e){try{cs&&cs.delete(p)}catch(_){}return ''}
-  return PHOTO_CACHE[p]=URL.createObjectURL(new Blob([plain],{type:'image/jpeg'}));
+  return PHOTO_CACHE.set(p,URL.createObjectURL(new Blob([plain],{type:'image/jpeg'})));
 }
 function noKeyScreen(msg){
   try{if(window.AndroidApp&&!KEY_B64){window.AndroidApp.relink();return}}catch(e){}
@@ -6053,11 +6187,18 @@ function noKeyScreen(msg){
 }
 function inactiveScreen(c){
   const l=document.getElementById('lock'); if(!l)return;
-  const e=t=>String(t||'').replace(/[&<>"]/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[x])).replace(/\{ella\}/g,c.ella).replace(/\{yo\}/g,c.yo).replace(/\n/g,'<br>');
+  const e=t=>esc(t||'').replace(/\{ella\}/g,c.ella).replace(/\{yo\}/g,c.yo).replace(/\n/g,'<br>');
   l.innerHTML='<div class="lock-ico">💤</div><div class="lock-q">'+e(c.inactivaTitulo||'Página inactiva')+'</div><div class="lock-h" style="max-width:310px;margin:12px auto 0;line-height:1.3">'+e(c.inactivaTexto||'Esta página se desactivó por no entrar a verla.')+'</div>';
   const A=c.avisos||{};
   if(A.ntfy){let yo=false;try{yo=localStorage.getItem('yo-soy')==='yo'}catch(_){}
-    if(!yo)NTFY({topic:A.ntfy.trim(),title:'💤 Página inactiva · '+c.ella,message:'👀 '+c.ella+' intentó entrar, pero la página está inactiva',tags:['zzz'],priority:4}).catch(()=>{})}
+    /* boot() no corre con la página inactiva, así que NTFY no existe aquí: envío mínimo local (una vez por día, nunca en vista previa) */
+    let hoy='',ya=false;try{hoy=new Date().toISOString().slice(0,10);ya=localStorage.getItem('inactiva-avisado')===hoy}catch(_){}
+    if(!yo&&!PV_MODE&&!ya){try{localStorage.setItem('inactiva-avisado',hoy)}catch(_){}
+      const t=A.ntfy.trim(),title='💤 Página inactiva · '+c.ella,message='👀 '+c.ella+' intentó entrar, pero la página está inactiva';
+      const go=b=>fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify(b)});
+      const claro=()=>go({topic:t,title,message,tags:['zzz'],priority:4});
+      let enc=false;try{const L=JSON.parse(localStorage.getItem('versiones-cache')||'[]');const x=L.find(y=>y.id==='yo'&&!y.x);enc=!!x&&(+String(x.v).replace(/\D/g,'')||0)>=26}catch(_){}
+      (enc?encBuf(new TextEncoder().encode(JSON.stringify({t:title,m:message,ir:''}))).then(b=>{let x='';b.forEach(k=>x+=String.fromCharCode(k));return go({topic:t,title:'💗 Nuestro lugar',message:'nl1:'+btoa(x),priority:4})}).catch(claro):claro()).catch(()=>{})}}
 }
 const ghH=tok=>Object.assign({Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},tok?{Authorization:'Bearer '+tok}:{});
 function mergeC(a,b){
@@ -6105,14 +6246,17 @@ let CUR=null;
   CUR=mergeC(DEFAULTS,remote); DG('contenido listo, cargando fotos');
   // no esperamos las fotos: se abre con un marcador y cada foto se pone en cuanto se descifra
   const PH=i=>'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7#nlf-'+i+'-';
-  const paths=(CUR.fotos||[]).slice();
-  const VIEW=Object.assign({},CUR,{fotos:paths.map((p,i)=>/\.bin$/.test(p)?(PHOTO_CACHE[p]||PH(i)):p),fotoPaths:paths});
-  const lazy=()=>{let n=0;const q=paths.map((p,i)=>[p,i]).filter(([p])=>/\.bin$/.test(p)&&!PHOTO_CACHE[p]);
+  const paths=(CUR.fotos||[]).slice(); PHOTO_CACHE.max=Math.max(60,paths.length+30); /* que el límite nunca saque fotos que la página sí usa */
+  const VIEW=Object.assign({},CUR,{fotos:paths.map((p,i)=>/\.bin$/.test(p)?(PHOTO_CACHE.get(p)||PH(i)):p),fotoPaths:paths});
+  const lazy=()=>{let n=0;const q=paths.map((p,i)=>[p,i]).filter(([p])=>/\.bin$/.test(p)&&!PHOTO_CACHE.has(p));
     const next=()=>{const it=q.shift();if(!it)return;photoBlobURL(it[0]).catch(()=>'').then(u=>{if(u&&window.__fotoSwap)__fotoSwap(PH(it[1]),u)}).finally(next)};
     for(let k=0;k<3;k++)next()};
   if(CUR.inactiva&&!EDIT){inactiveScreen(CUR);return}
   try{boot(VIEW)}catch(e){console.error(e);slowScreen('Algo falló al abrir la página ('+String(e&&e.message||e).slice(0,80)+').');throw e}
   setTimeout(lazy,50);
+  /* abrir sin internet: service worker solo de la cáscara (no dentro de la app Android, ni en vista previa ni al editar) */
+  try{if('serviceWorker' in navigator&&!window.AndroidApp&&!PV_MODE&&!EDIT&&/^https?:$/.test(location.protocol))
+    navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{})}catch(e){}
   if(EDIT){
     initEditor();
   }
@@ -6224,6 +6368,13 @@ function initEditor(){
   if(!KEY_B64) body.append(h('div',{class:'ed-help',html:'⚠️ Abre esta página con tu link de edición completo (el que trae <b>#k=…</b>) para poder guardar.'}));
   const jumpBox=h('div',{class:'ed-jump'},...SCHEMA.filter((x,i)=>x.g&&grpShown(i)).map(x=>h('button',{onclick:()=>{const e=document.getElementById('edg-'+x.g.replace(/[^a-záéíóúñ]/gi,''));if(e)body.scrollTo({top:e.offsetTop-8,behavior:'smooth'})}},x.g)));
   body.append(jumpBox);
+  /* aviso visible cuando a un token le faltan ≤30 días */
+  const tokBn=h('div',{class:'ed-help',role:'status'});tokBn.hidden=true;body.append(tokBn);
+  function tokBanner(){try{const L=[];
+      [['planes',{kanban:D.kanban}],['editor',null]].forEach(([k,c])=>{const e=TOK.info(k,c);if(e&&e.days<=30)L.push(TOK.text(e))});
+      tokBn.hidden=!L.length;tokBn.innerHTML='';L.forEach(t=>{const d=document.createElement('div');d.textContent=t;tokBn.append(d)});
+      fab.textContent=L.length?'✏️ Editar ⚠️':'✏️ Editar'}catch(e){}}
+  window.addEventListener('tokexp',tokBanner);setTimeout(tokBanner,600);
   body.append(h('div',{class:'ed-help',html:'Puedes escribir <b>{ella}</b>, <b>{yo}</b>, <b>{meses}</b> (ej. «8 meses»), <b>{Meses}</b> (ej. «Ocho meses») y <b>{toques}</b>: se actualizan solos cada mes.'}));
 
   // Conexión GitHub
@@ -6232,7 +6383,7 @@ function initEditor(){
   const brIn=h('input',{class:'ed-in',placeholder:'main',value:R0.branch||'main'});
   const tokIn=h('input',{class:'ed-in',type:'password',placeholder:'github_pat_…',value:ghToken(),autocomplete:'off'});
   const conMsg=h('div',{class:'ed-note'});
-  const storeCon=()=>{let v=repoIn.value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\/+$/,'');if(v&&!v.includes('/'))v='Jonatan-Montiel/'+v;if(v!==repoIn.value)repoIn.value=v;const [o,r]=v.split('/');if(o&&r)LS.set('gh-repo',JSON.stringify({owner:o.trim(),repo:r.trim(),branch:brIn.value.trim()||'main'}));LS.set('gh-token',tokIn.value.trim())};
+  const storeCon=()=>{let v=repoIn.value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\/+$/,'');if(v&&!v.includes('/'))v='Jonatan-Montiel/'+v;if(v!==repoIn.value)repoIn.value=v;const [o,r]=v.split('/');if(o&&r)LS.set('gh-repo',JSON.stringify({owner:o.trim(),repo:r.trim(),branch:brIn.value.trim()||'main'}));{const nt=tokIn.value.trim();if(nt!==ghToken())LS.set('gh-token-vence','');LS.set('gh-token',nt)}};
   [repoIn,brIn,tokIn].forEach(i=>i.addEventListener('change',storeCon));
   async function testCon(){
     storeCon(); const R=ghRepo(), t=ghToken();
@@ -6347,7 +6498,7 @@ function initEditor(){
       const msg=h('div',{class:'ed-note'});
       async function test(){
         msg.textContent='Enviando prueba…';msg.className='ed-note'; const add=t=>{if(msg.textContent==='Enviando prueba…')msg.textContent='';msg.textContent+=t}; const txt='🎟️ Prueba: así te va a llegar el aviso cuando '+(D.ella||'Ale')+' canjee un vale 💗'; let any=false;
-        if(A.ntfy){any=true;try{const r=await NTFY({topic:A.ntfy,title:'🎟️ Prueba de aviso',message:txt,tags:['heart'],priority:4});add(r.ok?'🔔 Notificación enviada a ntfy. ':'No se pudo mandar a ntfy. ')}catch(e){add('No se pudo mandar a ntfy. ')}}
+        if(A.ntfy){any=true;try{const r=await NTFY({topic:A.ntfy,title:'🎟️ Prueba de aviso',message:txt,tags:['heart'],priority:4,claro:true});add(r.ok?'🔔 Notificación enviada a ntfy. ':'No se pudo mandar a ntfy. ')}catch(e){add('No se pudo mandar a ntfy. ')}}
         if(!any){msg.textContent='Primero genera tu nombre secreto de ntfy y guarda.';msg.className='ed-note bad'}else msg.className='ed-note ok';
       }
       body.append(section('🔔 '+sec.t,[
@@ -6373,7 +6524,7 @@ function initEditor(){
           const ok=(x,good)=>{m2.textContent=x;m2.className='ed-note '+(good?'ok':'bad')};
           const gen=h('button',{class:'ed-btn',style:'background:#7a6168',onclick:()=>{const r=[...crypto.getRandomValues(new Uint8Array(15))].map(x=>'abcdefghijkmnpqrstuvwxyz23456789'[x%32]).join('');t.value='al-'+r;A.ntfyElla=t.value;markDirty();ok('Listo. Toca «Guardar cambios»: su app lo toma sola la próxima vez que la abra.',true)}},'Generar');
           const send=async(title,message)=>{if(!A.ntfyElla){ok('Primero toca «Generar» y guarda.',false);return}
-            try{const r=await NTFY({topic:A.ntfyElla,title,message,tags:['love_letter'],priority:4});ok(r.ok?'✅ Enviado a su celular.':'No se pudo enviar.',r.ok)}catch(e){ok('No se pudo enviar.',false)}};
+            try{const r=await NTFY({topic:A.ntfyElla,title,message,tags:['love_letter'],priority:4,claro:true});ok(r.ok?'✅ Enviado a su celular.':'No se pudo enviar.',r.ok)}catch(e){ok('No se pudo enviar.',false)}};
           const cm=h('input',{class:'ed-in',placeholder:'Ej. Te dejé algo en nuestro lugar 💌',maxlength:200});
           return h('div',{style:'margin-top:18px;padding-top:14px;border-top:1px solid #f0e2dc'},
             h('div',{class:'ed-flab'},'📱 Notificaciones para '+(D.ella||'Ale')+' (app ntfy)'),
@@ -6419,7 +6570,7 @@ function initEditor(){
           const H={Authorization:'Bearer '+t,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'};
           let cache=[];try{cache=JSON.parse(localStorage.getItem('planes-cache')||'[]')}catch(e){}
           const enc=await encBuf(new TextEncoder().encode(JSON.stringify({cards:cache})));
-          let gist=D.kanban.gist;
+          let gist=D.kanban.gist; const prevVence=D.kanban.vence;
           if(gist){const r=await fetch('https://api.github.com/gists/'+gist,{headers:H,cache:'no-store'});if(!r.ok)gist=''}
           if(!gist){
             const r=await fetch('https://api.github.com/gists',{method:'POST',headers:H,body:JSON.stringify({description:'♥',public:false,files:{'planes.bin':{content:b64buf(enc.buffer)}}})});
@@ -6427,7 +6578,7 @@ function initEditor(){
             if(!r.ok)throw new Error('GitHub respondió '+r.status+' (revisa que el token tenga «Gists: Read and write»)');
             gist=(await r.json()).id;
           }
-          D.kanban={gist,token:t};markDirty();
+          D.kanban={gist,token:t};if(prevVence)D.kanban.vence=prevVence;markDirty();
           msg.textContent='✅ Listo. Toca «Guardar cambios» para activarlo en el celular de Ale.';msg.className='ed-note ok';
         }catch(e){msg.textContent='No se pudo activar: '+e.message+'.';msg.className='ed-note bad'}
       }
@@ -6446,7 +6597,6 @@ function initEditor(){
     }
     if(sec.special==='respaldo'){
       const msg=h('div',{class:'ed-note'}), tmsg=h('div',{class:'ed-note'});
-      const b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
       async function backup(){
         const K=D.kanban||{}; if(!K.gist||!K.token){msg.textContent='Primero activa el guardado compartido (sección «Planes, fotos…»).';msg.className='ed-note bad';return}
         msg.textContent='Armando el respaldo… (puede tardar un poco por las fotos y audios)';msg.className='ed-note';
@@ -6476,14 +6626,21 @@ function initEditor(){
             const ex=r.headers.get('github-authentication-token-expiration');
             if(r.status===401){out.push(`❌ ${label}: venció o no es válido. Hay que crear uno nuevo.`);return}
             if(ex){const d=Math.round((new Date(ex)-Date.now())/864e5);out.push(`${d<=15?'⚠️':'✅'} ${label}: vence en ${d} días (${new Date(ex).toLocaleDateString('es-MX')})`)}
-            else out.push(`✅ ${label}: funciona${D.tokenVence?'':' (pon abajo la fecha en que vence para avisarte)'}`)}catch(e){out.push(`${label}: no se pudo revisar`)}};
+            else out.push(`✅ ${label}: funciona (la fecha de vencimiento se pone abajo)`)}catch(e){out.push(`${label}: no se pudo revisar`)}};
         const R=ghRepo(); await chk('Token de la página (GitHub)',ghToken(),R?`https://api.github.com/repos/${R.owner}/${R.repo}`:'https://api.github.com/user');
         await chk('Token del guardado compartido (Gists)',(D.kanban||{}).token,(D.kanban||{}).gist?'https://api.github.com/gists/'+D.kanban.gist:'https://api.github.com/gists');
-        if(D.tokenVence){const d=Math.round((new Date(D.tokenVence+'T12:00:00')-Date.now())/864e5);out.push(`${d<=15?'⚠️':'📅'} Fecha que pusiste: vence en ${d} días`)}
         tmsg.innerHTML=out.map(esc0).join('<br>');tmsg.className='ed-note '+(out.some(x=>/❌|⚠️/.test(x))?'bad':'ok');
       }
-      const esc0=x=>String(x).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-      const vd=h('input',{class:'ed-in',type:'date',value:D.tokenVence||''});vd.addEventListener('input',()=>{D.tokenVence=vd.value;markDirty()});
+      const esc0=esc;
+      /* fecha de vencimiento de cada token: «Planes Ale» va dentro del contenido (D.kanban.vence); «Editor app Ale» solo en este dispositivo */
+      const hasPl=!!(D.kanban&&D.kanban.token);
+      if(hasPl){const hv=TOK.hdr('planes',D.kanban.token);if(hv&&hv!==D.kanban.vence){D.kanban.vence=hv;markDirty()}}
+      const vdP=h('input',{class:'ed-in',type:'date',value:hasPl?(TOK.ymd('planes',{kanban:D.kanban})||''):'','aria-label':'Fecha en que vence el token Planes Ale',disabled:!hasPl});
+      vdP.addEventListener('input',()=>{if(!D.kanban)return;D.kanban.vence=vdP.value;markDirty();tokBanner()});
+      const vdE=h('input',{class:'ed-in',type:'date',value:TOK.ymd('editor')||TOK.DEF.editor,'aria-label':'Fecha en que vence el token Editor app Ale'});
+      vdE.addEventListener('input',()=>{LS.set('gh-token-vence',vdE.value);tokBanner()});
+      window.addEventListener('tokexp',()=>{try{if(D.kanban&&D.kanban.token){const hv=TOK.hdr('planes',D.kanban.token);if(hv){vdP.value=hv;if(D.kanban.vence!==hv){D.kanban.vence=hv;markDirty()}}}
+        const he=TOK.hdr('editor',ghToken());if(he)vdE.value=he}catch(e){}});
       const last=D.ultimoRespaldo?'Último respaldo: '+new Date(D.ultimoRespaldo).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}):'Todavía no has hecho ningún respaldo.';
       body.append(section('💾 '+sec.t,[
         h('div',{class:'ed-note',html:'Descarga en un archivo <b>todo</b> lo de la página: notitas, audios, diario, fotos, cartas, respuestas, planes… (sigue cifrado). Hazlo de vez en cuando y guárdalo en tu Drive o compu.'}),
@@ -6491,8 +6648,9 @@ function initEditor(){
         h('div',{class:'ed-flab',style:'margin-top:14px'},'🔑 Vencimiento de tus tokens'),
         h('div',{class:'ed-note'},'Si un token vence, ya no se guarda nada. Revisa aquí cuándo vencen.'),
         h('button',{class:'ed-btn',onclick:tokens},'Revisar tokens'),tmsg,
-        h('label',{class:'ed-lab'},h('span',null,'Fecha en que vence tu token (opcional, para avisarte)'),vd)]));
-      setTimeout(()=>{if(D.tokenVence){const d=Math.round((new Date(D.tokenVence+'T12:00:00')-Date.now())/864e5);if(d<=15){status.textContent=d<0?'⚠️ Tu token ya venció: renuévalo':'⚠️ Tu token vence en '+d+' días: renuévalo';status.className='ed-status bad'}}},800);
+        h('div',{class:'ed-note'},'Si GitHub deja leer la fecha, se llena sola; si no, escríbela aquí. Te avisamos 30, 7 y 1 día antes (y si ya venció).'),
+        h('label',{class:'ed-lab'},h('span',null,'🔑 «Planes Ale» (el que usa '+(D.ella||'Ale')+' para guardar planes y fotos) · vence'),vdP),
+        h('label',{class:'ed-lab'},h('span',null,'🔑 «Editor app Ale» (el de este editor) · vence'),vdE)]));
       return;
     }
     if(sec.special==='reset'){
@@ -6630,7 +6788,7 @@ function initEditor(){
       const file=h('input',{type:'file',accept:'image/*',multiple:true,style:'display:none'});
       file.addEventListener('change',()=>{uploadPhotos([...file.files]);file.value=''});
       const render=()=>{grid.innerHTML='';const arr=D.fotos;
-        arr.forEach((src,i)=>grid.append(h('div',{class:'ed-ph'},h('img',{src:PHOTO_CACHE[src]||src,alt:''}),h('b',null,String(i+1)),tools(arr,i,render))));
+        arr.forEach((src,i)=>grid.append(h('div',{class:'ed-ph'},h('img',{src:PHOTO_CACHE.get(src)||src,alt:''}),h('b',null,String(i+1)),tools(arr,i,render))));
         grid.append(h('button',{class:'ed-ph add',onclick:()=>file.click()},h('span',null,'⬆️'),'Agregar fotos'))};
       async function uploadPhotos(files){
         const R=ghRepo(),t=ghToken(); if(!R||!t){msg.textContent='Primero conecta GitHub (arriba) para poder subir fotos.';msg.className='ed-note bad';conSec.classList.add('open');return}
@@ -6644,7 +6802,7 @@ function initEditor(){
             const r=await fetch(`https://api.github.com/repos/${R.owner}/${R.repo}/contents/${name}`,{method:'PUT',headers:Object.assign(ghH(t),{'Content-Type':'application/json'}),
               body:JSON.stringify({message:'Agregar foto',content:b64buf(enc.buffer),branch:R.branch||'main'})});
             if(!r.ok)throw new Error('GitHub respondió '+r.status);
-            PHOTO_CACHE[name]=URL.createObjectURL(blob);
+            PHOTO_CACHE.set(name,URL.createObjectURL(blob));
             D.fotos.push(name);markDirty();render();
           }catch(e){msg.textContent='No pude subir «'+files[k].name+'»: '+e.message+'. Si es HEIC, conviértela a JPG.';msg.className='ed-note bad';return}
         }
@@ -6663,7 +6821,7 @@ function initEditor(){
   }
   async function shrink(f){
     let bmp; try{bmp=await createImageBitmap(f,{imageOrientation:'from-image'})}catch(e){
-      bmp=await new Promise((ok,ko)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ko(new Error('formato no compatible'));im.src=URL.createObjectURL(f)})}
+      bmp=await new Promise((ok,ko)=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{ok(im);URL.revokeObjectURL(u)};im.onerror=()=>{URL.revokeObjectURL(u);ko(new Error('formato no compatible'))};im.src=u})}
     const W=bmp.width,H=bmp.height,sc=Math.min(1,1200/Math.max(W,H));
     const cv=document.createElement('canvas');cv.width=Math.round(W*sc);cv.height=Math.round(H*sc);
     cv.getContext('2d').drawImage(bmp,0,0,cv.width,cv.height);

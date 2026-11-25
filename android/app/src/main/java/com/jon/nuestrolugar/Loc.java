@@ -22,7 +22,7 @@ import javax.crypto.spec.SecretKeySpec;
 class Loc {
     static SharedPreferences sp(Context c) { return c.getSharedPreferences("nl", Context.MODE_PRIVATE); }
 
-    static byte[] key(Context c) { String k = sp(c).getString("k", ""); if (k.isEmpty()) return null; try { return Base64.decode(k, Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING); } catch (Exception e) { return null; } }
+    static byte[] key(Context c) { String k = SecureKey.get(c); if (k.isEmpty()) return null; try { return Base64.decode(k, Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING); } catch (Exception e) { return null; } }
     static String enc(byte[] k, String s) throws Exception {
         byte[] iv = new byte[12]; new SecureRandom().nextBytes(iv);
         Cipher ci = Cipher.getInstance("AES/GCM/NoPadding"); ci.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(k, "AES"), new GCMParameterSpec(128, iv));

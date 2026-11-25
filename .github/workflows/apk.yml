@@ -5,20 +5,23 @@ on:
     paths: ['android/**', '.github/workflows/apk.yml']
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: apk
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-latest
+    # write: solo los pasos de publicar (release y push de dl/) lo necesitan; es un solo job.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
         with:
           gradle-version: '8.9'
       - name: Preparar llave de firma (desde los secretos)
@@ -39,8 +42,41 @@ jobs:
         run: |
           cp android/app/build/outputs/apk/ale/release/app-ale-release.apk nuestro-lugar.apk
           cp android/app/build/outputs/apk/jon/release/app-jon-release.apk nuestro-lugar-jon.apk
+      - name: Borrar llave del runner
+        if: always()
+        run: rm -f "$RUNNER_TEMP/nl.jks"
+      - name: Activar KVM para el emulador
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - name: Probar en emulador
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          script: bash android/test-emulador.sh
+      - name: Preparar resumen de la prueba
+        if: always()
+        run: |
+          mkdir -p /tmp/out
+          tail -n 200 android/build.log > /tmp/out/build-cola.txt 2>/dev/null || true
+          # Solo el resumen: nada de logcat completo, volcados de UI ni capturas.
+          mkdir -p /tmp/resumen
+          for f in resultado.txt errores.txt install.txt start.txt pid.txt build-cola.txt; do
+            cp "/tmp/out/$f" /tmp/resumen/ 2>/dev/null || true
+          done
+      - name: Guardar resultado de la prueba (artefacto, 7 dias)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultado-prueba-${{ github.run_number }}
+          path: /tmp/resumen
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Publicar descarga
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2 (v2.6.2)
         with:
           tag_name: apk
           name: Nuestro lugar (Android)
@@ -57,24 +93,3 @@ jobs:
           git add dl && git commit -qm "App v${{ github.run_number }} lista para descargar"
           for i in 1 2 3 4; do git push -q origin pub:main && break; sleep 5; git fetch -q origin main && git rebase -q origin/main; done
           git checkout -q ${{ github.sha }}
-      - name: Activar KVM para el emulador
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
-      - name: Probar en emulador
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          disable-animations: true
-          script: bash android/test-emulador.sh
-      - name: Borrar llave del runner
-        if: always()
-        run: rm -f "$RUNNER_TEMP/nl.jks"
-      - name: Guardar resultado de la prueba
-        if: always()
-        run: |
-          mkdir -p /tmp/out && cp android/build.log /tmp/out/ 2>/dev/null || true
-          cd /tmp/out && git init -q -b apk-log && git add . && git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "prueba ${{ github.run_number }}"
-          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" apk-log

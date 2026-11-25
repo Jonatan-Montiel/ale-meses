@@ -11,7 +11,7 @@ import java.security.MessageDigest;
 /** Señal de «sigo instalada»: cada ~30 min la app avisa (cifrado) que está viva, para que el otro lo vea en «Versiones». */
 class Beat {
     static String topic(Context c, String who) throws Exception {
-        String k = Loc.sp(c).getString("k", "");
+        String k = SecureKey.get(c);
         byte[] h = MessageDigest.getInstance("SHA-256").digest(("nl-hb:" + k + ":" + who).getBytes("UTF-8"));
         StringBuilder b = new StringBuilder("nlhb"); for (int i = 0; i < 12; i++) b.append(String.format("%02x", h[i])); return b.toString();
     }
