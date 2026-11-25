@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-orS6MbKJBN+YtV3piR+C3YKD59skYrKaawa29tBD3/I='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-gtj3JSYjeakuJY2ss/6BA2YwF25Wdo1L72UPNeiJmIs='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -4089,7 +4089,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const b=document.createElement('button'); b.className='th-btn'; b.textContent='🎨'; b.setAttribute('aria-label','Cambiar tema'); hero.append(b);
   const sh=document.createElement('div'); sh.className='th-sheet';
   sh.innerHTML='<div class="th-box"><h3>Elige un tema 🎨</h3><p>se queda guardado en este celular</p><div class="th-grid"></div><div class="th-sub">✨ Lo que flota en el fondo</div><div class="th-emo"></div><form class="th-own"><input maxlength="40" placeholder="o escribe tus emojis, ej. 🐻🍕💗"><button>Usar</button></form><label class="th-lite"><span><b>⚡ Modo ligero</b><small>más rápido en celulares sencillos: menos efectos y animaciones</small></span><input type="checkbox"></label><button class="btn small" style="margin-top:16px">Listo ♥</button></div>';
-  {const lc=sh.querySelector('.th-lite input');lc.checked=!!window.LITE;lc.onchange=()=>{try{localStorage.setItem('modo-ligero',lc.checked?'1':'0')}catch(e){}location.reload()}}
+  {const lc=sh.querySelector('.th-lite input');const sync=()=>{lc.checked=document.documentElement.classList.contains('lite')};sync();window.addEventListener('lite',sync);
+   lc.onchange=()=>{try{localStorage.setItem('modo-ligero',lc.checked?'1':'0')}catch(e){}window.LITE=lc.checked;document.documentElement.classList.toggle('lite',lc.checked)}}
   document.body.append(sh);
   const grid=sh.querySelector('.th-grid'), cur=()=>{try{return localStorage.getItem('tema')||'vino'}catch(e){return 'vino'}};
   function paint(){grid.innerHTML='';TEMAS.forEach(([k,n,,bg,c])=>{const o=document.createElement('button');o.className='th-op'+(cur()===k?' sel':'');
@@ -5283,11 +5284,11 @@ function heart(burst){
   H.appendChild(h);
   setTimeout(()=>h.remove(),14000);
 }
-const LITE=window.LITE=(()=>{try{const f=localStorage.getItem('modo-ligero');if(f==='1')return true;if(f==='0')return false}catch(e){}
+window.LITE=(()=>{try{const f=localStorage.getItem('modo-ligero');if(f==='1')return true;if(f==='0')return false}catch(e){}
   const m=navigator.deviceMemory, c=navigator.hardwareConcurrency;return (m&&m<=4)||(c&&c<=4)||false})();
-if(LITE)document.documentElement.classList.add('lite');
-setInterval(()=>{if(!document.hidden&&(!LITE||document.querySelectorAll('#hearts .fh').length<9))heart(false)},LITE?1600:900);
-function burst(n=30){if(LITE)n=Math.ceil(n/2);for(let i=0;i<n;i++)setTimeout(()=>heart(true),i*(LITE?60:40))}
+if(window.LITE)document.documentElement.classList.add('lite'); window.dispatchEvent(new Event('lite'));
+{let tk=0;setInterval(()=>{if(document.hidden)return;if(window.LITE&&((tk++)%2||document.querySelectorAll('#hearts .fh').length>=9))return;heart(false)},900)}
+function burst(n=30){const L=window.LITE;if(L)n=Math.ceil(n/2);for(let i=0;i<n;i++)setTimeout(()=>heart(true),i*(L?60:40))}
 document.getElementById('beat').addEventListener('click',()=>burst(40));
 
 /* ====== Carta ====== */
