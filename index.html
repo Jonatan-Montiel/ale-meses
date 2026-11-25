@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Y0rJeKkrHohOIQXv3cvWYTZ9VyLtKWiol67Q7i1zaLM='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-yoI1KsA1UV/p2jzE49SU1DwXus3a+0DyfDqQvrwRIw8='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -6155,19 +6155,21 @@ function initEditor(){
     if(!e.sec||!e.f)return null;
     return document.getElementById(e.sec)||null;
   }
-  // en modo edición todas las secciones con contenido se pueden editar: si está oculta, se muestra SOLO para Jon
+  // en modo edición, las secciones ocultas por su propio módulo (fecha / sin contenido) se muestran SOLO para Jon.
+  // Lo que Jon ocultó a propósito («Ocultar secciones» → «a los dos») NO se muestra hasta que lo haga visible.
   const ED_O=(CUR.ocultas&&typeof CUR.ocultas==='object')?CUR.ocultas:{};
-  const edWhy=(el,id)=>ED_O[id]==='dos'?'está oculta para los dos':el.hidden?'todavía no tiene contenido o solo aparece en su fecha':ED_O[id]==='ella'?'Ale no la ve':'';
+  const edUserHid=id=>ED_O[id]==='dos';
   function edShow(el,id){
-    const why=edWhy(el,id), wasHid=el.hidden||el.classList.contains('oculta');
-    if(wasHid){el.hidden=false;el.classList.remove('oculta');el.classList.add('ed-only')}
-    if(!why&&!wasHid)return;
+    if(edUserHid(id))return;
+    const wasHid=el.hidden||el.classList.contains('oculta');
+    if(!wasHid)return;
+    el.hidden=false;el.classList.remove('oculta');el.classList.add('ed-only');
     let ban=el.querySelector(':scope>.ed-only-ban');
     if(!ban){ban=h('div',{class:'ed-only-ban'});el.prepend(ban)}
-    ban.textContent='👁️ Solo tú ves esta sección para editarla · '+(why||'está oculta');
+    ban.textContent='👁️ Solo tú ves esta sección para editarla · solo aparece en su fecha / todavía no tiene contenido';
   }
   {const seen=new Set();
-   SCHEMA.forEach(e=>{if(!e.sec||!e.f||seen.has(e.sec))return;seen.add(e.sec);const el=document.getElementById(e.sec);if(!el)return;
+   SCHEMA.forEach(e=>{if(!e.sec||!e.f||seen.has(e.sec))return;seen.add(e.sec);const el=document.getElementById(e.sec);if(!el||edUserHid(e.sec))return;
      edShow(el,e.sec);
      // algunos módulos vuelven a ocultarla más tarde (p. ej. por fecha): se mantiene visible para Jon
      try{let busy=false;new MutationObserver(()=>{if(busy)return;if(!(el.hidden||el.classList.contains('oculta')))return;busy=true;edShow(el,e.sec);try{window.TABNAV&&TABNAV.rebuild&&TABNAV.rebuild()}catch(x){}busy=false}).observe(el,{attributes:true,attributeFilter:['hidden','class']})}catch(x){}});
