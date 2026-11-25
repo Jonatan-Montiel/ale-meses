@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rokcjbpGqHt5JhLc3vhwZzJvR3czapUKSH8Ng2Zo6mI='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-OLhNazGMIC7OfXUJYaLuGAKLHnClzsbhjQwSM7F6dRU='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2203,7 +2203,7 @@ function avisar(txt,tipo){
   let soyYo=EDIT; try{if(localStorage.getItem('yo-soy')==='yo')soyYo=true}catch(e){}
   if(soyYo)avisarElla(txt,tipo); else ACT_LOG(txt,tipo,'ella');
   if(!AV.ntfy)return;
-  if(soyYo&&AV.yo===false)return;
+  if(soyYo&&AV.yo!==true)return;
   if(!avOn(tipo))return;
   const gap=({abrazo:1,secreto:1}[tipo]?60*1000:tipo==='extrano'?20*1000:0);
   try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
@@ -5843,7 +5843,7 @@ function initEditor(){
           cb.addEventListener('change',()=>{A.off=Object.assign({},AV_OFF_DEF,A.off||{});A.off[k]=cb.checked?0:1;if(k==='nota')A.notas=cb.checked;markDirty()});
           return h('label',{class:'ed-lab',style:'display:flex;gap:10px;align-items:center;margin:0'},cb,h('span',{style:'margin:0;font-size:14px;color:#2a0a14;font-weight:600'},l))})),
         h('button',{class:'ed-btn',onclick:test},'Enviar prueba'),msg,
-        (()=>{const cb=h('input',{type:'checkbox'}); cb.checked=A.yo!==false; cb.addEventListener('change',()=>{A.yo=cb.checked;markDirty()});
+        (()=>{const cb=h('input',{type:'checkbox'}); cb.checked=A.yo===true; cb.addEventListener('change',()=>{A.yo=cb.checked;markDirty()});
           return h('label',{class:'ed-lab',style:'display:flex;gap:10px;align-items:center;margin-top:8px'},cb,h('span',{style:'margin:0;font-size:14px;color:#2a0a14;font-weight:700'},'Avisarme también de lo que haga yo (sale con mi nombre)'))})(),
         h('div',{class:'ed-note',html:'Nota: el texto del aviso (ej. «Ale canjeó un vale: Un masaje») pasa por el servidor de ntfy; el resto de la app sigue cifrado.'}),
         (()=>{const t=inp('ntfyElla','toca «Generar» abajo'); const m2=h('div',{class:'ed-note'});
