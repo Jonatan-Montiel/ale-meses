@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-15jx5dB2puPf41QuCqe916/8VxqFmWcRI0eWP9TtvE4='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tmtT2O9yofbWaFQfWV5b4pmWsQOfYddHHpgHvtIxtQk='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -784,6 +784,8 @@
   .pj-tabs{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.pj-tabs::-webkit-scrollbar{display:none}
   .pj-tabs button{white-space:nowrap}
   .pj-slot .scratch:not(.ready) .prize{visibility:hidden}
+  .pj-mode{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:0 0 12px}.pj-mode button,.pj-peek{border:1px solid rgba(247,198,211,.3);background:rgba(255,255,255,.07);color:inherit;border-radius:999px;padding:7px 13px;font:700 13px 'Nunito',sans-serif;cursor:pointer}.pj-mode button.cur{background:var(--rose,#e8577f);border-color:transparent;color:#fff}.pj-peek{display:block;margin:8px auto;font-size:12.5px;opacity:.85}
+  body.light .pj-mode button:not(.cur),body.light .pj-peek{background:#fff;border-color:rgba(120,40,70,.18)}
   .pj-note{text-align:center;font-size:13.5px;opacity:.8;margin-bottom:12px}
   .pj-f{margin-bottom:14px}.pj-f .btn{margin:2px auto 0}
   .pj-l{display:grid;gap:8px}
@@ -4406,8 +4408,12 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   const upd=(x,o)=>{Object.assign(x,o,{u:Date.now()});S.save()};
   const del=(btn,x)=>{let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent='¿Borrar?';setTimeout(()=>{armed=false;btn.textContent='✕'},2500);return}upd(x,{x:1})}};
   const T=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['cartaj','💌 Una carta'],['mes','✉️ Carta del mes'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana'],['fortuna','🥠 Galleta'],['sorpresa','🎁 Sorpresas'],['capsula','⏳ Cápsula']];
-  let fortuna=null, surOpen=null, capOpen=false;
-  let tab='msg', razon=null, carta=null, pick=null, scratching=false, cjOpen=false, mesOpen=null, mesSel=0;
+  let scratching=false, mesSel=0;
+  /* vista del receptor: RV = quien recibe; PV = vista previa del creador (sin efectos); estado local separado real/previa */
+  let RV=ME_(), PV=false; const rS={}, pvS={}, pvm={};
+  function ME_(){return VIEWER()}
+  const SN=()=>NM(RV==='yo'?'ella':'yo'), HT=()=>RV==='yo'?'💙':'💗';
+  const CX=()=>{const pv=PV;return{pv,s:pv?pvS:rS,upd:(x,o)=>pv||upd(x,o),add:o=>pv||add(o),avisar:(...a)=>pv||avisar(...a)}};
   function pjReset(){let ch=false;const now=Date.now(),K={yo:['rpjv','rpjr','rpjc'],ella:['rpev','rper','rpec']};
     S.all().forEach(x=>{if(x.x)return;const [cv,cr,cc]=K[P(x)].map(CUTOF);
       if(cv&&x.k==='vale'&&x.c&&x.c<=cv){delete x.c;x.u=now;ch=true}
@@ -4433,7 +4439,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   const ST=new Date((C.inicio||'2026-01-01')+'T00:00:00'), opensAt=m=>new Date(ST.getFullYear(),ST.getMonth()+m,ST.getDate()).getTime();
   const curM=()=>{let m=0;while(opensAt(m+1)<=MXD().getTime())m++;return m};
   const fecha=t=>new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
-  const paper=(t,head)=>`<div class="paper">${head?`<p style="font-weight:800;text-align:center">${esc(FILL(head))}</p>`:''}${FILL(t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(OTN())} ${HRT()}</p></div>`;
+  const paper=(t,head)=>`<div class="paper">${head?`<p style="font-weight:800;text-align:center">${esc(FILL(head))}</p>`:''}${FILL(t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(SN())} ${HT()}</p></div>`;
   function pending(){
     const me=ME(),sn=OTN(),go=goK,L=k=>live(k,me),now=MXD().getTime(),td=DK(MXD());
     const cm=L('mes').filter(x=>!x.o&&opensAt(+x.m)<=now).length,cj=L('cartaj').filter(x=>!x.o).length,c=L('carta').filter(x=>!x.o).length,v=L('vale').filter(x=>!x.c).length,r=Math.max(0,L('ticket').length-L('win').length),
@@ -4462,6 +4468,8 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   }
   function keepVals(){const m={};[...SLOTS(),cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(i.value)m[i.placeholder]=i.value}));return m}
   function putVals(m){[...SLOTS(),cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(m[i.placeholder]!=null&&!i.dataset.fresh)i.value=m[i.placeholder]}))}
+  function modeBar(k){const d=el(`<div class="pj-mode"><button class="${pvm[k]?'':'cur'}">✏️ Editar</button><button class="${pvm[k]?'cur':''}">👁️ Ver como lo ve ${esc(OTN())}</button></div>`),b=d.querySelectorAll('button');
+    b[0].onclick=()=>{pvm[k]=false;render()};b[1].onclick=()=>{pvm[k]=true;render()};return d}
   let rend=false;
   function render(){
     if(rend)return; rend=true; try{
@@ -4476,7 +4484,8 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       const off=r==='yo'&&PJO(k); // lo que Ale le deja a Jon se puede ocultar
       if(s&&r==='yo')s.classList.toggle('duo-nob',off);
       if(off&&s){const w=mine?'b':'a';if(s.dataset.pane!==w){const c=s.querySelector(':scope>.dp-chips button[data-p="'+w+'"]');if(c)c.click()}}
-      box=sl; sl.innerHTML=''; if(off)return; try{(mine?JON:ALE)[k]()}catch(e){console.error(e)}});
+      box=sl; sl.innerHTML=''; if(off)return;
+      try{if(mine){RV=ME();PV=false;JON[k]()}else{box.append(modeBar(k));if(pvm[k]){RV=RC();PV=true;box.append(el(`<div class="pj-note">👁️ Vista previa: así lo ve ${esc(OTN())}. Nada de lo que hagas aquí cuenta ni se le avisa.</div>`));try{JON[k]()}finally{PV=false;RV=ME()}}else ALE[k]()}}catch(e){console.error(e)}});
     putVals(kv);
     }finally{rend=false}
   }
@@ -4527,53 +4536,54 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       if(cur){f.elements.f.value=cur.f||'';f.elements.t.value=cur.t;f.elements.f.dataset.fresh=f.elements.t.dataset.fresh='1';f.elements.t.rows=6}
       box.append(f);if(cur)box.append(el(`<div class="pj-note">${cur.o?`✓ ${esc(OTN())} la abrió el ${fmtDia(cur.o)}`:`Se abre el ${cur.f?fecha(new Date(cur.f+'T12:00:00')):'?'}`}</div>`))}
   };
+  const peek=(fn,t)=>{const a=el(`<button class="pj-peek">👀 Leer ahora (solo tú) · ${esc(t)}</button>`);a.onclick=fn;return a};
   function alertBox(t){const n=el(`<div class="zb-toast">${esc(t)}</div>`);document.body.append(n);setTimeout(()=>n.remove(),2600)}
   const empty=t=>el(`<div class="nb-empty">${t}</div>`);
   const JON={
-    msg(){const m=todayMsg(ME()); box.append(m?el(`<div class="card"><div class="daily-l">Mensaje de hoy de ${esc(OTN())}</div><div class="daily">${esc(FILL(m.t))}</div><div class="cu-t">— ${esc(OTN())} ${HRT()}</div></div>`):empty(esc(OTN())+' todavía no te escribe mensajes del día 💭'))},
-    razon(){const L=live('razon',ME()); if(!L.length){box.append(empty('tu frasco todavía está vacío… '+esc(OTN())+' lo irá llenando 🫙'));return}
+    msg(){const {pv,s,upd,add,avisar}=CX();const m=todayMsg(RV); box.append(m?el(`<div class="card"><div class="daily-l">Mensaje de hoy de ${esc(SN())}</div><div class="daily">${esc(FILL(m.t))}</div><div class="cu-t">— ${esc(SN())} ${HT()}</div></div>`):empty(esc(SN())+' todavía no te escribe mensajes del día 💭'))},
+    razon(){const {pv,s,upd,add,avisar}=CX();const L=live('razon',RV); if(!L.length){box.append(empty('tu frasco todavía está vacío… '+esc(SN())+' lo irá llenando 🫙'));return}
       box.append(JARBOX(L.map(x=>FILL(x.t))))},
-    cartaj(){const L=live('cartaj',ME()),x=L[L.length-1]; if(!x){box.append(empty(esc(OTN())+' todavía no te escribe una carta 💌'));return}
-      if(!cjOpen){const b=el(`<button class="pj-env" aria-label="Abrir carta"><div class="pj-env-e">💌</div><div>Una carta de ${esc(OTN())} para ti</div><small>toca para abrirla</small></button>`);
-        b.onclick=()=>{cjOpen=true;if(!x.o){upd(x,{o:Date.now()});avisar(`💌 ${C.ella} abrió la carta que le escribiste`,'parajon')}else render();burst(16)};box.append(b);return}
+    cartaj(){const {pv,s,upd,add,avisar}=CX();const L=live('cartaj',RV),x=L[L.length-1]; if(!x){box.append(empty(esc(SN())+' todavía no te escribe una carta 💌'));return}
+      if(!s.cjOpen){const b=el(`<button class="pj-env" aria-label="Abrir carta"><div class="pj-env-e">💌</div><div>Una carta de ${esc(SN())} para ti</div><small>toca para abrirla</small></button>`);
+        b.onclick=()=>{s.cjOpen=true;if(!x.o&&!pv){upd(x,{o:Date.now()});avisar(`💌 ${C.ella} abrió la carta que le escribiste`,'parajon')}else render();burst(16)};box.append(b);return}
       box.append(el(paper(x.t)))},
-    mes(){const L=live('mes',ME()).slice().sort((a,b)=>a.m-b.m),now=MXD().getTime(); if(!L.length){box.append(empty('cuando '+esc(OTN())+' te escriba cartas del mes aparecerán aquí ✉️'));return}
+    mes(){const {pv,s,upd,add,avisar}=CX();const L=live('mes',RV).slice().sort((a,b)=>a.m-b.m),now=MXD().getTime(); if(!L.length){box.append(empty('cuando '+esc(SN())+' te escriba cartas del mes aparecerán aquí ✉️'));return}
       const g=document.createElement('div');g.className='whens';
-      L.forEach(x=>{const ok=opensAt(+x.m)<=now,b=el(`<button class="when${x.o?' read':''}"><div class="when-e">${ok?'✉️':'🔒'}</div><div class="when-t">Carta de los ${x.m} meses</div><small style="opacity:.7">${ok?(x.h?esc(FILL(x.h)):'ya la puedes abrir'):'se abre el '+fecha(opensAt(+x.m))}</small></button>`);
-        b.onclick=()=>{if(!ok){alertBox('🔒 Esta carta se abre el '+fecha(opensAt(+x.m)));return}mesOpen=mesOpen===x?null:x;if(!x.o){upd(x,{o:Date.now()});avisar(`✉️ ${C.ella} abrió la carta de los ${x.m} meses que le escribiste`,'parajon');burst(14)}else render()};g.append(b)});
-      box.append(g); if(mesOpen)box.append(el(paper(mesOpen.t,mesOpen.h||('Carta de los '+mesOpen.m+' meses'))))},
-    carta(){const L=live('carta',ME()); if(!L.length){box.append(empty('aquí aparecerán las cartas que te deje '+esc(OTN())+' 📬'));return}
+      L.forEach(x=>{const ok=opensAt(+x.m)<=now,b=el(`<button class="when${x.o&&!pv?' read':''}"><div class="when-e">${ok?'✉️':'🔒'}</div><div class="when-t">Carta de los ${x.m} meses</div><small style="opacity:.7">${ok?(x.h?esc(FILL(x.h)):'ya la puedes abrir'):'se abre el '+fecha(opensAt(+x.m))}</small></button>`);
+        b.onclick=()=>{if(!ok){alertBox('🔒 Esta carta se abre el '+fecha(opensAt(+x.m)));return}s.mesOpen=s.mesOpen===x?null:x;if(!x.o&&!pv){upd(x,{o:Date.now()});avisar(`✉️ ${C.ella} abrió la carta de los ${x.m} meses que le escribiste`,'parajon');burst(14)}else render()};g.append(b)});
+      box.append(g);if(pv)L.filter(x=>opensAt(+x.m)>now).forEach(x=>box.append(peek(()=>{s.mesOpen=s.mesOpen===x?null:x;render()},'Carta de los '+x.m+' meses')));if(s.mesOpen)box.append(el(paper(s.mesOpen.t,s.mesOpen.h||('Carta de los '+s.mesOpen.m+' meses'))))},
+    carta(){const {pv,s,upd,add,avisar}=CX();const L=live('carta',RV); if(!L.length){box.append(empty('aquí aparecerán las cartas que te deje '+esc(SN())+' 📬'));return}
       const g=document.createElement('div');g.className='whens';
-      L.forEach(x=>{const b=el(`<button class="when${x.o?' read':''}"><div class="when-e">💌</div><div class="when-t">Ábrela cuando ${esc(x.w)}</div></button>`);
-        b.onclick=()=>{carta=carta===x?null:x;if(!x.o){upd(x,{o:Date.now()});avisar(`📬 ${C.ella} abrió tu carta «Ábrela cuando ${x.w}»`,'parajon');burst(14)}else render()};g.append(b)});
-      box.append(g); if(carta)box.append(el(`<div class="paper">${FILL(carta.t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(OTN())} ${HRT()}</p></div>`))},
-    vale(){const L=live('vale',ME()); if(!L.length){box.append(empty('cuando '+esc(OTN())+' te regale vales aparecerán aquí 🎟️'));return}
+      L.forEach(x=>{const b=el(`<button class="when${x.o&&!pv?' read':''}"><div class="when-e">💌</div><div class="when-t">Ábrela cuando ${esc(x.w)}</div></button>`);
+        b.onclick=()=>{s.carta=s.carta===x?null:x;if(!x.o&&!pv){upd(x,{o:Date.now()});avisar(`📬 ${C.ella} abrió tu carta «Ábrela cuando ${x.w}»`,'parajon');burst(14)}else render()};g.append(b)});
+      box.append(g); if(s.carta)box.append(el(`<div class="paper">${FILL(s.carta.t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(SN())} ${HT()}</p></div>`))},
+    vale(){const {pv,s,upd,add,avisar}=CX();const L=live('vale',RV); if(!L.length){box.append(empty('cuando '+esc(SN())+' te regale vales aparecerán aquí 🎟️'));return}
       const g=document.createElement('div');g.className='coupons';
-      L.forEach(x=>{const c=el(`<div class="coupon${x.c?' used':''}"><div class="c-emoji">${esc(x.e||'🎟️')}</div><div class="c-txt"><b>Vale por: ${esc(String(FILL(x.t)).replace(/^\s*vale\s+por:?\s*/i,''))}</b><small>${esc(FILL(x.d||''))}</small>${x.c?`<div class="c-when">Canjeado el ${fmtDia(x.c)} ✓</div>`:''}</div></div>`);
-        if(!x.c){const b=document.createElement('button');b.className='c-btn';b.textContent='Canjear';let armed=false;
+      L.forEach(x=>{const c=el(`<div class="coupon${x.c&&!pv?' used':''}"><div class="c-emoji">${esc(x.e||'🎟️')}</div><div class="c-txt"><b>Vale por: ${esc(String(FILL(x.t)).replace(/^\s*vale\s+por:?\s*/i,''))}</b><small>${esc(FILL(x.d||''))}</small>${x.c&&!pv?`<div class="c-when">Canjeado el ${fmtDia(x.c)} ✓</div>`:''}</div></div>`);
+        if(pv)c.querySelector('.c-txt').append(el(`<div class="c-when">solo ${esc(NM(RV))} lo puede canjear</div>`));else if(!x.c){const b=document.createElement('button');b.className='c-btn';b.textContent='Canjear';let armed=false;
           b.onclick=()=>{if(!armed){armed=true;b.textContent='¿Seguro?';setTimeout(()=>{armed=false;b.textContent='Canjear'},2500);return}upd(x,{c:Date.now()});burst(20);avisar(`🎟️ ${C.ella} canjeó tu vale: ${x.t}`,'parajon')};c.append(b)}
         g.append(c)}); box.append(g)},
-    rasca(){const tk=live('ticket',ME()).length, W=live('win',ME()), P=live('premio',ME()).filter(p=>!p.used);
+    rasca(){const {pv,s,upd,add,avisar}=CX();const tk=live('ticket',RV).length, W=live('win',RV), P=live('premio',RV).filter(p=>!p.used);
       if(tk>W.length&&P.length){
-        if(!pick||!P.includes(pick))pick=P[Math.floor(Math.random()*P.length)];
+        if(!s.pick||!P.includes(s.pick))s.pick=P[Math.floor(Math.random()*P.length)];const pick=s.pick;
         const wrap=el(`<div class="scratch"><div class="prize"><div class="prize-emoji">${esc(pick.e||'🎁')}</div><div class="prize-title">¡Ganaste!</div><div class="prize-text">${esc(FILL(pick.t))}</div></div><canvas></canvas></div>`);
-        box.append(wrap,el(`<div class="tap">raspa con tu dedito ✨</div>`)); scratch(wrap.querySelector('canvas'),()=>{const p=pick;pick=null;upd(p,{used:Date.now()});add({k:'win',para:ME(),p:p.id,t:p.t,e:p.e});if(window.confetti)confetti(60);burst(20);avisar(`🌠 ${C.ella} raspó su rasca y gana: ${p.e||'🎁'} ${p.t}`,'parajon')});
-      } else box.append(empty('cuando '+esc(OTN())+' te regale un rasca y gana aparecerá aquí 🌠'));
+        box.append(wrap,el(`<div class="tap">raspa con tu dedito ✨</div>`)); scratch(wrap.querySelector('canvas'),()=>{const p=pick;s.pick=null;if(pv){render();return}upd(p,{used:Date.now()});add({k:'win',para:RV,p:p.id,t:p.t,e:p.e});if(window.confetti)confetti(60);burst(20);avisar(`🌠 ${C.ella} raspó su rasca y gana: ${p.e||'🎁'} ${p.t}`,'parajon')});
+      } else box.append(empty('cuando '+esc(SN())+' te regale un rasca y gana aparecerá aquí 🌠'));
       if(W.length)box.append(el(`<div class="wheel-used" style="margin-top:14px"><div class="wu-t">Lo que has ganado:</div>${W.slice().reverse().map(w=>`<span class="wu" style="text-decoration:none">${esc(w.e||'🎁')} ${esc(w.t)} · ${fmtDia(w.a)}</span>`).join('')}</div>`))},
-    fortuna(){const L=live('fortuna',ME());if(!L.length){box.append(empty('cuando '+esc(OTN())+' te deje fortunas, aquí podrás romper tu galleta 🥠'));return}
-      const b=el(`<button class="pj-env" aria-label="Romper galleta"><div class="pj-env-e">🥠</div><div>${fortuna?'Otra galleta':'Rompe tu galleta'}</div><small>toca para ver tu suerte</small></button>`);
-      b.onclick=()=>{let x;do{x=L[Math.floor(Math.random()*L.length)]}while(L.length>1&&x===fortuna);fortuna=x;burst(10);render()};box.append(b);
-      if(fortuna)box.append(el(`<div class="paper"><p style="text-align:center;font-size:18px">«${esc(FILL(fortuna.t))}»</p><p class="sign">— ${esc(OTN())} ${HRT()}</p></div>`))},
-    sorpresa(){const L=live('sorpresa',ME()).slice().sort((a,b)=>String(a.f).localeCompare(String(b.f))),td=DK(MXD());if(!L.length){box.append(empty('aquí aparecerán las sorpresas que te deje '+esc(OTN())+' 🎁'));return}
+    fortuna(){const {pv,s,upd,add,avisar}=CX();const L=live('fortuna',RV);if(!L.length){box.append(empty('cuando '+esc(SN())+' te deje fortunas, aquí podrás romper tu galleta 🥠'));return}
+      const b=el(`<button class="pj-env" aria-label="Romper galleta"><div class="pj-env-e">🥠</div><div>${s.fortuna?'Otra galleta':'Rompe tu galleta'}</div><small>toca para ver tu suerte</small></button>`);
+      b.onclick=()=>{let x;do{x=L[Math.floor(Math.random()*L.length)]}while(L.length>1&&x===s.fortuna);s.fortuna=x;burst(10);render()};box.append(b);
+      if(s.fortuna)box.append(el(`<div class="paper"><p style="text-align:center;font-size:18px">«${esc(FILL(s.fortuna.t))}»</p><p class="sign">— ${esc(SN())} ${HT()}</p></div>`))},
+    sorpresa(){const {pv,s,upd,add,avisar}=CX();const L=live('sorpresa',RV).slice().sort((a,b)=>String(a.f).localeCompare(String(b.f))),td=DK(MXD());if(!L.length){box.append(empty('aquí aparecerán las sorpresas que te deje '+esc(SN())+' 🎁'));return}
       const g=document.createElement('div');g.className='whens';
-      L.forEach(x=>{const ok=x.f&&x.f<=td,b=el(`<button class="when${x.o?' read':''}"><div class="when-e">${ok?esc(x.e||'🎁'):'🔒'}</div><div class="when-t">${esc(x.n||'Sorpresa')}</div><small style="opacity:.7">${ok?'ya la puedes abrir':'se abre el '+fecha(new Date(x.f+'T12:00:00'))}</small></button>`);
-        b.onclick=()=>{if(!ok){alertBox('🔒 Esta sorpresa se abre el '+fecha(new Date(x.f+'T12:00:00')));return}surOpen=surOpen===x?null:x;if(!x.o){upd(x,{o:Date.now()});avisar(`🎁 ${C.ella} abrió la sorpresa «${x.n||'Sorpresa'}» que le dejaste`,'parajon');burst(20)}else render()};g.append(b)});
-      box.append(g);if(surOpen)box.append(el(paper(surOpen.t,(surOpen.e||'🎁')+' '+(surOpen.n||'Sorpresa'))))},
-    capsula(){const L=live('capsula',ME()),x=L[L.length-1],td=DK(MXD());if(!x){box.append(empty(esc(OTN())+' todavía no te deja una cápsula del tiempo ⏳'));return}
-      if(!(x.f&&x.f<=td)){box.append(el(`<div class="pj-env" style="cursor:default"><div class="pj-env-e">🔒</div><div>Cápsula del tiempo de ${esc(OTN())}</div><small>se abre el ${fecha(new Date(x.f+'T12:00:00'))}</small></div>`));return}
-      if(!capOpen){const b=el(`<button class="pj-env" aria-label="Abrir cápsula"><div class="pj-env-e">⏳</div><div>Ya puedes abrir la cápsula de ${esc(OTN())}</div><small>toca para abrirla</small></button>`);
-        b.onclick=()=>{capOpen=true;if(!x.o){upd(x,{o:Date.now()});avisar(`⏳ ${C.ella} abrió la cápsula del tiempo que le dejaste`,'parajon')}else render();burst(30)};box.append(b);return}
-      box.append(el(paper(x.t,'⏳ Cápsula del tiempo')))}
+      L.forEach(x=>{const ok=x.f&&x.f<=td,b=el(`<button class="when${x.o&&!pv?' read':''}"><div class="when-e">${ok?esc(x.e||'🎁'):'🔒'}</div><div class="when-t">${esc(x.n||'Sorpresa')}</div><small style="opacity:.7">${ok?'ya la puedes abrir':'se abre el '+fecha(new Date(x.f+'T12:00:00'))}</small></button>`);
+        b.onclick=()=>{if(!ok){alertBox('🔒 Esta sorpresa se abre el '+fecha(new Date(x.f+'T12:00:00')));return}s.surOpen=s.surOpen===x?null:x;if(!x.o&&!pv){upd(x,{o:Date.now()});avisar(`🎁 ${C.ella} abrió la sorpresa «${x.n||'Sorpresa'}» que le dejaste`,'parajon');burst(20)}else render()};g.append(b)});
+      box.append(g);if(pv)L.filter(x=>!(x.f&&x.f<=td)).forEach(x=>box.append(peek(()=>{s.surOpen=s.surOpen===x?null:x;render()},x.n||'Sorpresa')));if(s.surOpen)box.append(el(paper(s.surOpen.t,(s.surOpen.e||'🎁')+' '+(s.surOpen.n||'Sorpresa'))))},
+    capsula(){const {pv,s,upd,add,avisar}=CX();const L=live('capsula',RV),x=L[L.length-1],td=DK(MXD());if(!x){box.append(empty(esc(SN())+' todavía no te deja una cápsula del tiempo ⏳'));return}
+      if(!(x.f&&x.f<=td)&&!(pv&&s.capOpen)){box.append(el(`<div class="pj-env" style="cursor:default"><div class="pj-env-e">🔒</div><div>Cápsula del tiempo de ${esc(SN())}</div><small>se abre el ${fecha(new Date(x.f+'T12:00:00'))}</small></div>`));if(pv)box.append(peek(()=>{s.capOpen=true;render()},'Cápsula del tiempo'));return}
+      if(!s.capOpen){const b=el(`<button class="pj-env" aria-label="Abrir cápsula"><div class="pj-env-e">⏳</div><div>Ya puedes abrir la cápsula de ${esc(SN())}</div><small>toca para abrirla</small></button>`);
+        b.onclick=()=>{s.capOpen=true;if(!x.o&&!pv){upd(x,{o:Date.now()});avisar(`⏳ ${C.ella} abrió la cápsula del tiempo que le dejaste`,'parajon')}else render();burst(30)};box.append(b);return}
+      box.append(el(paper(x.t,'⏳ Cápsula del tiempo')));if(pv&&!(x.f&&x.f<=td))box.append(peek(()=>{s.capOpen=false;render()},'ocultar'))}
   };
   function scratch(cv,done){
     const go=()=>{if(!cv.isConnected)return;const r=cv.getBoundingClientRect(); if(r.width<2||r.height<2){setTimeout(go,400);return} /* oculto: reintenta hasta que tenga tamaño */
