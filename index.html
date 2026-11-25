@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NxPl7W8k9pZEnEEDfuckf3jxfYhNH339zE9mJHDT/IA='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ggoxx+h7m+hUA63gi0VTwjSMTAaTJogQscMezLDnefw='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2219,7 +2219,10 @@ const UID=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 /* lista compartida y cifrada en el gist (se combina por id) */
 function SHARED(file,field,LK,max,onChange){
   let L=[]; try{L=JSON.parse(localStorage.getItem(LK)||'[]')||[]}catch(e){}
-  const keep=()=>{L=L.sort((a,b)=>(a.a||0)-(b.a||0)).slice(-max);try{localStorage.setItem(LK,JSON.stringify(L))}catch(e){}};
+  const CUT=(()=>{try{return +((C.resets||{})[file])||0}catch(e){return 0}})();
+  const prune=()=>{if(CUT)L=L.filter(x=>(x.a||x.u||0)>CUT)};
+  const keep=()=>{prune();L=L.sort((a,b)=>(a.a||0)-(b.a||0)).slice(-max);try{localStorage.setItem(LK,JSON.stringify(L))}catch(e){}};
+  prune();
   let busy=false,again=false;
   let sync=async function(){ if(!GG.on)return; if(busy){again=true;return} busy=true;
     try{const r=await GG.pull(file,true)||{}; L=GG.merge(L,r[field]); keep(); await GG.push(file,{[field]:L}); try{localStorage.removeItem(LK+'-pend')}catch(_){} onChange()}catch(e){setTimeout(sync,15000)}
@@ -4299,6 +4302,13 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const del=(btn,x)=>{let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent='¿Borrar?';setTimeout(()=>{armed=false;btn.textContent='✕'},2500);return}upd(x,{x:1})}};
   const T=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['cartaj','💌 Una carta'],['mes','✉️ Carta del mes'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana']];
   let tab='msg', razon=null, carta=null, pick=null, scratching=false, cjOpen=false, mesOpen=null, mesSel=0;
+  function pjReset(){let ch=false;const cv=CUTOF('rpjv'),cr=CUTOF('rpjr'),cc=CUTOF('rpjc'),now=Date.now();
+    S.all().forEach(x=>{if(x.x)return;
+      if(cv&&x.k==='vale'&&x.c&&x.c<=cv){delete x.c;x.u=now;ch=true}
+      if(cr&&(x.k==='ticket'||x.k==='win')&&(x.a||0)<=cr){x.x=1;x.u=now;ch=true}
+      if(cr&&x.k==='premio'&&x.used&&x.used<=cr){delete x.used;x.u=now;ch=true}
+      if(cc&&(x.k==='cartaj'||x.k==='mes'||x.k==='carta')&&x.o&&x.o<=cc){delete x.o;x.u=now;ch=true}});
+    if(ch)S.save()}
   const PJO=k=>{const v=((C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{})['pj-'+k];return v==='dos'||(v==='ella'&&VIEWER()==='ella')}, TV=()=>T.filter(([k])=>!PJO(k));
   window.PJ_GO=t=>{if(t)tab=t;render();GOTO('parajon')};
   const doy=()=>{const n=MXD();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)};
@@ -4346,6 +4356,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   function putVals(m){[box,cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(m[i.placeholder]!=null&&!i.dataset.fresh)i.value=m[i.placeholder]}))}
   function render(){
     if(scratching){jonDaily();return}
+    try{pjReset()}catch(e){}
     const kv=keepVals();
     jonDaily(); cumple();
     sec.querySelector('h2').textContent=soyJon()?'De '+C.ella+' para ti':'Para '+C.yo;
@@ -5966,6 +5977,18 @@ function initEditor(){
         btD('Vaciar «Nuestro recetario»',()=>{D.rrt=Date.now()},'el recetario queda vacío.'),
         btD('Vaciar «Para Jon» (lo que te dejó Ale)',()=>{D.rpj=Date.now()},'se borra todo lo de «Para Jon», incluida la carta de cumpleaños.'),
         btD('Vaciar «Lo que viene»',()=>{D.rev=Date.now()},'la cuenta regresiva queda vacía.'),
+        h('div',{class:'ed-flab',style:'margin-top:14px'},'💙 Lo que te deja '+(D.ella||'Ale')),
+        bt('Reiniciar los vales que te dejó '+(D.ella||'Ale'),()=>{D.rpjv=Date.now()},'tus vales vuelven a estar sin canjear.'),
+        bt('Reiniciar tu rasca y gana',()=>{D.rpjr=Date.now()},'los premios vuelven a estar disponibles y no quedan rascas pendientes.'),
+        bt('Volver a cerrar las cartas que te dejó',()=>{D.rpjc=Date.now()},'su carta, las cartas del mes y las «Ábrela cuando» vuelven a estar sin abrir.'),
+        h('div',{class:'ed-flab',style:'margin-top:14px'},'♻️ Reiniciar más secciones'),
+        h('div',{class:'ed-note'},'Cada botón deja esa sección como nueva para los dos (lo de antes se quita). Toca dos veces para confirmar.'),
+        ...[['detalles.bin','Detalles (canciones, retos, fotos, antojos) y el termómetro'],['sellos.bin','el sello del día'],['probable.bin','«¿Quién es más probable?»'],
+          ['fotoreto.bin','Reto de fotos'],['fotocom.bin','Comentarios y ❤️ de las fotos'],['corazones.bin','Corazones escondidos'],['dibujos.bin','Pizarra (dibujitos)'],
+          ['botella.bin','Mensajes en una botella'],['debo.bin','«Me debes…»'],['elige.bin','«¿Quién elige hoy?»'],['noches.bin','Buenas noches (y su racha)'],
+          ['lista.bin','Nuestra lista'],['bingo.bin','Bingo de citas'],['tregua.bin','Botón de tregua'],['historia.bin','Momentos que agregaron a «Nuestra historia»'],
+          ['albumes.bin','Nombres de los álbumes'],['insignias.bin','Insignias (se vuelven a ganar solas)'],['especiales.bin','Fechas especiales (San Valentín y aniversario)'],
+          ['actividad.bin','Campana (lo nuevo del otro)']].map(([f,l])=>btD('Reiniciar '+l,()=>{D.resets=Object.assign({},D.resets,{[f]:Date.now()})},l+' queda como nuevo.')),
         msg]));
       return;
     }
