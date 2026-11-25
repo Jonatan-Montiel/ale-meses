@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-c5njpxzkrU8fRGG/9TqvUcmw5ezh2an4xlwaRbl/89o='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-XrmdcbQ2eMCqTfnbjfYkf4g91114Bd3sicuZcTJ66r0='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1263,7 +1263,6 @@
   body.light .pr-card{background:#fff;border-color:rgba(120,40,70,.12)}
   .dp-chips{display:flex;gap:8px;justify-content:center;margin:12px 0 14px;flex-wrap:wrap}.dp-chips button{border:1px solid rgba(247,198,211,.3);background:rgba(255,255,255,.07);color:inherit;border-radius:999px;padding:8px 16px;font:800 14px 'Nunito',sans-serif;cursor:pointer}.dp-chips button.cur{background:var(--rose,#e8577f);border-color:transparent;color:#fff}
   body.light .dp-chips button{background:#fff;border-color:rgba(120,40,70,.18)}body.light .dp-chips button.cur{background:var(--rose,#e8577f)}
-  section.duo-nob>.dp-chips{display:none}
   .dp-off{position:absolute!important;left:-10000px!important;width:100%!important;height:0!important;overflow:hidden!important;visibility:hidden!important;pointer-events:none!important}
   .dp-ban{font-size:13px;text-align:center;opacity:.85;margin:0 auto 12px;max-width:440px;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.06)}body.light .dp-ban{background:rgba(120,40,70,.06)}
   .dp-lock>*:not(.dp-ban){pointer-events:none!important;user-select:none;filter:saturate(.55);opacity:.7}
@@ -4686,7 +4685,6 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   const add=o=>S.add(Object.assign({id:UID(),a:Date.now(),u:Date.now(),para:RC()},o));
   const upd=(x,o)=>{Object.assign(x,o,{u:Date.now()});S.save()};
   const del=(btn,x)=>{let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent='¿Borrar?';setTimeout(()=>{armed=false;btn.textContent='✕'},2500);return}upd(x,{x:1})}};
-  const T=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['cartaj','💌 Una carta'],['mes','✉️ Carta del mes'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana'],['fortuna','🥠 Galleta'],['sorpresa','🎁 Sorpresas'],['capsula','⏳ Cápsula']];
   let scratching=false, mesSel=0;
   /* vista del receptor: RV = quien recibe; PV = vista previa del creador (sin efectos); estado local separado real/previa */
   let RV=ME_(), PV=false; const rS={}, pvS={}, pvm={};
@@ -4700,11 +4698,10 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       if(cr&&x.k==='premio'&&x.used&&x.used<=cr){delete x.used;x.u=now;ch=true}
       if(cc&&(x.k==='cartaj'||x.k==='mes'||x.k==='carta'||x.k==='sorpresa'||x.k==='capsula')&&x.o&&x.o<=cc){delete x.o;x.u=now;ch=true}});
     if(ch)S.save()}
-  const PJO=k=>{const O=(C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{},h=v=>v==='dos'||(v==='ella'&&VIEWER()==='ella');return h(O['pj-'+k])||h(O.parajon)}, TV=()=>T.filter(([k])=>!PJO(k));
   window.PJ_GO=t=>{render();goK(t||'carta')()};
   const doy=()=>{const n=MXD();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)};
   const el=(h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
-  function todayMsg(para){if(para==='yo'&&PJO('msg'))return null;const L=live('msg',para);return L.length?L[doy()%L.length]:null}
+  function todayMsg(para){const L=live('msg',para);return L.length?L[doy()%L.length]:null}
   /* el mensaje del día de cada quien lo escribe el otro */
   function myDaily(){
     pending(); const me=ME(), m=todayMsg(me), sn=OTN(), Lm=live('msg',me).map(x=>FILL(x.t));
@@ -4775,10 +4772,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
     sec.querySelector('.sub').textContent=soyJon()?'todo lo que '+C.ella+' te dejó 💙':'cosas que le dejas a '+C.yo+' 💙';
     tabs.innerHTML='';
     SLOTS().forEach(sl=>{const k=sl.dataset.k,r=sl.dataset.r,s=sl.closest('section'),mine=r===ME();
-      const off=r==='yo'&&PJO(k); // lo que Ale le deja a Jon se puede ocultar
-      if(s&&r==='yo')s.classList.toggle('duo-nob',off);
-      if(off&&s){const w=mine?'b':'a';if(s.dataset.pane!==w){const c=s.querySelector(':scope>.dp-chips button[data-p="'+w+'"]');if(c)c.click()}}
-      box=sl; SCP[k+r]=[...sl.querySelectorAll('.pj-sc')].map(e=>e.scrollTop); sl.innerHTML=''; if(off)return;
+      box=sl; SCP[k+r]=[...sl.querySelectorAll('.pj-sc')].map(e=>e.scrollTop); sl.innerHTML='';
       try{if(mine){RV=ME();PV=false;JON[k]()}else{box.append(modeBar(k));if(pvm[k]){RV=RC();PV=true;box.append(el(`<div class="pj-note">👁️ Vista previa: así lo ve ${esc(OTN())}. Nada de lo que hagas aquí cuenta ni se le avisa.</div>`));try{JON[k]()}finally{PV=false;RV=ME()}}else ALE[k]()}}catch(e){console.error(e)}
       const sv=SCP[k+r]||[];sl.querySelectorAll('.pj-sc').forEach((e,i)=>{if(sv[i]){e.scrollTop=sv[i];scUpd(e)}})});
     putVals(kv);
@@ -6310,6 +6304,8 @@ let CUR=null;
   let remote;
   try{remote=await loadContent()}catch(e){noKeyScreen(e.message==='nodata'?'No pude cargar el contenido. Revisa tu conexión e intenta de nuevo.':'El link no es correcto. Ábrela desde el link especial que te mandaron 💗');return}
   CUR=mergeC(DEFAULTS,remote); DG('contenido listo, cargando fotos');
+  /* migración silenciosa: el viejo grupo «De Ale» (ocultas['pj-*'] y ocultas.parajon) ya no existe; se borran sus claves (las secciones DUO solo se ocultan con su propia fila) */
+  if(CUR.ocultas&&typeof CUR.ocultas==='object'&&!Array.isArray(CUR.ocultas))Object.keys(CUR.ocultas).forEach(k=>{if(k==='parajon'||/^pj-/.test(k))delete CUR.ocultas[k]});
   // no esperamos las fotos: se abre con un marcador y cada foto se pone en cuanto se descifra
   const PH=i=>'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7#nlf-'+i+'-';
   const paths=(CUR.fotos||[]).slice();
@@ -6527,9 +6523,9 @@ function initEditor(){
     }
     if(sec.special==='ocultas'){
       D.ocultas=(D.ocultas&&typeof D.ocultas==='object'&&!Array.isArray(D.ocultas))?D.ocultas:{};
-      const TN={inicio:'🏠 Inicio',nosotros:'💑 Nosotros',cartas:'💌 Cartas',juegos:'🎮 Juegos',planes:'📝 Planes',parajon:'💙 De '+(D.ella||'Ale')};
+      const TN={inicio:'🏠 Inicio',nosotros:'💑 Nosotros',cartas:'💌 Cartas',juegos:'🎮 Juegos',planes:'📝 Planes'};
       const ORD=['inicio','nosotros','cartas','juegos','planes','parajon','avisos'];
-      const secs=[...document.querySelectorAll('main section[id]')].filter(x=>x.querySelector(':scope>h2')&&!['misavisos'].includes(x.id)).sort((a,b)=>ORD.indexOf(a.dataset.tab||'inicio')-ORD.indexOf(b.dataset.tab||'inicio'));
+      const secs=[...document.querySelectorAll('main section[id]')].filter(x=>x.querySelector(':scope>h2')&&!['misavisos','parajon'].includes(x.id)).sort((a,b)=>ORD.indexOf(a.dataset.tab||'inicio')-ORD.indexOf(b.dataset.tab||'inicio'));
       D.fechasVer=(D.fechasVer&&typeof D.fechasVer==='object'&&!Array.isArray(D.fechasVer))?D.fechasVer:{};
       const FECHAS=['cumple','cumpleyo','aniversario','sanvalentin'];
       const cnt=h('div',{class:'ed-note'}), list=h('div',null);
@@ -6539,8 +6535,6 @@ function initEditor(){
       const hoyI=rows.findIndex(r=>r.t==='inicio'); rows.splice(Math.max(0,hoyI),0,{id:'hoy',t:'inicio',n:'💬 Mensaje del día'});
       const finI=rows.map(r=>r.t).lastIndexOf('inicio')+1;
       rows.splice(finI,0,{id:'p-frase',t:'inicio',n:'✨ Frase final y «un poquito más de amor»'},{id:'p-creditos',t:'inicio',n:'🎬 Ver los créditos'},{id:'p-wa',t:'inicio',n:'💬 Estoy pensando en ti (WhatsApp)'},{id:'p-ver',t:'inicio',n:'📱 Versiones de la app'});
-      {const pi=rows.findIndex(r=>r.id==='parajon');const PJ=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['cartaj','💌 Una carta'],['mes','✉️ Carta del mes'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana']].map(([k,n])=>({id:'pj-'+k,t:'parajon',n:'· '+n}));
-        if(pi>=0){rows[pi].n='Toda la pestaña';rows.splice(pi+1,0,...PJ)}else rows.push(...PJ)}
       rows.forEach(x=>{const t=x.t;if(t!==last){last=t;list.append(h('div',{class:'ed-flab',style:'margin-top:12px'},TN[t]||t))}
         const sel=h('select',{class:'ed-in',style:'max-width:150px;padding:6px 8px'});
         [['','👁️ Visible'],['ella','🙈 Ocultar a '+(D.ella||'Ale')],['dos','🚫 Ocultar a los dos']].forEach(([v,l])=>{const o=h('option',{value:v},l);if((D.ocultas[x.id]||'')===v)o.selected=true;sel.append(o)});
