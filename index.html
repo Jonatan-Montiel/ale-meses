@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fcTPEPBVTxdD6j4wUXkRTb8KedXCbvY0FFc5spcwfY8='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-15jx5dB2puPf41QuCqe916/8VxqFmWcRI0eWP9TtvE4='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -783,13 +783,14 @@
   /* Para Jon */
   .pj-tabs{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.pj-tabs::-webkit-scrollbar{display:none}
   .pj-tabs button{white-space:nowrap}
+  .pj-slot .scratch:not(.ready) .prize{visibility:hidden}
   .pj-note{text-align:center;font-size:13.5px;opacity:.8;margin-bottom:12px}
   .pj-f{margin-bottom:14px}.pj-f .btn{margin:2px auto 0}
   .pj-l{display:grid;gap:8px}
   .pj-env{display:block;width:100%;border:0;border-radius:18px;padding:26px 16px;background:linear-gradient(160deg,#fbe3d6,#f3c6c9);color:#5a1430;font:800 17px 'Nunito';cursor:pointer;box-shadow:0 14px 30px -12px rgba(0,0,0,.5)}
   .pj-env-e{font-size:46px;margin-bottom:6px}.pj-env small{display:block;font:600 12.5px 'Nunito';opacity:.7;margin-top:4px}
   .pj-tk{text-align:center;margin-bottom:14px}
-  #pjBox .scratch canvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
+  #pjBox .scratch canvas,.pj-slot .scratch canvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
   .pj-jar{display:block;margin:0 auto;font-size:110px;line-height:1;background:none;border:0;cursor:pointer;filter:drop-shadow(0 12px 20px rgba(0,0,0,.45))}
   .pj-jar:active{transform:scale(.94)}
   .rch-other{margin-top:10px;font-size:14px;font-weight:700;opacity:.9}
@@ -4369,24 +4370,25 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
 const DUO=[['vales','vale'],['rasca','rasca'],['carta','cartaj'],['cartames','mes'],['abrela','carta'],['razones','razon'],['galleta','fortuna'],['sorpresas','sorpresa'],['capsula','capsula'],['hoy','msg']];
 const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
 (function(){
-  const $=id=>document.getElementById(id), E=VIEWER()==='ella';
+  const $=id=>document.getElementById(id), ME=VIEWER(), E=ME==='ella', OTH=E?'yo':'ella';
   {const pj=$('parajon');if(pj){pj.classList.add('oculta');pj.hidden=true}}
   const mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
   const setPane=(s,p)=>{s.dataset.pane=p;s.querySelectorAll(':scope>.dp-chips button').forEach(b=>b.classList.toggle('cur',b.dataset.p===p));
     s.querySelector(':scope>.dp-a').classList.toggle('dp-off',p!=='a');s.querySelector(':scope>.dp-b').classList.toggle('dp-off',p!=='b');
     window.dispatchEvent(new CustomEvent('duo',{detail:{id:s.id,p}}));window.dispatchEvent(new Event('resize'))};
-  window.DUO_GO=(id,p)=>{const s=$(id);if(!s)return;if(s.querySelector(':scope>.dp-chips'))setPane(s,p||'b');s.scrollIntoView({behavior:'smooth'})};
+  /* pane «a» = lo que recibo (para mí) · pane «b» = lo que le dejo al otro */
+  window.DUO_GO=(id,p)=>{const s=$(id);if(!s)return;if(s.querySelector(':scope>.dp-chips'))setPane(s,p||'a');s.scrollIntoView({behavior:'smooth'})};
   DUO.forEach(([id,k])=>{const s=$(id);if(!s)return;
-    if(id==='hoy'&&!E)return; // a Jon su mensaje del día de Ale ya le sale en la tarjeta
     const keep=c=>c.tagName==='H2'||c.classList.contains('sub')||c.classList.contains('for-tag');
-    const a=mk('div','dp-pane dp-a'), b=mk('div','dp-pane dp-b'), sl=mk('div','pj-slot'); sl.dataset.k=k; b.append(sl);
-    [...s.children].forEach(c=>{if(!keep(c))a.append(c)});
-    const ch=mk('div','dp-chips');
-    const own=E?'a':'b', oth=E?'b':'a', OT=E?C.yo:C.ella;
-    [[own,(E?'💗':'💙')+' Para ti'],[oth,(E?'💙':'💗')+' Para '+OT]].forEach(([p,l])=>{const bt=mk('button',null,l);bt.type='button';bt.dataset.p=p;bt.onclick=()=>setPane(s,p);ch.append(bt)});
-    if(!E){a.classList.add('dp-lock');a.prepend(mk('div','dp-ban','🔒 Esto es para '+C.ella+': solo ella lo puede abrir. Lo cambias en el editor ✏️'))}
-    else b.prepend(mk('div','dp-ban','💙 Esto es para '+C.yo+': tú se lo dejas y solo él lo puede abrir'));
-    s.append(ch,a,b); s.classList.add('duo'); setPane(s,own);
+    const a=mk('div','dp-pane dp-a'), b=mk('div','dp-pane dp-b'), sa=mk('div','pj-slot'), sb=mk('div','pj-slot');
+    sa.dataset.k=sb.dataset.k=k; sa.dataset.r=ME; sb.dataset.r=OTH;
+    const old=[...s.children].filter(c=>!keep(c));
+    if(id==='hoy')a.append(...old); // su tarjeta del día sigue siendo la de siempre (la llena «myDaily»)
+    else{const lg=mk('div','dp-legacy');lg.hidden=true;lg.style.display='none';lg.append(...old);a.append(lg,sa)}
+    const ch=mk('div','dp-chips'), OT=E?C.yo:C.ella;
+    [['a',(E?'💗':'💙')+' Para ti'],['b',(E?'💙':'💗')+' Para '+OT]].forEach(([p,l])=>{const bt=mk('button',null,l);bt.type='button';bt.dataset.p=p;bt.onclick=()=>setPane(s,p);ch.append(bt)});
+    b.append(mk('div','pj-note',E?'💙 Esto es para '+C.yo+': tú se lo dejas y solo él lo puede abrir':'💗 Esto es para '+C.ella+': tú se lo dejas y solo ella lo puede abrir'),sb);
+    s.append(ch,a,b); s.classList.add('duo'); setPane(s,'a');
   });
 })();
 
@@ -4394,18 +4396,20 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
 (function(){
   const $=id=>document.getElementById(id), sec=$('parajon'), tabs=$('pjTabs'), cs=$('cumpleyo'), cb=$('cyBox'); let box=$('pjBox');
   const SLOTS=()=>[...document.querySelectorAll('.pj-slot')];
-  const goK=k=>()=>window.DUO_GO&&DUO_GO(PJSEC[k]||'vales','b');
+  const goK=k=>()=>window.DUO_GO&&DUO_GO(PJSEC[k]||'vales','a');
   const S=SHARED('parajon.bin','p','parajon-cache',600,render);
   const soyJon=()=>VIEWER()==='yo';
-  const live=k=>S.all().filter(x=>!x.x&&x.k===k&&NEWER(x,'rpj')).sort((a,b)=>a.a-b.a);
-  const add=o=>S.add(Object.assign({id:UID(),a:Date.now(),u:Date.now()},o));
+  /* cada registro es para alguien: para:'yo' (Jon) o 'ella' (Ale); los viejos no traen «para» = Jon */
+  const P=x=>x.para||'yo', ME=()=>VIEWER(), RC=()=>ME()==='yo'?'ella':'yo', NM=w=>w==='yo'?C.yo:C.ella, OTN=()=>NM(RC()), HRT=()=>RC()==='ella'?'💙':'💗';
+  const live=(k,para)=>S.all().filter(x=>!x.x&&x.k===k&&P(x)===para&&NEWER(x,'rpj')).sort((a,b)=>a.a-b.a);
+  const add=o=>S.add(Object.assign({id:UID(),a:Date.now(),u:Date.now(),para:RC()},o));
   const upd=(x,o)=>{Object.assign(x,o,{u:Date.now()});S.save()};
   const del=(btn,x)=>{let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent='¿Borrar?';setTimeout(()=>{armed=false;btn.textContent='✕'},2500);return}upd(x,{x:1})}};
   const T=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['cartaj','💌 Una carta'],['mes','✉️ Carta del mes'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana'],['fortuna','🥠 Galleta'],['sorpresa','🎁 Sorpresas'],['capsula','⏳ Cápsula']];
   let fortuna=null, surOpen=null, capOpen=false;
   let tab='msg', razon=null, carta=null, pick=null, scratching=false, cjOpen=false, mesOpen=null, mesSel=0;
-  function pjReset(){let ch=false;const cv=CUTOF('rpjv'),cr=CUTOF('rpjr'),cc=CUTOF('rpjc'),now=Date.now();
-    S.all().forEach(x=>{if(x.x)return;
+  function pjReset(){let ch=false;const now=Date.now(),K={yo:['rpjv','rpjr','rpjc'],ella:['rpev','rper','rpec']};
+    S.all().forEach(x=>{if(x.x)return;const [cv,cr,cc]=K[P(x)].map(CUTOF);
       if(cv&&x.k==='vale'&&x.c&&x.c<=cv){delete x.c;x.u=now;ch=true}
       if(cr&&(x.k==='ticket'||x.k==='win')&&(x.a||0)<=cr){x.x=1;x.u=now;ch=true}
       if(cr&&x.k==='premio'&&x.used&&x.used<=cr){delete x.used;x.u=now;ch=true}
@@ -4415,31 +4419,30 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   window.PJ_GO=t=>{render();goK(t||'carta')()};
   const doy=()=>{const n=MXD();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)};
   const el=(h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
-  function todayMsg(){if(PJO('msg'))return null;const L=live('msg');return L.length?L[doy()%L.length]:null}
-  /* el mensaje del día de Jon lo escribe Ale */
-  function jonDaily(){
-    if(!soyJon())return; pending(); const m=todayMsg();
-    try{if(window.AndroidApp&&AndroidApp.setWidget){const L=live('msg').map(x=>x.t);AndroidApp.setWidget(JSON.stringify({inicio:C.inicio,msgs:L.length?L:['Que tengas un día bonito, '+C.yo+' 💙']}))}}catch(e){}
-    $('hoyFix').style.display='none'; $('hoyFix').previousElementSibling.style.display='none';
-    if(!m){$('hoyMsg').textContent='Que tengas un día bonito, '+C.yo+' 💙';$('hoySign').textContent='';return}
-    $('hoyMsg').textContent=m.t; $('daily').textContent=m.t;
-    $('hoySign').textContent='— '+C.ella+' 💙';
-    $('dailyL').textContent='Mensaje de '+C.ella+' para ti · '+MXD().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+  function todayMsg(para){if(para==='yo'&&PJO('msg'))return null;const L=live('msg',para);return L.length?L[doy()%L.length]:null}
+  /* el mensaje del día de cada quien lo escribe el otro */
+  function myDaily(){
+    pending(); const me=ME(), m=todayMsg(me), sn=OTN(), Lm=live('msg',me).map(x=>FILL(x.t));
+    try{if(window.AndroidApp&&AndroidApp.setWidget&&(Lm.length||me==='yo'))AndroidApp.setWidget(JSON.stringify({inicio:C.inicio,msgs:Lm.length?Lm:['Que tengas un día bonito, '+C.yo+' 💙']}))}catch(e){}
+    if(me==='yo'){$('hoyFix').style.display='none'; $('hoyFix').previousElementSibling.style.display='none'}
+    if(!m){if(me==='yo'){$('hoyMsg').textContent='Que tengas un día bonito, '+C.yo+' 💙';$('hoySign').textContent=''}return}
+    $('hoyMsg').textContent=FILL(m.t); $('daily').textContent=FILL(m.t);
+    $('hoySign').textContent='— '+sn+' '+HRT();
+    $('dailyL').textContent='Mensaje de '+sn+' para ti · '+MXD().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
   }
   const ST=new Date((C.inicio||'2026-01-01')+'T00:00:00'), opensAt=m=>new Date(ST.getFullYear(),ST.getMonth()+m,ST.getDate()).getTime();
   const curM=()=>{let m=0;while(opensAt(m+1)<=MXD().getTime())m++;return m};
   const fecha=t=>new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
-  const paper=(t,head)=>`<div class="paper">${head?`<p style="font-weight:800;text-align:center">${esc(head)}</p>`:''}${FILL(t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(C.ella)} 💙</p></div>`;
+  const paper=(t,head)=>`<div class="paper">${head?`<p style="font-weight:800;text-align:center">${esc(FILL(head))}</p>`:''}${FILL(t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(OTN())} ${HRT()}</p></div>`;
   function pending(){
-    {const now=MXD().getTime(),cm=live('mes').filter(x=>!x.o&&opensAt(+x.m)<=now).length,cj=live('cartaj').filter(x=>!x.o).length,go=goK;
-     PEND.set('pj-mes',{n:cm,t:cm===1?'✉️ Ya puedes abrir una carta del mes de '+C.ella:'✉️ '+cm+' cartas del mes de '+C.ella+' para abrir',go:go('mes')});
-     PEND.set('pj-cartaj',{n:cj,t:'💌 '+C.ella+' te escribió una carta',go:go('cartaj')});}
-    const c=live('carta').filter(x=>!x.o).length, v=live('vale').filter(x=>!x.c).length, r=Math.max(0,live('ticket').length-live('win').length);
-    const go=goK;
-    {const td=DK(MXD()),su=live('sorpresa').filter(x=>!x.o&&x.f&&x.f<=td).length,cp=live('capsula').filter(x=>!x.o&&x.f&&x.f<=td).length;
-     PEND.set('pj-sorpresa',{n:su,t:su===1?'🎁 Ya puedes abrir una sorpresa de '+C.ella:'🎁 '+su+' sorpresas de '+C.ella+' para abrir',go:go('sorpresa')});
-     PEND.set('pj-capsula',{n:cp,t:'⏳ Ya se abrió la cápsula del tiempo de '+C.ella,go:go('capsula')})}
-    PEND.set('pj-carta',{n:c,t:c===1?'📬 1 carta de '+C.ella+' sin abrir':'📬 '+c+' cartas de '+C.ella+' sin abrir',go:go('carta')});
+    const me=ME(),sn=OTN(),go=goK,L=k=>live(k,me),now=MXD().getTime(),td=DK(MXD());
+    const cm=L('mes').filter(x=>!x.o&&opensAt(+x.m)<=now).length,cj=L('cartaj').filter(x=>!x.o).length,c=L('carta').filter(x=>!x.o).length,v=L('vale').filter(x=>!x.c).length,r=Math.max(0,L('ticket').length-L('win').length),
+      su=L('sorpresa').filter(x=>!x.o&&x.f&&x.f<=td).length,cp=L('capsula').filter(x=>!x.o&&x.f&&x.f<=td).length;
+    PEND.set('pj-mes',{n:cm,t:cm===1?'✉️ Ya puedes abrir una carta del mes de '+sn:'✉️ '+cm+' cartas del mes de '+sn+' para abrir',go:go('mes')});
+    PEND.set('pj-cartaj',{n:cj,t:'💌 '+sn+' te escribió una carta',go:go('cartaj')});
+    PEND.set('pj-sorpresa',{n:su,t:su===1?'🎁 Ya puedes abrir una sorpresa de '+sn:'🎁 '+su+' sorpresas de '+sn+' para abrir',go:go('sorpresa')});
+    PEND.set('pj-capsula',{n:cp,t:'⏳ Ya se abrió la cápsula del tiempo de '+sn,go:go('capsula')});
+    PEND.set('pj-carta',{n:c,t:c===1?'📬 1 carta de '+sn+' sin abrir':'📬 '+c+' cartas de '+sn+' sin abrir',go:go('carta')});
     PEND.set('pj-vale',{n:v,t:v===1?'🎟️ 1 vale por canjear':'🎟️ '+v+' vales por canjear',go:go('vale')});
     PEND.set('pj-rasca',{n:r,t:r===1?'🌠 1 rasca y gana por raspar':'🌠 '+r+' rasca y gana por raspar',go:go('rasca')});
   }
@@ -4459,116 +4462,122 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   }
   function keepVals(){const m={};[...SLOTS(),cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(i.value)m[i.placeholder]=i.value}));return m}
   function putVals(m){[...SLOTS(),cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(m[i.placeholder]!=null&&!i.dataset.fresh)i.value=m[i.placeholder]}))}
+  let rend=false;
   function render(){
-    if(scratching){jonDaily();return}
+    if(rend)return; rend=true; try{
+    if(scratching){myDaily();return}
     try{pjReset()}catch(e){}
     const kv=keepVals();
-    jonDaily(); cumple();
+    myDaily(); cumple();
     sec.querySelector('h2').textContent=soyJon()?'De '+C.ella+' para ti':'Para '+C.yo;
     sec.querySelector('.sub').textContent=soyJon()?'todo lo que '+C.ella+' te dejó 💙':'cosas que le dejas a '+C.yo+' 💙';
     tabs.innerHTML='';
-    SLOTS().forEach(sl=>{const k=sl.dataset.k,s=sl.closest('section');const off=PJO(k);if(s)s.classList.toggle('duo-nob',off);
-      if(off&&s&&s.dataset.pane==='b'){const c=s.querySelector(':scope>.dp-chips button[data-p="a"]');if(c)c.click()}
-      box=sl; sl.innerHTML=''; if(off)return; try{(soyJon()?JON:ALE)[k]()}catch(e){console.error(e)}});
+    SLOTS().forEach(sl=>{const k=sl.dataset.k,r=sl.dataset.r,s=sl.closest('section'),mine=r===ME();
+      const off=r==='yo'&&PJO(k); // lo que Ale le deja a Jon se puede ocultar
+      if(s&&r==='yo')s.classList.toggle('duo-nob',off);
+      if(off&&s){const w=mine?'b':'a';if(s.dataset.pane!==w){const c=s.querySelector(':scope>.dp-chips button[data-p="'+w+'"]');if(c)c.click()}}
+      box=sl; sl.innerHTML=''; if(off)return; try{(mine?JON:ALE)[k]()}catch(e){console.error(e)}});
     putVals(kv);
+    }finally{rend=false}
   }
   const ALE={
-    msg(){box.append(el(`<div class="pj-note">A ${esc(C.yo)} le sale uno distinto cada día al entrar, en grande, como a ti 💌</div>`),
-      form([['t','Escribe un mensajito para '+C.yo,'ta',300]],'💌 Agregar mensaje',v=>add({k:'msg',t:v.t})),
-      listAle(live('msg'),x=>esc(x.t)+(todayMsg()===x?' <b style="color:#b3204f">· hoy</b>':'')))},
-    razon(){const RL=live('razon');box.append(el(`<div class="pj-note">${esc(C.yo)} saca un papelito al azar de su frasco 🫙 · así lo ve él</div>`));if(RL.length)box.append(JARBOX(RL.map(x=>x.t)));box.append(
-      form([['t','Una razón por la que quieres a '+C.yo,'in',200]],'🫙 Agregar al frasco',v=>{add({k:'razon',t:v.t});avisar(`🫙 ${C.ella} agregó una razón a tu frasco`,'parajon')}),
-      listAle(live('razon'),x=>esc(x.t)))},
-    cartaj(){const L=live('cartaj'),cur=L[L.length-1];
-      box.append(el(`<div class="pj-note">Una carta para ${esc(C.yo)}, como «Una carta para ti». Le aparece en un sobre para abrir 💌${cur?' · si la cambias, le vuelve a llegar como nueva':''}</div>`));
-      const f=form([['t','Escribe tu carta para '+C.yo,'ta',4000]],cur?'💌 Guardar cambios':'💌 Guardar carta',v=>{if(cur)upd(cur,{t:v.t,o:0});else add({k:'cartaj',t:v.t});avisar(`💌 ${C.ella} te escribió una carta`,'parajon')});
+    msg(){box.append(el(`<div class="pj-note">A ${esc(OTN())} le sale uno distinto cada día al entrar, en grande, como a ti 💌</div>`),
+      form([['t','Escribe un mensajito para '+OTN(),'ta',300]],'💌 Agregar mensaje',v=>add({k:'msg',t:v.t})),
+      listAle(live('msg',RC()),x=>esc(x.t)+(todayMsg(RC())===x?' <b style="color:#b3204f">· hoy</b>':'')))},
+    razon(){const RL=live('razon',RC());box.append(el(`<div class="pj-note">${esc(OTN())} saca un papelito al azar de su frasco 🫙</div>`));if(RL.length)box.append(JARBOX(RL.map(x=>x.t)));box.append(
+      form([['t','Una razón por la que quieres a '+OTN(),'in',200]],'🫙 Agregar al frasco',v=>{add({k:'razon',t:v.t});avisar(`🫙 ${C.ella} agregó una razón a tu frasco`,'parajon')}),
+      listAle(live('razon',RC()),x=>esc(x.t)))},
+    cartaj(){const L=live('cartaj',RC()),cur=L[L.length-1];
+      box.append(el(`<div class="pj-note">Una carta para ${esc(OTN())}, como «Una carta para ti». Le aparece en un sobre para abrir 💌${cur?' · si la cambias, le vuelve a llegar como nueva':''}</div>`));
+      const f=form([['t','Escribe tu carta para '+OTN(),'ta',4000]],cur?'💌 Guardar cambios':'💌 Guardar carta',v=>{if(cur)upd(cur,{t:v.t,o:0});else add({k:'cartaj',t:v.t});avisar(`💌 ${C.ella} te escribió una carta`,'parajon')});
       if(cur){const ta=f.querySelector('textarea');ta.value=cur.t;ta.dataset.fresh='1';ta.rows=8}
-      box.append(f); if(cur)box.append(el(`<div class="pj-note">${cur.o?`✓ ${esc(C.yo)} la abrió el ${fmtDia(cur.o)}`:`${esc(C.yo)} todavía no la abre`}</div>`))},
-    mes(){const L=live('mes'),cm=curM(),have=new Set(L.map(x=>+x.m));
+      box.append(f); if(cur)box.append(el(`<div class="pj-note">${cur.o?`✓ ${esc(OTN())} la abrió el ${fmtDia(cur.o)}`:`${esc(OTN())} todavía no la abre`}</div>`))},
+    mes(){const L=live('mes',RC()),cm=curM(),have=new Set(L.map(x=>+x.m));
       const opts=[];for(let m=cm;m<=cm+12;m++){if(m<1)continue;if(opensAt(m)<MXD().getTime()-864e5*20&&m===cm)continue;opts.push(m)}
-      box.append(el(`<div class="pj-note">Cada mes que cumplen se abre una carta tuya para ${esc(C.yo)} ✉️ (igual que la tuya de cada mes)</div>`));
+      box.append(el(`<div class="pj-note">Cada mes que cumplen se abre una carta tuya para ${esc(OTN())} ✉️ (igual que la tuya de cada mes)</div>`));
       const f=el(`<form class="di-add card pj-f" autocomplete="off"><select class="pq-in" name="m">${opts.map(m=>`<option value="${m}">${have.has(m)?'✏️ ':''}Carta de los ${m} ${m===1?'mes':'meses'} · se abre el ${fecha(opensAt(m))}</option>`).join('')}</select><input class="pq-in" name="h" maxlength="80" placeholder="Título (opcional, ej. Nueve meses contigo)"><textarea class="pq-in" name="t" rows="6" maxlength="4000" placeholder="Escribe la carta"></textarea><button class="btn small">✉️ Guardar carta del mes</button></form>`);
       if(mesSel&&opts.includes(mesSel))f.elements.m.value=mesSel;
       const fillSel=()=>{mesSel=+f.elements.m.value;const x=L.find(y=>+y.m===mesSel);f.elements.t.value=x?x.t:'';f.elements.h.value=x?x.h||'':'';f.elements.t.dataset.fresh=f.elements.h.dataset.fresh='1'};f.elements.m.onchange=fillSel;fillSel();
       f.onsubmit=e=>{e.preventDefault();const m=+f.elements.m.value,t=f.elements.t.value.trim(),h=f.elements.h.value.trim();if(!t)return f.elements.t.focus();
         const x=L.find(y=>+y.m===m);if(x)upd(x,{t,h});else{add({k:'mes',m,t,h});avisar(`✉️ ${C.ella} te dejó la carta de los ${m} meses (se abre el ${fecha(opensAt(m))})`,'parajon')}burst(10)};
       box.append(f,listAle(L.slice().sort((a,b)=>a.m-b.m),x=>`✉️ Carta de los ${x.m} meses${x.h?' · '+esc(x.h):''}<br><small>se abre el ${fecha(opensAt(+x.m))}</small>`+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
-    carta(){box.append(el(`<div class="pj-note">Cartas para que ${esc(C.yo)} las abra cuando las necesite 📬</div>`),
+    carta(){box.append(el(`<div class="pj-note">Cartas para que ${esc(OTN())} las abra cuando las necesite 📬</div>`),
       form([['w','Ábrela cuando… (ej. estés triste)','in',80],['t','Escribe la carta','ta',2000]],'📬 Guardar carta',v=>{if(!v.t)return;add({k:'carta',w:v.w,t:v.t});avisar(`📬 ${C.ella} te dejó una carta: «Ábrela cuando ${v.w}»`,'parajon')}),
-      listAle(live('carta'),x=>'Ábrela cuando '+esc(x.w)+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
-    vale(){box.append(el(`<div class="pj-note">Vales que ${esc(C.yo)} puede canjear cuando quiera 🎟️</div>`),
+      listAle(live('carta',RC()),x=>'Ábrela cuando '+esc(x.w)+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
+    vale(){box.append(el(`<div class="pj-note">Vales que ${esc(OTN())} puede canjear cuando quiera 🎟️</div>`),
       form([['t','Vale por… (ej. un masaje)','in',80],['d','Detalle (opcional)','in',120],['e','Emoji (opcional)','in',4]],'🎟️ Regalar vale',v=>{add({k:'vale',t:v.t,d:v.d,e:v.e||'🎟️'});avisar(`🎟️ ${C.ella} te regaló un vale: ${v.t}`,'parajon')}),
-      listAle(live('vale'),x=>esc(x.e||'🎟️')+' Vale por: '+esc(x.t)+(x.c?` <b style="color:#2e9d5b">✓ canjeado el ${fmtDia(x.c)}</b>`:'')))},
-    rasca(){const P=live('premio'), tk=live('ticket').length, w=live('win');
+      listAle(live('vale',RC()),x=>esc(x.e||'🎟️')+' Vale por: '+esc(x.t)+(x.c?` <b style="color:#2e9d5b">✓ canjeado el ${fmtDia(x.c)}</b>`:'')))},
+    rasca(){const P=live('premio',RC()), tk=live('ticket',RC()).length, w=live('win',RC());
       const g=document.createElement('div');g.className='card pj-tk';
-      g.innerHTML=`<div class="daily-l">Rasca y gana de ${esc(C.yo)}</div><div>${tk-w.length>0?`Tiene <b>${tk-w.length}</b> por raspar 🌠`:'No tiene ninguno pendiente'}</div>`;
+      g.innerHTML=`<div class="daily-l">Rasca y gana de ${esc(OTN())}</div><div>${tk-w.length>0?`Tiene <b>${tk-w.length}</b> por raspar 🌠`:'No tiene ninguno pendiente'}</div>`;
       const b=document.createElement('button');b.className='btn small';b.textContent='🎁 Regalarle un rasca y gana';
       b.onclick=()=>{if(!P.filter(p=>!p.used).length){alertBox('Primero agrega al menos un premio abajo 👇');return}add({k:'ticket'});burst(16);avisar(`🌠 ${C.ella} te regaló un rasca y gana`,'parajon')};
       g.append(b); box.append(g,
       form([['t','Premio (ej. Te invito a cenar)','in',120],['e','Emoji (opcional)','in',4]],'➕ Agregar premio',v=>add({k:'premio',t:v.t,e:v.e||'🎁'})),
       listAle(P,x=>esc(x.e||'🎁')+' '+esc(x.t)+(x.used?' <b style="color:#2e9d5b">✓ ya lo ganó</b>':'')))},
-    fortuna(){box.append(el(`<div class="pj-note">Mensajitos para la galleta de ${esc(C.yo)}: cada vez que la rompa le sale uno al azar 🥠</div>`),
-      form([['t','Una fortuna para '+C.yo+' (ej. Hoy te va a ir increíble)','in',160]],'🥠 Agregar a su galleta',v=>add({k:'fortuna',t:v.t})),
-      listAle(live('fortuna'),x=>esc(x.t)))},
-    sorpresa(){box.append(el(`<div class="pj-note">Sorpresas para ${esc(C.yo)} que se abren en la fecha que elijas 🎁</div>`),
+    fortuna(){box.append(el(`<div class="pj-note">Mensajitos para la galleta de ${esc(OTN())}: cada vez que la rompa le sale uno al azar 🥠</div>`),
+      form([['t','Una fortuna para '+OTN()+' (ej. Hoy te va a ir increíble)','in',160]],'🥠 Agregar a su galleta',v=>add({k:'fortuna',t:v.t})),
+      listAle(live('fortuna',RC()),x=>esc(x.t)))},
+    sorpresa(){box.append(el(`<div class="pj-note">Sorpresas para ${esc(OTN())} que se abren en la fecha que elijas 🎁</div>`),
       form([['n','Nombre de la sorpresa (ej. 9 meses)','in',60],['f','Se abre el','date'],['t','Lo que le quieres decir','ta',1500],['e','Emoji (opcional)','in',4]],'🎁 Guardar sorpresa',v=>{if(!v.t||!v.f)return;add({k:'sorpresa',e:v.e||'🎁',n:v.n,f:v.f,t:v.t});avisar(`🎁 ${C.ella} te dejó una sorpresa (se abre el ${fecha(new Date(v.f+'T12:00:00'))})`,'parajon')}),
-      listAle(live('sorpresa').slice().sort((a,b)=>String(a.f).localeCompare(String(b.f))),x=>esc(x.e||'🎁')+' '+esc(x.n||'Sorpresa')+`<br><small>se abre el ${x.f?fecha(new Date(x.f+'T12:00:00')):'?'}</small>`+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
-    capsula(){const L=live('capsula'),cur=L[L.length-1];
-      box.append(el(`<div class="pj-note">Un mensaje para ${esc(C.yo)} que no podrá abrir hasta la fecha que elijas ⏳</div>`));
+      listAle(live('sorpresa',RC()).slice().sort((a,b)=>String(a.f).localeCompare(String(b.f))),x=>esc(x.e||'🎁')+' '+esc(x.n||'Sorpresa')+`<br><small>se abre el ${x.f?fecha(new Date(x.f+'T12:00:00')):'?'}</small>`+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
+    capsula(){const L=live('capsula',RC()),cur=L[L.length-1];
+      box.append(el(`<div class="pj-note">Un mensaje para ${esc(OTN())} que no podrá abrir hasta la fecha que elijas ⏳</div>`));
       const f=form([['f','Se abre el','date'],['t','Tu mensaje para el futuro','ta',4000]],cur?'⏳ Guardar cambios':'⏳ Guardar cápsula',v=>{if(!v.t||!v.f)return;if(cur)upd(cur,{f:v.f,t:v.t,o:0});else{add({k:'capsula',f:v.f,t:v.t});avisar(`⏳ ${C.ella} te dejó una cápsula del tiempo (se abre el ${fecha(new Date(v.f+'T12:00:00'))})`,'parajon')}});
       if(cur){f.elements.f.value=cur.f||'';f.elements.t.value=cur.t;f.elements.f.dataset.fresh=f.elements.t.dataset.fresh='1';f.elements.t.rows=6}
-      box.append(f);if(cur)box.append(el(`<div class="pj-note">${cur.o?`✓ ${esc(C.yo)} la abrió el ${fmtDia(cur.o)}`:`Se abre el ${cur.f?fecha(new Date(cur.f+'T12:00:00')):'?'}`}</div>`))}
+      box.append(f);if(cur)box.append(el(`<div class="pj-note">${cur.o?`✓ ${esc(OTN())} la abrió el ${fmtDia(cur.o)}`:`Se abre el ${cur.f?fecha(new Date(cur.f+'T12:00:00')):'?'}`}</div>`))}
   };
   function alertBox(t){const n=el(`<div class="zb-toast">${esc(t)}</div>`);document.body.append(n);setTimeout(()=>n.remove(),2600)}
   const empty=t=>el(`<div class="nb-empty">${t}</div>`);
   const JON={
-    msg(){const m=todayMsg(); box.append(m?el(`<div class="card"><div class="daily-l">Mensaje de hoy de ${esc(C.ella)}</div><div class="daily">${esc(m.t)}</div><div class="cu-t">— ${esc(C.ella)} 💙</div></div>`):empty(esc(C.ella)+' todavía no te escribe mensajes del día 💭'))},
-    razon(){const L=live('razon'); if(!L.length){box.append(empty('tu frasco todavía está vacío… '+esc(C.ella)+' lo irá llenando 🫙'));return}
-      box.append(JARBOX(L.map(x=>x.t)))},
-    cartaj(){const L=live('cartaj'),x=L[L.length-1]; if(!x){box.append(empty(esc(C.ella)+' todavía no te escribe una carta 💌'));return}
-      if(!cjOpen){const b=el(`<button class="pj-env" aria-label="Abrir carta"><div class="pj-env-e">💌</div><div>Una carta de ${esc(C.ella)} para ti</div><small>toca para abrirla</small></button>`);
+    msg(){const m=todayMsg(ME()); box.append(m?el(`<div class="card"><div class="daily-l">Mensaje de hoy de ${esc(OTN())}</div><div class="daily">${esc(FILL(m.t))}</div><div class="cu-t">— ${esc(OTN())} ${HRT()}</div></div>`):empty(esc(OTN())+' todavía no te escribe mensajes del día 💭'))},
+    razon(){const L=live('razon',ME()); if(!L.length){box.append(empty('tu frasco todavía está vacío… '+esc(OTN())+' lo irá llenando 🫙'));return}
+      box.append(JARBOX(L.map(x=>FILL(x.t))))},
+    cartaj(){const L=live('cartaj',ME()),x=L[L.length-1]; if(!x){box.append(empty(esc(OTN())+' todavía no te escribe una carta 💌'));return}
+      if(!cjOpen){const b=el(`<button class="pj-env" aria-label="Abrir carta"><div class="pj-env-e">💌</div><div>Una carta de ${esc(OTN())} para ti</div><small>toca para abrirla</small></button>`);
         b.onclick=()=>{cjOpen=true;if(!x.o){upd(x,{o:Date.now()});avisar(`💌 ${C.ella} abrió la carta que le escribiste`,'parajon')}else render();burst(16)};box.append(b);return}
       box.append(el(paper(x.t)))},
-    mes(){const L=live('mes').slice().sort((a,b)=>a.m-b.m),now=MXD().getTime(); if(!L.length){box.append(empty('cuando '+esc(C.ella)+' te escriba cartas del mes aparecerán aquí ✉️'));return}
+    mes(){const L=live('mes',ME()).slice().sort((a,b)=>a.m-b.m),now=MXD().getTime(); if(!L.length){box.append(empty('cuando '+esc(OTN())+' te escriba cartas del mes aparecerán aquí ✉️'));return}
       const g=document.createElement('div');g.className='whens';
-      L.forEach(x=>{const ok=opensAt(+x.m)<=now,b=el(`<button class="when${x.o?' read':''}"><div class="when-e">${ok?'✉️':'🔒'}</div><div class="when-t">Carta de los ${x.m} meses</div><small style="opacity:.7">${ok?(x.h?esc(x.h):'ya la puedes abrir'):'se abre el '+fecha(opensAt(+x.m))}</small></button>`);
+      L.forEach(x=>{const ok=opensAt(+x.m)<=now,b=el(`<button class="when${x.o?' read':''}"><div class="when-e">${ok?'✉️':'🔒'}</div><div class="when-t">Carta de los ${x.m} meses</div><small style="opacity:.7">${ok?(x.h?esc(FILL(x.h)):'ya la puedes abrir'):'se abre el '+fecha(opensAt(+x.m))}</small></button>`);
         b.onclick=()=>{if(!ok){alertBox('🔒 Esta carta se abre el '+fecha(opensAt(+x.m)));return}mesOpen=mesOpen===x?null:x;if(!x.o){upd(x,{o:Date.now()});avisar(`✉️ ${C.ella} abrió la carta de los ${x.m} meses que le escribiste`,'parajon');burst(14)}else render()};g.append(b)});
       box.append(g); if(mesOpen)box.append(el(paper(mesOpen.t,mesOpen.h||('Carta de los '+mesOpen.m+' meses'))))},
-    carta(){const L=live('carta'); if(!L.length){box.append(empty('aquí aparecerán las cartas que te deje '+esc(C.ella)+' 📬'));return}
+    carta(){const L=live('carta',ME()); if(!L.length){box.append(empty('aquí aparecerán las cartas que te deje '+esc(OTN())+' 📬'));return}
       const g=document.createElement('div');g.className='whens';
       L.forEach(x=>{const b=el(`<button class="when${x.o?' read':''}"><div class="when-e">💌</div><div class="when-t">Ábrela cuando ${esc(x.w)}</div></button>`);
         b.onclick=()=>{carta=carta===x?null:x;if(!x.o){upd(x,{o:Date.now()});avisar(`📬 ${C.ella} abrió tu carta «Ábrela cuando ${x.w}»`,'parajon');burst(14)}else render()};g.append(b)});
-      box.append(g); if(carta)box.append(el(`<div class="paper">${FILL(carta.t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(C.ella)} 💙</p></div>`))},
-    vale(){const L=live('vale'); if(!L.length){box.append(empty('cuando '+esc(C.ella)+' te regale vales aparecerán aquí 🎟️'));return}
+      box.append(g); if(carta)box.append(el(`<div class="paper">${FILL(carta.t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(OTN())} ${HRT()}</p></div>`))},
+    vale(){const L=live('vale',ME()); if(!L.length){box.append(empty('cuando '+esc(OTN())+' te regale vales aparecerán aquí 🎟️'));return}
       const g=document.createElement('div');g.className='coupons';
-      L.forEach(x=>{const c=el(`<div class="coupon${x.c?' used':''}"><div class="c-emoji">${esc(x.e||'🎟️')}</div><div class="c-txt"><b>Vale por: ${esc(String(x.t).replace(/^\s*vale\s+por:?\s*/i,''))}</b><small>${esc(x.d||'')}</small>${x.c?`<div class="c-when">Canjeado el ${fmtDia(x.c)} ✓</div>`:''}</div></div>`);
+      L.forEach(x=>{const c=el(`<div class="coupon${x.c?' used':''}"><div class="c-emoji">${esc(x.e||'🎟️')}</div><div class="c-txt"><b>Vale por: ${esc(String(FILL(x.t)).replace(/^\s*vale\s+por:?\s*/i,''))}</b><small>${esc(FILL(x.d||''))}</small>${x.c?`<div class="c-when">Canjeado el ${fmtDia(x.c)} ✓</div>`:''}</div></div>`);
         if(!x.c){const b=document.createElement('button');b.className='c-btn';b.textContent='Canjear';let armed=false;
           b.onclick=()=>{if(!armed){armed=true;b.textContent='¿Seguro?';setTimeout(()=>{armed=false;b.textContent='Canjear'},2500);return}upd(x,{c:Date.now()});burst(20);avisar(`🎟️ ${C.ella} canjeó tu vale: ${x.t}`,'parajon')};c.append(b)}
         g.append(c)}); box.append(g)},
-    rasca(){const tk=live('ticket').length, W=live('win'), P=live('premio').filter(p=>!p.used);
+    rasca(){const tk=live('ticket',ME()).length, W=live('win',ME()), P=live('premio',ME()).filter(p=>!p.used);
       if(tk>W.length&&P.length){
         if(!pick||!P.includes(pick))pick=P[Math.floor(Math.random()*P.length)];
-        const wrap=el(`<div class="scratch"><div class="prize"><div class="prize-emoji">${esc(pick.e||'🎁')}</div><div class="prize-title">¡Ganaste!</div><div class="prize-text">${esc(pick.t)}</div></div><canvas></canvas></div>`);
-        box.append(wrap,el(`<div class="tap">raspa con tu dedito ✨</div>`)); scratch(wrap.querySelector('canvas'),()=>{const p=pick;pick=null;upd(p,{used:Date.now()});add({k:'win',p:p.id,t:p.t,e:p.e});if(window.confetti)confetti(60);burst(20);avisar(`🌠 ${C.ella} raspó su rasca y gana: ${p.e||'🎁'} ${p.t}`,'parajon')});
-      } else box.append(empty('cuando '+esc(C.ella)+' te regale un rasca y gana aparecerá aquí 🌠'));
+        const wrap=el(`<div class="scratch"><div class="prize"><div class="prize-emoji">${esc(pick.e||'🎁')}</div><div class="prize-title">¡Ganaste!</div><div class="prize-text">${esc(FILL(pick.t))}</div></div><canvas></canvas></div>`);
+        box.append(wrap,el(`<div class="tap">raspa con tu dedito ✨</div>`)); scratch(wrap.querySelector('canvas'),()=>{const p=pick;pick=null;upd(p,{used:Date.now()});add({k:'win',para:ME(),p:p.id,t:p.t,e:p.e});if(window.confetti)confetti(60);burst(20);avisar(`🌠 ${C.ella} raspó su rasca y gana: ${p.e||'🎁'} ${p.t}`,'parajon')});
+      } else box.append(empty('cuando '+esc(OTN())+' te regale un rasca y gana aparecerá aquí 🌠'));
       if(W.length)box.append(el(`<div class="wheel-used" style="margin-top:14px"><div class="wu-t">Lo que has ganado:</div>${W.slice().reverse().map(w=>`<span class="wu" style="text-decoration:none">${esc(w.e||'🎁')} ${esc(w.t)} · ${fmtDia(w.a)}</span>`).join('')}</div>`))},
-    fortuna(){const L=live('fortuna');if(!L.length){box.append(empty('cuando '+esc(C.ella)+' te deje fortunas, aquí podrás romper tu galleta 🥠'));return}
+    fortuna(){const L=live('fortuna',ME());if(!L.length){box.append(empty('cuando '+esc(OTN())+' te deje fortunas, aquí podrás romper tu galleta 🥠'));return}
       const b=el(`<button class="pj-env" aria-label="Romper galleta"><div class="pj-env-e">🥠</div><div>${fortuna?'Otra galleta':'Rompe tu galleta'}</div><small>toca para ver tu suerte</small></button>`);
       b.onclick=()=>{let x;do{x=L[Math.floor(Math.random()*L.length)]}while(L.length>1&&x===fortuna);fortuna=x;burst(10);render()};box.append(b);
-      if(fortuna)box.append(el(`<div class="paper"><p style="text-align:center;font-size:18px">«${esc(FILL(fortuna.t))}»</p><p class="sign">— ${esc(C.ella)} 💙</p></div>`))},
-    sorpresa(){const L=live('sorpresa').slice().sort((a,b)=>String(a.f).localeCompare(String(b.f))),td=DK(MXD());if(!L.length){box.append(empty('aquí aparecerán las sorpresas que te deje '+esc(C.ella)+' 🎁'));return}
+      if(fortuna)box.append(el(`<div class="paper"><p style="text-align:center;font-size:18px">«${esc(FILL(fortuna.t))}»</p><p class="sign">— ${esc(OTN())} ${HRT()}</p></div>`))},
+    sorpresa(){const L=live('sorpresa',ME()).slice().sort((a,b)=>String(a.f).localeCompare(String(b.f))),td=DK(MXD());if(!L.length){box.append(empty('aquí aparecerán las sorpresas que te deje '+esc(OTN())+' 🎁'));return}
       const g=document.createElement('div');g.className='whens';
       L.forEach(x=>{const ok=x.f&&x.f<=td,b=el(`<button class="when${x.o?' read':''}"><div class="when-e">${ok?esc(x.e||'🎁'):'🔒'}</div><div class="when-t">${esc(x.n||'Sorpresa')}</div><small style="opacity:.7">${ok?'ya la puedes abrir':'se abre el '+fecha(new Date(x.f+'T12:00:00'))}</small></button>`);
         b.onclick=()=>{if(!ok){alertBox('🔒 Esta sorpresa se abre el '+fecha(new Date(x.f+'T12:00:00')));return}surOpen=surOpen===x?null:x;if(!x.o){upd(x,{o:Date.now()});avisar(`🎁 ${C.ella} abrió la sorpresa «${x.n||'Sorpresa'}» que le dejaste`,'parajon');burst(20)}else render()};g.append(b)});
       box.append(g);if(surOpen)box.append(el(paper(surOpen.t,(surOpen.e||'🎁')+' '+(surOpen.n||'Sorpresa'))))},
-    capsula(){const L=live('capsula'),x=L[L.length-1],td=DK(MXD());if(!x){box.append(empty(esc(C.ella)+' todavía no te deja una cápsula del tiempo ⏳'));return}
-      if(!(x.f&&x.f<=td)){box.append(el(`<div class="pj-env" style="cursor:default"><div class="pj-env-e">🔒</div><div>Cápsula del tiempo de ${esc(C.ella)}</div><small>se abre el ${fecha(new Date(x.f+'T12:00:00'))}</small></div>`));return}
-      if(!capOpen){const b=el(`<button class="pj-env" aria-label="Abrir cápsula"><div class="pj-env-e">⏳</div><div>Ya puedes abrir la cápsula de ${esc(C.ella)}</div><small>toca para abrirla</small></button>`);
+    capsula(){const L=live('capsula',ME()),x=L[L.length-1],td=DK(MXD());if(!x){box.append(empty(esc(OTN())+' todavía no te deja una cápsula del tiempo ⏳'));return}
+      if(!(x.f&&x.f<=td)){box.append(el(`<div class="pj-env" style="cursor:default"><div class="pj-env-e">🔒</div><div>Cápsula del tiempo de ${esc(OTN())}</div><small>se abre el ${fecha(new Date(x.f+'T12:00:00'))}</small></div>`));return}
+      if(!capOpen){const b=el(`<button class="pj-env" aria-label="Abrir cápsula"><div class="pj-env-e">⏳</div><div>Ya puedes abrir la cápsula de ${esc(OTN())}</div><small>toca para abrirla</small></button>`);
         b.onclick=()=>{capOpen=true;if(!x.o){upd(x,{o:Date.now()});avisar(`⏳ ${C.ella} abrió la cápsula del tiempo que le dejaste`,'parajon')}else render();burst(30)};box.append(b);return}
       box.append(el(paper(x.t,'⏳ Cápsula del tiempo')))}
   };
   function scratch(cv,done){
-    requestAnimationFrame(()=>{const r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1; cv.width=r.width*dpr; cv.height=r.height*dpr; const x=cv.getContext('2d'); x.scale(dpr,dpr);
+    const go=()=>{if(!cv.isConnected)return;const r=cv.getBoundingClientRect(); if(r.width<2||r.height<2){setTimeout(go,400);return} /* oculto: reintenta hasta que tenga tamaño */
+      const dpr=window.devicePixelRatio||1; cv.width=r.width*dpr; cv.height=r.height*dpr; const x=cv.getContext('2d'); x.scale(dpr,dpr);
       const g=x.createLinearGradient(0,0,r.width,r.height); g.addColorStop(0,'#e9b872'); g.addColorStop(.5,'#f7dca8'); g.addColorStop(1,'#c99550');
       x.fillStyle=g; x.fillRect(0,0,r.width,r.height); x.fillStyle='rgba(90,40,10,.7)'; x.font='700 22px Nunito,sans-serif'; x.textAlign='center'; x.fillText('✨ Raspa aquí ✨',r.width/2,r.height/2+8);
       x.globalCompositeOperation='destination-out'; x.lineWidth=46; x.lineCap='round'; x.lineJoin='round'; let down=false, n=0, fin=false, lx=0, ly=0;
@@ -4577,7 +4586,8 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
         if(c/(d.length/64)>.45){fin=true;cv.style.transition='opacity .6s';cv.style.opacity=0;setTimeout(()=>{scratching=false;done()},700)}};
       const paint=e=>{if(!down||fin)return;const [px,py]=at(e);x.beginPath();x.moveTo(lx,ly);x.lineTo(px,py);x.stroke();lx=px;ly=py;if(++n%10===0)check()};
       cv.addEventListener('pointerdown',e=>{down=true;scratching=true;cv.setPointerCapture(e.pointerId);[lx,ly]=at(e);paint(e)}); cv.addEventListener('pointermove',paint); cv.addEventListener('pointerup',()=>{down=false;if(!fin)check();setTimeout(()=>{if(!fin)scratching=false},4000)});
-      cv.style.touchAction='none';});
+      cv.style.touchAction='none'; if(cv.parentElement)cv.parentElement.classList.add('ready');};
+    requestAnimationFrame(go);
   }
   /* ---- Cumpleaños de Jon ---- */
   let cyOpen=false, cyBanner=false;
@@ -4608,8 +4618,38 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       let d=false;try{const k='cumpleyo-av-'+now.getFullYear();d=localStorage.getItem(k)==='1';localStorage.setItem(k,'1')}catch(e){}
       if(!d)avisar(`🎂 ${C.ella} abrió la carta de cumpleaños que le escribiste`,'parajon')}};
   }
-  window.addEventListener('duo',e=>{if(e.detail&&e.detail.p==='b')render()});
+  window.addEventListener('duo',()=>render());
   render();
+  /* ---- Migración única (solo en el cel de Jon, modo editar): lo que Jon le dejaba a Ale en el editor pasa a la app ---- */
+  async function migrar(){
+    if(!(soyJon()&&EDIT)||!GG.on)return;
+    try{if(localStorage.getItem('mig-ella-1')==='1')return}catch(e){}
+    const flag=()=>{try{localStorage.setItem('mig-ella-1','1')}catch(e){}};
+    try{
+      if(S.all().some(x=>x.id==='mig-ella-1')){flag();return}
+      const r=await GG.pull('parajon.bin',true);
+      if(r&&Array.isArray(r.p)&&r.p.some(x=>x&&x.id==='mig-ella-1')){flag();return}
+      const vr=await GG.pull('vales.bin',true), VK=RK+'.'+(C.reinicioVales||0), st=(vr&&vr.rk===VK&&vr.v)||{};
+      const now=Date.now(), td=DK(MXD()), out=[], arr=a=>Array.isArray(a)?a:[], tx=v=>String(v==null?'':v).trim();
+      const put=o=>{out.push(Object.assign({id:UID(),a:now+out.length,u:now+out.length,para:'ella'},o));return out[out.length-1]};
+      arr(C.vales).forEach(o=>{if(!o||!tx(o.titulo))return;const x=st[o.emoji+'|'+FILL(o.titulo)],v={k:'vale',e:o.emoji||'🎟️',t:o.titulo,d:o.detalle||''};if(x&&x.on)v.c=x.t||Date.now();put(v)});
+      const pr=[];arr(C.rascaPremios).forEach(o=>{if(!o||!tx(o.titulo))return;pr.push([o,put({k:'premio',e:o.emoji||'🎁',t:o.titulo+(tx(o.texto)?' — '+o.texto:'')})])});
+      if(pr.length){const g=JUEGOS.get('rasca'),gp=g&&g.p;
+        if(gp){const m=pr.find(([o])=>FILL(o.titulo)===gp.titulo||o.titulo===gp.titulo);if(m){m[1].used=now;put({k:'win',p:m[1].id,t:m[1].t,e:m[1].e})}else put({k:'win',t:(gp.titulo||'')+(gp.texto?' — '+gp.texto:''),e:gp.emoji||'🎁'})}
+        put({k:'ticket'})}
+      if(tx(C.carta))put({k:'cartaj',t:C.carta,o:now});
+      arr(C.cartasMes).forEach(o=>{const m=parseInt(o&&o.mes);if(!m||!tx(o.texto))return;const x={k:'mes',m,h:o.titulo||'',t:o.texto};if(opensAt(m)<=now)x.o=now;put(x)});
+      arr(C.abrela).forEach(o=>{if(!o||!tx(o.texto))return;put({k:'carta',w:o.cuando||'',t:o.texto,o:now})});
+      arr(C.razones).forEach(t=>{if(tx(t))put({k:'razon',t})});
+      arr(C.fortunas).forEach(t=>{if(tx(t))put({k:'fortuna',t})});
+      arr(C.sorpresas).forEach(o=>{if(!o||!tx(o.fecha)||!(tx(o.titulo)||tx(o.texto)))return;const x={k:'sorpresa',e:o.emoji||'🎁',n:o.nombre||'',f:tx(o.fecha),t:(tx(o.titulo)?o.titulo+'\n\n':'')+(o.texto||'')};if(x.f<=td)x.o=now;put(x)});
+      if(C.capsula&&tx(C.capsula.texto))put({k:'capsula',f:C.capsula.fecha||'',t:C.capsula.texto});
+      arr(C.mensajesDia).forEach(t=>{if(tx(t))put({k:'msg',t})});
+      put({id:'mig-ella-1',k:'mig'});
+      const L=S.all();out.forEach(x=>L.push(x));flag();S.save();
+    }catch(e){setTimeout(migrar,20000)}
+  }
+  setTimeout(migrar,2500);
 })();
 
 /* ====== Avisos que Ale quiere recibir ====== */
@@ -5088,7 +5128,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
     if(s.dataset.grp&&GRP[s.dataset.tab]&&gOf(s.dataset.tab)!==s.dataset.grp){curG[s.dataset.tab]=s.dataset.grp;saveG();apply()}
     if(s.classList.contains('dash-sec')&&!s.classList.contains('dash-open')&&window.DASH_OPEN)DASH_OPEN(s.id,true)}}catch(e){}return orig.apply(this,a)};
   PEND.on(dots);
-  window.GOTO=id=>{if(id==='parajon'){const p=(window.PEND_VIS?PEND_VIS():[]).find(x=>/^pj-/.test(x.k)&&x.n>0);if(window.DUO_GO){DUO_GO(p?PJSEC[p.k.slice(3)]:'vales','b');return}}const s=document.getElementById(id);if(s)s.scrollIntoView({behavior:'smooth'})};
+  window.GOTO=id=>{if(id==='parajon'){const p=(window.PEND_VIS?PEND_VIS():[]).find(x=>/^pj-/.test(x.k)&&x.n>0);if(window.DUO_GO){DUO_GO(p?PJSEC[p.k.slice(3)]:'vales','a');return}}const s=document.getElementById(id);if(s)s.scrollIntoView({behavior:'smooth'})};
   const after=()=>{const g=window.__goAfterUnlock,sh=window.__pendingShare;window.__goAfterUnlock=window.__pendingShare=null;if(!g&&!sh)return;
     const ov=document.getElementById('hoyOv');if(ov&&ov.classList.contains('open'))document.getElementById('hoyBtn').click();
     setTimeout(()=>{if(sh&&window.__sharePhotos)__sharePhotos(sh);else if(g)(window.GO_ANY||GOTO)(g)},ov&&ov.classList.contains('open')?600:100)};
@@ -5110,7 +5150,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   const body=t=>FILL(t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('');
   function render(){
     box.innerHTML='';
-    {let op=true;try{op=!cur||localStorage.getItem('cm-av-'+cur.m)==='1'}catch(e){}PEND.set('cartames',{n:VIEWER()==='ella'&&!op?1:0,t:'✉️ Tu carta de los '+(cur&&cur.m)+' meses ya se puede abrir',go:()=>GOTO('cartames')})}
+    PEND.set('cartames',null); // ahora lo avisa «Para ti» (pj-mes)
     if(!cur){box.innerHTML=`<div class="card cm-env"><div class="e">🔒</div><h3>${next?'Muy pronto':'Pronto habrá una carta aquí'}</h3><div class="t">${next?'la primera se abre el '+dateOf(next.m):'💌'}</div></div>`;return}
     const c=document.createElement('div');c.className='card cm-env';
     c.innerHTML=`<div class="e">${isOpen?'💌':'✉️'}</div><h3>Carta de los ${cur.m} meses</h3><div class="t">${esc(cur.t)}</div>`;
@@ -5939,7 +5979,7 @@ const SCHEMA=[
   {t:'Nombres, fecha y candado',f:[['ella','Su nombre','text'],['yo','Tu nombre (firma)','text'],['inicio','Fecha en que empezó todo','date'],['pin','Código del candado (4 números)','text']]},
   {t:'Saludos según la hora',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
   {g:'🏠 Inicio'},
-  {t:'Mensaje del día',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2],['mensajesDia','Frases (cambia una cada día)','list']]},
+  {t:'Mensaje del día',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2]]},
   {t:'Horóscopo del amor',f:[['horoscopo','Predicciones (salen dos distintas cada día; puedes usar {ella} y {yo})','list']]},
   {t:'Corazones escondidos',f:[['corazonesN','¿Cuántos corazones esconder cada mes? (3 a 12, normalmente 6)','text'],['premioCorazones','Premio cuando los encuentre todos (opcional)','textarea',2]]},
   {t:'Reto de fotos (uno por semana)',f:[['retosFoto','Temas (cambia cada lunes)','list']]},
@@ -5957,20 +5997,11 @@ const SCHEMA=[
   {t:'Nuestra canción',f:[['cancion.titulo','Título','text'],['cancion.artista','Artista','text'],['cancion.link','Link (Spotify, YouTube…)','text']]},
   {t:'Fotos',f:[['fotos','Galería (también se usan en el memorama y los créditos)','photos'],['polaroidTexto','Texto al revelar la polaroid (la foto sale al azar)','text'],['fotoRompecabezas','Número de foto para el rompecabezas','number']]},
   {t:'El cielo de esa noche',f:[['horaCielo','Hora del cielo (el día que empezó todo)','time']]},
-  {t:'Sorpresas de cada mes',f:[['sorpresas','Sorpresas con fecha','objlist',[['emoji','Emoji','text'],['nombre','Nombre en la tarjeta (ej. 9 meses)','text'],['fecha','Se abre el','date'],['titulo','Título','text'],['texto','Mensaje','textarea']]],['sorpresasExtra','Sorpresas automáticas para los meses siguientes','objlist',[['emoji','Emoji','text'],['texto','Mensaje','textarea']]]]},
-  {t:'Cápsula del tiempo',f:[['capsula.fecha','Se abre el','date'],['capsula.texto','Mensaje','textarea',8]]},
   {t:'Créditos de película',f:[['creditos','Créditos','objlist',[['rol','Rol','text'],['quien','Quién / qué','text']]]]},
   {g:'💌 Cartas'},
-  {t:'Carta principal',f:[['carta','Texto · deja una línea vacía entre párrafos','textarea',10]]},
-  {t:'Carta de cada mes',f:[['cartasMes','Cartas (se abre cada una el día 12 de ese mes)','objlist',[['mes','Meses que cumplimos (número)','text'],['titulo','Título','text'],['texto','Carta · deja una línea vacía entre párrafos','textarea',8]]]]},
-  {t:'Ábrela cuando…',f:[['abrela','Cartas','objlist',[['emoji','Emoji','text'],['cuando','Ábrela cuando…','text'],['texto','Texto de la carta','textarea']]]]},
   {t:'Carta que se escribe sola',f:[['cartaSola','Texto','textarea',9]]},
-  {t:'Razones por las que te quiero',f:[['razones','Razones','list']]},
-  {t:'Galleta de la fortuna',f:[['fortunas','Mensajes de la galleta','list']]},
   {t:'Mensaje secreto (easter egg)',f:[['secreto','Texto','textarea',4]]},
   {g:'🎮 Juegos'},
-  {t:'Rasca y gana',f:[['rascaPremios','Premios (sale uno al azar y solo se puede raspar una vez)','objlist',[['emoji','Emoji','text'],['titulo','Título','text'],['texto','Texto del premio','textarea',2]]]]},
-  {t:'Vales de amor',f:[['vales','Vales','objlist',[['emoji','Emoji','text'],['titulo','Vale por…','text'],['detalle','Detalle','text']]]]},
   {t:'Ruleta de citas',f:[['ruleta','Opciones (máximo 12)','list']]},
   {t:'Rueda de la comida',f:[['comida','Opciones (máximo 12)','list']]},
   {g:'📝 Planes'},
@@ -5991,13 +6022,6 @@ function autosize(t){t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px
 
 function initEditor(){
   let D=JSON.parse(JSON.stringify(CUR)), dirty=false;
-  if(!Array.isArray(D.rascaPremios)||!D.rascaPremios.length){const r=D.rasca||{};D.rascaPremios=[
-    {emoji:r.emoji||'🌠✨',titulo:r.titulo||'¡Ganaste un deseo!',texto:r.texto||'Pide lo que quieras y yo te lo cumplo, mi amor.'},
-    {emoji:'🍕',titulo:'¡Ganaste una cena!',texto:'Tú eliges el lugar y yo invito.'},
-    {emoji:'💆‍♀️',titulo:'¡Ganaste un masaje!',texto:'20 minutos de puro consentirte.'},
-    {emoji:'🎬',titulo:'¡Ganaste noche de películas!',texto:'Con palomitas, cobijita y tú eliges todas.'},
-    {emoji:'🍦',titulo:'¡Ganaste un antojo!',texto:'El que quieras, a la hora que quieras.'},
-    {emoji:'💐',titulo:'¡Ganaste flores!',texto:'Un ramito sorpresa solo para ti.'}]}
   const markDirty=()=>{dirty=true;saveBtn.textContent='Guardar cambios •'};
   document.body.classList.add('editing');
   document.body.append(h('div',{class:'ed-bar'},'✏️ Modo edición · tus cambios van directo a la página publicada'));
@@ -6270,11 +6294,11 @@ function initEditor(){
       body.append(section('🔄 '+sec.t,[
         h('div',{class:'ed-note'},'Vuelve a dejar todo como nuevo en el celular de Ale (y en el tuyo).'),
         h('div',{class:'ed-flab',style:'margin-top:10px'},'🎮 Juegos y sorpresas'),
-        bt('Reiniciar todo',()=>{D.reinicio=String(Date.now())},'vales sin usar, cartas sin abrir, rasca y gana, ruleta y «¿Cómo te sientes hoy?» listos para usarse otra vez (planes, notitas, eventos y fotos no se borran).'),
-        bt('Reiniciar solo el rasca y gana',()=>{D.rr=Date.now()},'el rasca y gana se podrá raspar otra vez.'),
+        bt('Reiniciar todo',()=>{D.reinicio=String(Date.now());D.rpev=D.rper=D.rpec=Date.now()},'vales sin usar, cartas sin abrir, rasca y gana, ruleta y «¿Cómo te sientes hoy?» listos para usarse otra vez (planes, notitas, eventos y fotos no se borran).'),
+        bt('Reiniciar su rasca y gana',()=>{D.rper=Date.now()},'los premios que le dejaste vuelven a estar disponibles y sus rascas ya usados se borran.'),
         bt('Reiniciar solo la ruleta de citas',()=>{D.rq=Date.now()},'todas las opciones de la ruleta vuelven a estar disponibles.'),
-        bt('Reiniciar solo los vales',()=>{D.reinicioVales=Date.now()},'todos los vales vuelven a estar sin usar.'),
-        bt('Reiniciar solo «Ábrela cuando…»',()=>{D.rab=Date.now()},'todas las cartas vuelven a estar sin abrir.'),
+        bt('Reiniciar los vales de '+(D.ella||'Ale'),()=>{D.rpev=Date.now()},'todos sus vales vuelven a estar sin usar.'),
+        bt('Volver a cerrar sus cartas',()=>{D.rpec=Date.now()},'su carta, las cartas del mes, «Ábrela cuando…», sorpresas y cápsula vuelven a estar sin abrir.'),
         bt('Reiniciar solo «¿Cómo te sientes hoy?»',()=>{D.ra=Date.now()},'las caritas vuelven a estar sin elegir para los dos.'),
         bt('Reiniciar «Pregunta del día»',()=>{D.rpr=Date.now()},'se borran las respuestas y la pregunta de hoy queda sin contestar.'),
         bt('Volver a mostrar la pantalla del mensaje de hoy',()=>{D.rhoy=Date.now()},'la próxima vez que Ale desbloquee la página le vuelve a salir la pantalla del mensaje del día (aunque ya la haya visto hoy).'),
