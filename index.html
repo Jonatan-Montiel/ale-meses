@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GZaRHKEcO79jJQK4SgBMseAAl7aHnSzlfFerB3SAT/s='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rlOUPDPgwL57kJ7RDjvRUBiYnReHXmX9kSsNbCTOUrI='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -4497,10 +4497,15 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   if(VIEWER()!=='ella'){sec.remove();return}
   const LIST=[['nota','💌 Te deja una notita'],['voz','🎙️ Te manda un mensaje de voz'],['like','❤️ Le da like a lo tuyo'],['extrano','🥺 Te dice que te extraña'],['pregunta','💭 Contesta la pregunta del día'],
     ['animo','🌤️ Dice cómo se siente'],['diario','📔 Guarda un momento en el diario'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Cosas que aprender'],['peli','🍿 Pelis y series'],
-    ['evento','🗓️ Agrega algo a «Lo que viene»'],['deseo','🎁 Lista de deseos'],['receta','🍳 Agrega una receta'],['reto','🎯 Reto de la semana'],['insignia','🏅 Desbloquean una insignia'],['probable','🤔 Vota en «¿Quién es más probable?»'],['botella','🍾 Encuentra tu mensaje en una botella'],['debo','😘 Anota o paga algo en «Me debes…»'],['dibujo','🎨 Te manda un dibujito'],['corazones','💗 Encuentra todos los corazones escondidos'],['fotoreto','📸 Sube su foto del reto de la semana'],['sello','🗓️ Elige el sello de su día'],['fotocom','💬 Comenta o le da ❤️ a una foto'],['detalle','💝 Te deja un detalle (canción, reto, foto o antojo)'],['termo','🌡️ Te dice cuánto te extraña'],['foto','📷 Sube fotos'],['recuerdo','📷 Guarda un recuerdo'],['parajon','💙 Usa lo que le dejas en «Para Jon»']];
+    ['evento','🗓️ Agrega algo a «Lo que viene»'],['deseo','🎁 Lista de deseos'],['receta','🍳 Agrega una receta'],['reto','🎯 Reto de la semana'],['insignia','🏅 Desbloquean una insignia'],['probable','🤔 Vota en «¿Quién es más probable?»'],['botella','🍾 Encuentra tu mensaje en una botella'],['debo','😘 Anota o paga algo en «Me debes…»'],['dibujo','🎨 Te manda un dibujito'],['corazones','💗 Encuentra todos los corazones escondidos'],['fotoreto','📸 Sube su foto del reto de la semana'],['sello','🗓️ Elige el sello de su día'],['fotocom','💬 Comenta o le da ❤️ a una foto'],['detalle','💝 Te deja un detalle (canción, reto, foto o antojo)'],['termo','🌡️ Te dice cuánto te extraña'],['foto','📷 Sube fotos'],['recuerdo','📷 Guarda un recuerdo'],['parajon','💙 Usa lo que le dejas en «Para Jon»'],['noches','🌙 Te manda las buenas noches'],['tregua','🕊️ Usa el botón de tregua'],['lista','🛒 Agrega algo a «Nuestra lista»'],['bingo','🎯 Marca algo en el bingo de citas'],['historia','📜 Agrega un momento a «Nuestra historia»']];
+  /* solo las opciones de secciones que Ale sí ve */
+  const SEC={nota:['buzon'],voz:['voz'],like:['buzon'],extrano:['extrano'],pregunta:['pregunta'],animo:['animo'],diario:['diario'],plan:['planes'],aprender:['aprender'],peli:['pelis'],evento:['viene'],deseo:['deseos'],receta:['recetas'],reto:['reto'],insignia:['insignias'],probable:['probable'],botella:['botella'],debo:['debo'],dibujo:['pizarra'],corazones:['corazones'],fotoreto:['fotoreto'],sello:['sello'],fotocom:['momentos','albumes'],detalle:['detalles'],termo:['termo'],foto:['momentos','albumes','polaroid'],recuerdo:['momentos','albumes','diario'],parajon:['parajon'],noches:['noches'],tregua:['tregua'],lista:['lista'],bingo:['bingo'],historia:['historia']};
+  const O=(C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{};
+  const ve=id=>{const e=document.getElementById(id);return !!e&&!e.hidden&&O[id]!=='ella'&&O[id]!=='dos'};
+  const visible=k=>!SEC[k]||SEC[k].some(ve);
   function render(){
     const off=ELLA_PREF.off(); box.innerHTML='';
-    LIST.forEach(([k,l])=>{const r=document.createElement('label');r.className='ma-r';
+    LIST.filter(([k])=>visible(k)).forEach(([k,l])=>{const r=document.createElement('label');r.className='ma-r';
       r.innerHTML=`<span>${l}</span><input type="checkbox" ${off[k]?'':'checked'}><i></i>`;
       r.querySelector('input').onchange=e=>{const o=Object.assign({},ELLA_PREF.off());if(e.target.checked)delete o[k];else o[k]=1;ELLA_PREF.set(o)};box.append(r)});
   }
