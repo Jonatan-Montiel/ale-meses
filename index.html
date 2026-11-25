@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tmtT2O9yofbWaFQfWV5b4pmWsQOfYddHHpgHvtIxtQk='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-5SdqPfwLw5qOt7u6iR8gpja0EQ4PpKabDKJJ4NjlW/U='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -789,6 +789,24 @@
   .pj-note{text-align:center;font-size:13.5px;opacity:.8;margin-bottom:12px}
   .pj-f{margin-bottom:14px}.pj-f .btn{margin:2px auto 0}
   .pj-l{display:grid;gap:8px}
+  .pj-slot .pj-lh{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold);font-weight:700;margin:4px 2px 8px}
+  .pj-slot .pj-sc{max-height:var(--mh,320px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(232,87,127,.55) transparent;padding:2px 4px 6px 2px;margin:0 -2px 10px 0;border-radius:16px}
+  .pj-slot .pj-sc::-webkit-scrollbar{width:5px}.pj-slot .pj-sc::-webkit-scrollbar-thumb{background:rgba(232,87,127,.5);border-radius:99px}.pj-slot .pj-sc::-webkit-scrollbar-track{background:transparent}
+  .pj-slot .pj-sc.more{-webkit-mask-image:linear-gradient(#000 calc(100% - 38px),transparent);mask-image:linear-gradient(#000 calc(100% - 38px),transparent)}
+  .pj-slot .pj-sc.rv{--mh:420px}
+  .pj-slot .pj-l .ds-i{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:start;padding:8px 10px 8px 12px;border-radius:14px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.2)}
+  .pj-slot .pj-l .ds-t{font-size:14px;line-height:1.35;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;word-break:break-word}
+  .pj-slot .pj-l .ds-i.open .ds-t{display:block;-webkit-line-clamp:unset;overflow:visible}
+  .pj-slot .pj-l .ds-f{margin:0;gap:6px;font-size:11px;white-space:nowrap;align-self:start}
+  .pj-slot .pj-l .ds-b{width:24px;height:24px;padding:0;border-radius:50%;font-size:11px;line-height:24px;text-align:center}
+  .pj-slot .pj-fw{margin-bottom:12px}
+  .pj-slot .pj-fw .pj-f{margin-bottom:0}
+  .pj-slot .pj-fw:not(.open) .pj-f{display:none}
+  .pj-slot .pj-fw.open .pj-open{display:none}
+  .pj-slot .pj-open{display:block;width:100%;border:1.5px dashed rgba(247,198,211,.4);background:rgba(255,255,255,.06);color:inherit;border-radius:18px;padding:12px 14px;font:800 14.5px 'Nunito',sans-serif;cursor:pointer}
+  .pj-slot .pj-open:active{transform:scale(.98)}
+  .pj-slot .pj-x{display:block;margin:8px auto 0;border:0;background:none;color:inherit;opacity:.65;font:700 12.5px 'Nunito',sans-serif;text-decoration:underline;cursor:pointer}
+  body.light .pj-slot .pj-open{background:#fff;border-color:rgba(179,32,79,.3);color:#b3204f}
   .pj-env{display:block;width:100%;border:0;border-radius:18px;padding:26px 16px;background:linear-gradient(160deg,#fbe3d6,#f3c6c9);color:#5a1430;font:800 17px 'Nunito';cursor:pointer;box-shadow:0 14px 30px -12px rgba(0,0,0,.5)}
   .pj-env-e{font-size:46px;margin-bottom:6px}.pj-env small{display:block;font:600 12.5px 'Nunito';opacity:.7;margin-top:4px}
   .pj-tk{text-align:center;margin-bottom:14px}
@@ -4452,19 +4470,34 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
     PEND.set('pj-vale',{n:v,t:v===1?'🎟️ 1 vale por canjear':'🎟️ '+v+' vales por canjear',go:go('vale')});
     PEND.set('pj-rasca',{n:r,t:r===1?'🌠 1 rasca y gana por raspar':'🌠 '+r+' rasca y gana por raspar',go:go('rasca')});
   }
-  function form(fields,btnTxt,onSave){
+  const OPEN={}, SCP={};
+  function scUpd(sc){sc.classList.toggle('more',sc.scrollHeight-sc.scrollTop-sc.clientHeight>6)}
+  function scrollBox(node,cls){const sc=document.createElement('div');sc.className='pj-sc'+(cls?' '+cls:'');sc.append(node);sc.addEventListener('scroll',()=>scUpd(sc),{passive:true});requestAnimationFrame(()=>{scUpd(sc);setTimeout(()=>scUpd(sc),250)});return sc}
+  function fold(f,btnTxt){
+    const k=box.dataset.k||'x',w=document.createElement('div');w.className='pj-fw'+(OPEN[k]?' open':'');
+    const o=document.createElement('button');o.type='button';o.className='pj-open';o.textContent='➕ '+String(btnTxt).replace(/^[^\p{L}\p{N}]+/u,'');
+    const x=document.createElement('button');x.type='button';x.className='pj-x';x.textContent='Cerrar';
+    o.onclick=()=>{OPEN[k]=true;w.classList.add('open');const i=f.querySelector('input:not([type=hidden]),textarea,select');if(i)try{i.focus()}catch(e){}};
+    x.onclick=()=>{OPEN[k]=false;w.classList.remove('open')};
+    f.append(x);w.append(o,f);return w;
+  }
+  function form(fields,btnTxt,onSave,always){
     const f=document.createElement('form'); f.className='di-add card pj-f'; f.autocomplete='off';
     fields.forEach(([k,ph,type,max])=>{const i=document.createElement(type==='ta'?'textarea':'input');i.className='pq-in';i.name=k;i.placeholder=ph;i.maxLength=max||200;if(type==='ta')i.rows=3;if(type==='date'){i.type='date';i.title=ph;const l=document.createElement('label');l.className='pj-dl';l.textContent=ph;f.append(l)}f.append(i)});
     const b=document.createElement('button');b.className='btn small';b.textContent=btnTxt;f.append(b);
     f.onsubmit=e=>{e.preventDefault();const v={};fields.forEach(([k])=>v[k]=f.elements[k].value.trim());if(!v[fields[0][0]])return f.elements[fields[0][0]].focus();f.reset();f.querySelectorAll('input,textarea').forEach(i=>{i.dataset.fresh=1});onSave(v);burst(10)};
-    return f;
+    return always?f:fold(f,btnTxt);
   }
   function listAle(items,fmt){
     const l=document.createElement('div');l.className='pj-l';
-    if(!items.length)l.innerHTML='<div class="kb-empty">todavía no hay nada aquí 💭</div>';
+    if(!items.length){l.innerHTML='<div class="kb-empty">todavía no hay nada aquí 💭</div>';return l}
+    const wr=document.createElement('div');
+    wr.append(el(`<div class="pj-lh">📋 Lo que le dejaste a ${esc(OTN())} · ${items.length}</div>`));
+    const sc=scrollBox(l);
     items.slice().reverse().forEach(x=>{const r=el(`<div class="ds-i"><div class="ds-t">${fmt(x)}</div><div class="ds-f"><span>${fmtDia(x.a)}</span></div></div>`);
-      const d=document.createElement('button');d.className='ds-b';d.textContent='✕';del(d,x);r.querySelector('.ds-f').append(d);l.append(r)});
-    return l;
+      const d=document.createElement('button');d.className='ds-b';d.textContent='✕';del(d,x);r.querySelector('.ds-f').append(d);
+      r.onclick=e=>{if(e.target.closest('.ds-b'))return;r.classList.toggle('open');scUpd(sc)};l.append(r)});
+    wr.append(sc);return wr;
   }
   function keepVals(){const m={};[...SLOTS(),cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(i.value)m[i.placeholder]=i.value}));return m}
   function putVals(m){[...SLOTS(),cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(m[i.placeholder]!=null&&!i.dataset.fresh)i.value=m[i.placeholder]}))}
@@ -4484,8 +4517,9 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       const off=r==='yo'&&PJO(k); // lo que Ale le deja a Jon se puede ocultar
       if(s&&r==='yo')s.classList.toggle('duo-nob',off);
       if(off&&s){const w=mine?'b':'a';if(s.dataset.pane!==w){const c=s.querySelector(':scope>.dp-chips button[data-p="'+w+'"]');if(c)c.click()}}
-      box=sl; sl.innerHTML=''; if(off)return;
-      try{if(mine){RV=ME();PV=false;JON[k]()}else{box.append(modeBar(k));if(pvm[k]){RV=RC();PV=true;box.append(el(`<div class="pj-note">👁️ Vista previa: así lo ve ${esc(OTN())}. Nada de lo que hagas aquí cuenta ni se le avisa.</div>`));try{JON[k]()}finally{PV=false;RV=ME()}}else ALE[k]()}}catch(e){console.error(e)}});
+      box=sl; SCP[k+r]=[...sl.querySelectorAll('.pj-sc')].map(e=>e.scrollTop); sl.innerHTML=''; if(off)return;
+      try{if(mine){RV=ME();PV=false;JON[k]()}else{box.append(modeBar(k));if(pvm[k]){RV=RC();PV=true;box.append(el(`<div class="pj-note">👁️ Vista previa: así lo ve ${esc(OTN())}. Nada de lo que hagas aquí cuenta ni se le avisa.</div>`));try{JON[k]()}finally{PV=false;RV=ME()}}else ALE[k]()}}catch(e){console.error(e)}
+      const sv=SCP[k+r]||[];sl.querySelectorAll('.pj-sc').forEach((e,i)=>{if(sv[i]){e.scrollTop=sv[i];scUpd(e)}})});
     putVals(kv);
     }finally{rend=false}
   }
@@ -4498,7 +4532,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       listAle(live('razon',RC()),x=>esc(x.t)))},
     cartaj(){const L=live('cartaj',RC()),cur=L[L.length-1];
       box.append(el(`<div class="pj-note">Una carta para ${esc(OTN())}, como «Una carta para ti». Le aparece en un sobre para abrir 💌${cur?' · si la cambias, le vuelve a llegar como nueva':''}</div>`));
-      const f=form([['t','Escribe tu carta para '+OTN(),'ta',4000]],cur?'💌 Guardar cambios':'💌 Guardar carta',v=>{if(cur)upd(cur,{t:v.t,o:0});else add({k:'cartaj',t:v.t});avisar(`💌 ${C.ella} te escribió una carta`,'parajon')});
+      const f=form([['t','Escribe tu carta para '+OTN(),'ta',4000]],cur?'💌 Guardar cambios':'💌 Guardar carta',v=>{if(cur)upd(cur,{t:v.t,o:0});else add({k:'cartaj',t:v.t});avisar(`💌 ${C.ella} te escribió una carta`,'parajon')},true);
       if(cur){const ta=f.querySelector('textarea');ta.value=cur.t;ta.dataset.fresh='1';ta.rows=8}
       box.append(f); if(cur)box.append(el(`<div class="pj-note">${cur.o?`✓ ${esc(OTN())} la abrió el ${fmtDia(cur.o)}`:`${esc(OTN())} todavía no la abre`}</div>`))},
     mes(){const L=live('mes',RC()),cm=curM(),have=new Set(L.map(x=>+x.m));
@@ -4509,7 +4543,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       const fillSel=()=>{mesSel=+f.elements.m.value;const x=L.find(y=>+y.m===mesSel);f.elements.t.value=x?x.t:'';f.elements.h.value=x?x.h||'':'';f.elements.t.dataset.fresh=f.elements.h.dataset.fresh='1'};f.elements.m.onchange=fillSel;fillSel();
       f.onsubmit=e=>{e.preventDefault();const m=+f.elements.m.value,t=f.elements.t.value.trim(),h=f.elements.h.value.trim();if(!t)return f.elements.t.focus();
         const x=L.find(y=>+y.m===m);if(x)upd(x,{t,h});else{add({k:'mes',m,t,h});avisar(`✉️ ${C.ella} te dejó la carta de los ${m} meses (se abre el ${fecha(opensAt(m))})`,'parajon')}burst(10)};
-      box.append(f,listAle(L.slice().sort((a,b)=>a.m-b.m),x=>`✉️ Carta de los ${x.m} meses${x.h?' · '+esc(x.h):''}<br><small>se abre el ${fecha(opensAt(+x.m))}</small>`+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
+      box.append(fold(f,'✉️ Guardar carta del mes'),listAle(L.slice().sort((a,b)=>a.m-b.m),x=>`✉️ Carta de los ${x.m} meses${x.h?' · '+esc(x.h):''}<br><small>se abre el ${fecha(opensAt(+x.m))}</small>`+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
     carta(){box.append(el(`<div class="pj-note">Cartas para que ${esc(OTN())} las abra cuando las necesite 📬</div>`),
       form([['w','Ábrela cuando… (ej. estés triste)','in',80],['t','Escribe la carta','ta',2000]],'📬 Guardar carta',v=>{if(!v.t)return;add({k:'carta',w:v.w,t:v.t});avisar(`📬 ${C.ella} te dejó una carta: «Ábrela cuando ${v.w}»`,'parajon')}),
       listAle(live('carta',RC()),x=>'Ábrela cuando '+esc(x.w)+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
@@ -4532,12 +4566,13 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       listAle(live('sorpresa',RC()).slice().sort((a,b)=>String(a.f).localeCompare(String(b.f))),x=>esc(x.e||'🎁')+' '+esc(x.n||'Sorpresa')+`<br><small>se abre el ${x.f?fecha(new Date(x.f+'T12:00:00')):'?'}</small>`+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
     capsula(){const L=live('capsula',RC()),cur=L[L.length-1];
       box.append(el(`<div class="pj-note">Un mensaje para ${esc(OTN())} que no podrá abrir hasta la fecha que elijas ⏳</div>`));
-      const f=form([['f','Se abre el','date'],['t','Tu mensaje para el futuro','ta',4000]],cur?'⏳ Guardar cambios':'⏳ Guardar cápsula',v=>{if(!v.t||!v.f)return;if(cur)upd(cur,{f:v.f,t:v.t,o:0});else{add({k:'capsula',f:v.f,t:v.t});avisar(`⏳ ${C.ella} te dejó una cápsula del tiempo (se abre el ${fecha(new Date(v.f+'T12:00:00'))})`,'parajon')}});
+      const f=form([['f','Se abre el','date'],['t','Tu mensaje para el futuro','ta',4000]],cur?'⏳ Guardar cambios':'⏳ Guardar cápsula',v=>{if(!v.t||!v.f)return;if(cur)upd(cur,{f:v.f,t:v.t,o:0});else{add({k:'capsula',f:v.f,t:v.t});avisar(`⏳ ${C.ella} te dejó una cápsula del tiempo (se abre el ${fecha(new Date(v.f+'T12:00:00'))})`,'parajon')}},true);
       if(cur){f.elements.f.value=cur.f||'';f.elements.t.value=cur.t;f.elements.f.dataset.fresh=f.elements.t.dataset.fresh='1';f.elements.t.rows=6}
       box.append(f);if(cur)box.append(el(`<div class="pj-note">${cur.o?`✓ ${esc(OTN())} la abrió el ${fmtDia(cur.o)}`:`Se abre el ${cur.f?fecha(new Date(cur.f+'T12:00:00')):'?'}`}</div>`))}
   };
   const peek=(fn,t)=>{const a=el(`<button class="pj-peek">👀 Leer ahora (solo tú) · ${esc(t)}</button>`);a.onclick=fn;return a};
   function alertBox(t){const n=el(`<div class="zb-toast">${esc(t)}</div>`);document.body.append(n);setTimeout(()=>n.remove(),2600)}
+  const scr=(g,n)=>n>4?scrollBox(g,'rv'):g;
   const empty=t=>el(`<div class="nb-empty">${t}</div>`);
   const JON={
     msg(){const {pv,s,upd,add,avisar}=CX();const m=todayMsg(RV); box.append(m?el(`<div class="card"><div class="daily-l">Mensaje de hoy de ${esc(SN())}</div><div class="daily">${esc(FILL(m.t))}</div><div class="cu-t">— ${esc(SN())} ${HT()}</div></div>`):empty(esc(SN())+' todavía no te escribe mensajes del día 💭'))},
@@ -4547,22 +4582,22 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       if(!s.cjOpen){const b=el(`<button class="pj-env" aria-label="Abrir carta"><div class="pj-env-e">💌</div><div>Una carta de ${esc(SN())} para ti</div><small>toca para abrirla</small></button>`);
         b.onclick=()=>{s.cjOpen=true;if(!x.o&&!pv){upd(x,{o:Date.now()});avisar(`💌 ${C.ella} abrió la carta que le escribiste`,'parajon')}else render();burst(16)};box.append(b);return}
       box.append(el(paper(x.t)))},
-    mes(){const {pv,s,upd,add,avisar}=CX();const L=live('mes',RV).slice().sort((a,b)=>a.m-b.m),now=MXD().getTime(); if(!L.length){box.append(empty('cuando '+esc(SN())+' te escriba cartas del mes aparecerán aquí ✉️'));return}
+    mes(){const {pv,s,upd,add,avisar}=CX();const L=live('mes',RV).slice().sort((a,b)=>a.m-b.m).sort((a,b)=>!!(a.o&&!PV)-!!(b.o&&!PV)),now=MXD().getTime(); if(!L.length){box.append(empty('cuando '+esc(SN())+' te escriba cartas del mes aparecerán aquí ✉️'));return}
       const g=document.createElement('div');g.className='whens';
       L.forEach(x=>{const ok=opensAt(+x.m)<=now,b=el(`<button class="when${x.o&&!pv?' read':''}"><div class="when-e">${ok?'✉️':'🔒'}</div><div class="when-t">Carta de los ${x.m} meses</div><small style="opacity:.7">${ok?(x.h?esc(FILL(x.h)):'ya la puedes abrir'):'se abre el '+fecha(opensAt(+x.m))}</small></button>`);
         b.onclick=()=>{if(!ok){alertBox('🔒 Esta carta se abre el '+fecha(opensAt(+x.m)));return}s.mesOpen=s.mesOpen===x?null:x;if(!x.o&&!pv){upd(x,{o:Date.now()});avisar(`✉️ ${C.ella} abrió la carta de los ${x.m} meses que le escribiste`,'parajon');burst(14)}else render()};g.append(b)});
-      box.append(g);if(pv)L.filter(x=>opensAt(+x.m)>now).forEach(x=>box.append(peek(()=>{s.mesOpen=s.mesOpen===x?null:x;render()},'Carta de los '+x.m+' meses')));if(s.mesOpen)box.append(el(paper(s.mesOpen.t,s.mesOpen.h||('Carta de los '+s.mesOpen.m+' meses'))))},
-    carta(){const {pv,s,upd,add,avisar}=CX();const L=live('carta',RV); if(!L.length){box.append(empty('aquí aparecerán las cartas que te deje '+esc(SN())+' 📬'));return}
+      box.append(scr(g,L.length));if(pv)L.filter(x=>opensAt(+x.m)>now).forEach(x=>box.append(peek(()=>{s.mesOpen=s.mesOpen===x?null:x;render()},'Carta de los '+x.m+' meses')));if(s.mesOpen)box.append(el(paper(s.mesOpen.t,s.mesOpen.h||('Carta de los '+s.mesOpen.m+' meses'))))},
+    carta(){const {pv,s,upd,add,avisar}=CX();const L=live('carta',RV).sort((a,b)=>!!(a.o&&!PV)-!!(b.o&&!PV)); if(!L.length){box.append(empty('aquí aparecerán las cartas que te deje '+esc(SN())+' 📬'));return}
       const g=document.createElement('div');g.className='whens';
       L.forEach(x=>{const b=el(`<button class="when${x.o&&!pv?' read':''}"><div class="when-e">💌</div><div class="when-t">Ábrela cuando ${esc(x.w)}</div></button>`);
         b.onclick=()=>{s.carta=s.carta===x?null:x;if(!x.o&&!pv){upd(x,{o:Date.now()});avisar(`📬 ${C.ella} abrió tu carta «Ábrela cuando ${x.w}»`,'parajon');burst(14)}else render()};g.append(b)});
-      box.append(g); if(s.carta)box.append(el(`<div class="paper">${FILL(s.carta.t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(SN())} ${HT()}</p></div>`))},
-    vale(){const {pv,s,upd,add,avisar}=CX();const L=live('vale',RV); if(!L.length){box.append(empty('cuando '+esc(SN())+' te regale vales aparecerán aquí 🎟️'));return}
+      box.append(scr(g,L.length)); if(s.carta)box.append(el(`<div class="paper">${FILL(s.carta.t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(SN())} ${HT()}</p></div>`))},
+    vale(){const {pv,s,upd,add,avisar}=CX();const L=live('vale',RV).sort((a,b)=>!!(a.c&&!pv)-!!(b.c&&!pv)); if(!L.length){box.append(empty('cuando '+esc(SN())+' te regale vales aparecerán aquí 🎟️'));return}
       const g=document.createElement('div');g.className='coupons';
       L.forEach(x=>{const c=el(`<div class="coupon${x.c&&!pv?' used':''}"><div class="c-emoji">${esc(x.e||'🎟️')}</div><div class="c-txt"><b>Vale por: ${esc(String(FILL(x.t)).replace(/^\s*vale\s+por:?\s*/i,''))}</b><small>${esc(FILL(x.d||''))}</small>${x.c&&!pv?`<div class="c-when">Canjeado el ${fmtDia(x.c)} ✓</div>`:''}</div></div>`);
         if(pv)c.querySelector('.c-txt').append(el(`<div class="c-when">solo ${esc(NM(RV))} lo puede canjear</div>`));else if(!x.c){const b=document.createElement('button');b.className='c-btn';b.textContent='Canjear';let armed=false;
           b.onclick=()=>{if(!armed){armed=true;b.textContent='¿Seguro?';setTimeout(()=>{armed=false;b.textContent='Canjear'},2500);return}upd(x,{c:Date.now()});burst(20);avisar(`🎟️ ${C.ella} canjeó tu vale: ${x.t}`,'parajon')};c.append(b)}
-        g.append(c)}); box.append(g)},
+        g.append(c)}); box.append(scr(g,L.length))},
     rasca(){const {pv,s,upd,add,avisar}=CX();const tk=live('ticket',RV).length, W=live('win',RV), P=live('premio',RV).filter(p=>!p.used);
       if(tk>W.length&&P.length){
         if(!s.pick||!P.includes(s.pick))s.pick=P[Math.floor(Math.random()*P.length)];const pick=s.pick;
@@ -4574,11 +4609,11 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       const b=el(`<button class="pj-env" aria-label="Romper galleta"><div class="pj-env-e">🥠</div><div>${s.fortuna?'Otra galleta':'Rompe tu galleta'}</div><small>toca para ver tu suerte</small></button>`);
       b.onclick=()=>{let x;do{x=L[Math.floor(Math.random()*L.length)]}while(L.length>1&&x===s.fortuna);s.fortuna=x;burst(10);render()};box.append(b);
       if(s.fortuna)box.append(el(`<div class="paper"><p style="text-align:center;font-size:18px">«${esc(FILL(s.fortuna.t))}»</p><p class="sign">— ${esc(SN())} ${HT()}</p></div>`))},
-    sorpresa(){const {pv,s,upd,add,avisar}=CX();const L=live('sorpresa',RV).slice().sort((a,b)=>String(a.f).localeCompare(String(b.f))),td=DK(MXD());if(!L.length){box.append(empty('aquí aparecerán las sorpresas que te deje '+esc(SN())+' 🎁'));return}
+    sorpresa(){const {pv,s,upd,add,avisar}=CX();const L=live('sorpresa',RV).slice().sort((a,b)=>String(a.f).localeCompare(String(b.f))).sort((a,b)=>!!(a.o&&!PV)-!!(b.o&&!PV)),td=DK(MXD());if(!L.length){box.append(empty('aquí aparecerán las sorpresas que te deje '+esc(SN())+' 🎁'));return}
       const g=document.createElement('div');g.className='whens';
       L.forEach(x=>{const ok=x.f&&x.f<=td,b=el(`<button class="when${x.o&&!pv?' read':''}"><div class="when-e">${ok?esc(x.e||'🎁'):'🔒'}</div><div class="when-t">${esc(x.n||'Sorpresa')}</div><small style="opacity:.7">${ok?'ya la puedes abrir':'se abre el '+fecha(new Date(x.f+'T12:00:00'))}</small></button>`);
         b.onclick=()=>{if(!ok){alertBox('🔒 Esta sorpresa se abre el '+fecha(new Date(x.f+'T12:00:00')));return}s.surOpen=s.surOpen===x?null:x;if(!x.o&&!pv){upd(x,{o:Date.now()});avisar(`🎁 ${C.ella} abrió la sorpresa «${x.n||'Sorpresa'}» que le dejaste`,'parajon');burst(20)}else render()};g.append(b)});
-      box.append(g);if(pv)L.filter(x=>!(x.f&&x.f<=td)).forEach(x=>box.append(peek(()=>{s.surOpen=s.surOpen===x?null:x;render()},x.n||'Sorpresa')));if(s.surOpen)box.append(el(paper(s.surOpen.t,(s.surOpen.e||'🎁')+' '+(s.surOpen.n||'Sorpresa'))))},
+      box.append(scr(g,L.length));if(pv)L.filter(x=>!(x.f&&x.f<=td)).forEach(x=>box.append(peek(()=>{s.surOpen=s.surOpen===x?null:x;render()},x.n||'Sorpresa')));if(s.surOpen)box.append(el(paper(s.surOpen.t,(s.surOpen.e||'🎁')+' '+(s.surOpen.n||'Sorpresa'))))},
     capsula(){const {pv,s,upd,add,avisar}=CX();const L=live('capsula',RV),x=L[L.length-1],td=DK(MXD());if(!x){box.append(empty(esc(SN())+' todavía no te deja una cápsula del tiempo ⏳'));return}
       if(!(x.f&&x.f<=td)&&!(pv&&s.capOpen)){box.append(el(`<div class="pj-env" style="cursor:default"><div class="pj-env-e">🔒</div><div>Cápsula del tiempo de ${esc(SN())}</div><small>se abre el ${fecha(new Date(x.f+'T12:00:00'))}</small></div>`));if(pv)box.append(peek(()=>{s.capOpen=true;render()},'Cápsula del tiempo'));return}
       if(!s.capOpen){const b=el(`<button class="pj-env" aria-label="Abrir cápsula"><div class="pj-env-e">⏳</div><div>Ya puedes abrir la cápsula de ${esc(SN())}</div><small>toca para abrirla</small></button>`);
