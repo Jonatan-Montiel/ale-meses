@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-l3UIXWlkWcwEi7F8ongpmWNWYm9cOonvsA6J4VZijJ4='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-bMaEQgrHheF3y9bLsrceVM0xpclDMEiHgDvH3bA8ekQ='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2211,10 +2211,12 @@ const everyVis=(f,ms)=>{setInterval(()=>{if(!document.hidden)f()},ms);document.a
   pass(document.body||document.documentElement);
   window.__a11y=pass;
 })();
-/* caché de blob: URLs con límite (LRU): al salir una entrada se libera su URL */
-function lruBlobs(max,onDrop){const m=new Map();const o={max,get(k){if(!m.has(k))return undefined;const v=m.get(k);m.delete(k);m.set(k,v);return v},
-  set(k,v){if(m.has(k)){const old=m.get(k);m.delete(k);if(old!==v){try{URL.revokeObjectURL(old)}catch(e){}}}m.set(k,v);while(m.size>o.max){const x=m.keys().next().value;const u=m.get(x);m.delete(x);try{onDrop&&onDrop(x,u)}catch(e){}try{URL.revokeObjectURL(u)}catch(e){}}return v},
-  has:k=>m.has(k),drop(k){if(m.has(k)){try{URL.revokeObjectURL(m.get(k))}catch(e){}m.delete(k)}}};return o}
+/* caché de blob: URLs (clave -> URL), SIN expulsión: una URL puesta en un <img>/background no se revoca nunca mientras la página vive
+   (un tope LRU dejaba en blanco las fotos más nuevas del diario al haber >60). set() con una clave ya existente conserva la URL
+   que ya puede estar en pantalla y libera la nueva (carreras de dos descargas de la misma foto). */
+function lruBlobs(){const m=new Map();return {get:k=>m.get(k),has:k=>m.has(k),
+  set(k,v){if(m.has(k)){const old=m.get(k);if(old!==v){try{URL.revokeObjectURL(v)}catch(e){}}return old}m.set(k,v);return v},
+  drop(k){if(m.has(k)){try{URL.revokeObjectURL(m.get(k))}catch(e){}m.delete(k)}}}}
 /* vista previa de una foto elegida: libera la URL de la anterior */
 const blobBg=(el,blob)=>{if(el._bu){try{URL.revokeObjectURL(el._bu)}catch(e){}}el._bu=URL.createObjectURL(blob);el.style.backgroundImage=cssUrl(el._bu)};
 /* ====== Temas ====== */
@@ -2343,7 +2345,7 @@ const GG=(()=>{
     cv.width=Math.round(bmp.width*sc);cv.height=Math.round(bmp.height*sc);cv.getContext('2d').drawImage(bmp,0,0,cv.width,cv.height);
     return await new Promise(ok=>cv.toBlob(ok,'image/jpeg',.8));
   }
-  const PC=lruBlobs(60);
+  const PC=lruBlobs();
   async function newPhoto(blob){
     const enc=await encBuf(new Uint8Array(await blob.arrayBuffer()));
     const r=await fetch('https://api.github.com/gists',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H()),body:JSON.stringify({description:'♥',public:false,files:{'f.bin':{content:b64(enc)}}})});
@@ -6163,7 +6165,7 @@ const getKey=()=>KEYP||(KEYP=crypto.subtle.importKey('raw',b64uDec(KEY_B64),{nam
 async function decBuf(buf){const u=new Uint8Array(buf);return crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(0,12)},await getKey(),u.slice(12))}
 async function encBuf(bytes){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await getKey(),bytes));const o=new Uint8Array(12+ct.length);o.set(iv);o.set(ct,12);return o}
 const rawURL=(R,p)=>`https://raw.githubusercontent.com/${R.owner}/${R.repo}/${R.branch||'main'}/${p}`;
-const PHOTO_CACHE=lruBlobs(60);
+const PHOTO_CACHE=lruBlobs();
 async function photoBlobURL(p){
   if(PHOTO_CACHE.has(p))return PHOTO_CACHE.get(p);
   if(!/\.bin$/.test(p))return p; // fotos antiguas sin cifrar
@@ -6246,7 +6248,7 @@ let CUR=null;
   CUR=mergeC(DEFAULTS,remote); DG('contenido listo, cargando fotos');
   // no esperamos las fotos: se abre con un marcador y cada foto se pone en cuanto se descifra
   const PH=i=>'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7#nlf-'+i+'-';
-  const paths=(CUR.fotos||[]).slice(); PHOTO_CACHE.max=Math.max(60,paths.length+30); /* que el límite nunca saque fotos que la página sí usa */
+  const paths=(CUR.fotos||[]).slice();
   const VIEW=Object.assign({},CUR,{fotos:paths.map((p,i)=>/\.bin$/.test(p)?(PHOTO_CACHE.get(p)||PH(i)):p),fotoPaths:paths});
   const lazy=()=>{let n=0;const q=paths.map((p,i)=>[p,i]).filter(([p])=>/\.bin$/.test(p)&&!PHOTO_CACHE.has(p));
     const next=()=>{const it=q.shift();if(!it)return;photoBlobURL(it[0]).catch(()=>'').then(u=>{if(u&&window.__fotoSwap)__fotoSwap(PH(it[1]),u)}).finally(next)};
