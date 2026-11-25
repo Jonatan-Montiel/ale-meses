@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rlOUPDPgwL57kJ7RDjvRUBiYnReHXmX9kSsNbCTOUrI='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rokcjbpGqHt5JhLc3vhwZzJvR3czapUKSH8Ng2Zo6mI='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -4503,6 +4503,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const O=(C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{};
   const ve=id=>{const e=document.getElementById(id);return !!e&&!e.hidden&&O[id]!=='ella'&&O[id]!=='dos'};
   const visible=k=>!SEC[k]||SEC[k].some(ve);
+  if(!LIST.some(([k])=>visible(k))){sec.remove();return}
   function render(){
     const off=ELLA_PREF.off(); box.innerHTML='';
     LIST.filter(([k])=>visible(k)).forEach(([k,l])=>{const r=document.createElement('label');r.className='ma-r';
