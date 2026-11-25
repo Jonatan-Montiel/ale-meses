@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-alGrlJeP8hG92OKSkQVhChV8hLx55kx0j/2mu9PNEa8='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-c5njpxzkrU8fRGG/9TqvUcmw5ezh2an4xlwaRbl/89o='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -710,6 +710,13 @@
   .rch{display:flex;flex-direction:column;align-items:center;gap:6px}
   .rch-fire{font-size:54px;line-height:1;animation:float 3s ease-in-out infinite}
   .rch-fire.off{filter:grayscale(1);opacity:.45;animation:none}
+  .rch-duo{display:flex;gap:14px;width:100%;justify-content:center}
+  .rch-who{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+  .rch-who .rch-fire{font-size:40px}
+  .rch-nm{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--gold,#f5d38a);overflow:hidden;text-overflow:ellipsis;max-width:100%;white-space:nowrap}
+  .rch-wk{display:flex;flex-direction:column;align-items:center;width:100%}
+  .rch-wn{font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.7;margin-top:8px}
+  .rch-wk .rch-week{margin:4px 0 0}
   .rch-n b{display:block;font-family:'Fraunces',serif;font-size:52px;font-weight:600;line-height:1;color:#fff}
   .rch-n span{font-size:13px;letter-spacing:1.3px;text-transform:uppercase;opacity:.75}
   .rch-week{display:flex;gap:8px;margin:12px 0 4px}
@@ -1495,9 +1502,20 @@
     <h2>Racha de visitas</h2>
     <div class="sub" id="rchSub">entra todos los días y desbloquea premios</div>
     <div class="card rch">
-      <div class="rch-fire" id="rchFire">🔥</div>
-      <div class="rch-n"><b id="rchN">0</b><span id="rchL">días seguidos</span></div>
-      <div class="rch-week" id="rchWeek"></div>
+      <div class="rch-duo">
+        <div class="rch-who" id="rchWhoA">
+          <div class="rch-nm" id="rchNmA"></div>
+          <div class="rch-fire" id="rchFire">🔥</div>
+          <div class="rch-n"><b id="rchN">0</b><span id="rchL">días seguidos</span></div>
+        </div>
+        <div class="rch-who" id="rchWhoJ">
+          <div class="rch-nm" id="rchNmJ"></div>
+          <div class="rch-fire" id="rchFireJ">🔥</div>
+          <div class="rch-n"><b id="rchNJ">0</b><span id="rchLJ">días seguidos</span></div>
+        </div>
+      </div>
+      <div class="rch-wk"><span class="rch-wn" id="rchWnA"></span><div class="rch-week" id="rchWeek"></div></div>
+      <div class="rch-wk"><span class="rch-wn" id="rchWnJ"></span><div class="rch-week" id="rchWeekJ"></div></div>
       <div class="rch-bar"><i id="rchBar"></i></div>
       <div class="rch-next" id="rchNext"></div>
       <div class="rch-other" id="rchOther"></div>
@@ -3476,50 +3494,70 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   render(); refresh(); document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
 })();
 
-/* ====== Racha de visitas ====== */
+/* ====== Racha de visitas ======
+   Compartida en racha.bin (gist cifrado, se mezcla por id con GG.update): un registro por persona y por día de Ciudad de México.
+   id 'AAAA-MM-DD' = Ale (igual que antes), 'yo:AAAA-MM-DD' = Jon; campos nuevos y aditivos: w (ella|yo), n (veces que abrió), ls (última vez).
+   Causa del problema anterior: la persona se deducía solo con localStorage 'yo-soy', que únicamente se guarda al contestar «¿Quién escribe?»
+   en las notitas y se borra al cerrar sesión; cualquier celular/navegador de Jon sin esa marca (o con la sesión cerrada) contaba como visita de Ale.
+   Ahora Jon se reconoce también por el token del editor (gh-token, solo existe en sus dispositivos), por ?editar y la vista previa nunca cuenta.
+   Además solo cuenta cuando de verdad se abrió la app (PIN/huella), y vuelve a comprobarse cada minuto (si la deja abierta pasando la medianoche). */
 (function(){
   const PR=(C.racha||[]).map(o=>({d:parseInt(o.dias)||0,e:o.emoji||'🎁',t:FILL(o.titulo),x:FILL(o.texto)})).filter(o=>o.d>0).sort((a,b)=>a.d-b.d);
-  const soyElla=VIEWER()==='ella';
-  const S=SHARED('racha.bin','d','racha-cache',400,render);
+  const ME=(()=>{if(PV_MODE)return 'ella';if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo'||localStorage.getItem('gh-token'))return 'yo'}catch(e){}return 'ella'})();
+  const soyElla=ME==='ella';
+  const S=SHARED('racha.bin','d','racha-cache',400,()=>{render();try{window.dispatchEvent(new Event('racha'))}catch(e){}});
   const W=['D','L','M','M','J','V','S'];
   const $=id=>document.getElementById(id);
+  const nm=w=>w==='yo'?C.yo:C.ella;
   let open=null;
+  const dOf=x=>String(x.id).replace(/^yo:/,''), wOf=x=>String(x.id).startsWith('yo:')?'yo':'ella';
   function stats(w){
-    const set=new Set(S.all().filter(x=>NEWER(x,'rrc')&&(w==='yo'?String(x.id).startsWith('yo:'):!String(x.id).includes(':'))).map(x=>String(x.id).replace(/^yo:/,''))), d=MXD(); if(!set.has(DK(d)))d.setDate(d.getDate()-1);
+    w=w==='yo'?'yo':'ella';
+    const set=new Set(S.all().filter(x=>!x.x&&NEWER(x,'rrc')&&wOf(x)===w&&/^\d{4}-\d\d-\d\d$/.test(dOf(x))).map(dOf)), d=MXD(); if(!set.has(DK(d)))d.setDate(d.getDate()-1);
     let cur=0; while(set.has(DK(d))){cur++;d.setDate(d.getDate()-1)}
     let best=0,run=0,prev=null; [...set].sort().forEach(k=>{const t=new Date(k+'T12:00:00');run=prev&&(t-prev)/864e5<1.5?run+1:1;best=Math.max(best,run);prev=t});
     return {cur,best:Math.max(best,cur),set};
   }
-  function render(){
-    const {cur,best,set}=stats();
-    $('rchN').textContent=cur; $('rchL').textContent=cur===1?'día seguido':'días seguidos';
-    $('rchFire').classList.toggle('off',!cur);
-    $('rchSub').textContent=soyElla?'entra todos los días y desbloquea premios':`así va ${C.ella} entrando a nuestro lugar`;
-    const wk=$('rchWeek'); wk.innerHTML=''; const d=MXD(); d.setDate(d.getDate()-6);
+  window.RACHA={cur:w=>stats(w).cur,best:w=>stats(w).best};
+  function week(el,set){
+    el.innerHTML=''; const d=MXD(); d.setDate(d.getDate()-6);
     for(let i=0;i<7;i++){const k=DK(d),on=set.has(k),c=document.createElement('div');c.className=(on?'on ':'')+(i===6?'today':'');
-      c.innerHTML=`<i>${on?'🔥':''}</i>${W[d.getDay()]}`;wk.append(c);d.setDate(d.getDate()+1)}
+      c.innerHTML=`<i>${on?'🔥':''}</i>${W[d.getDay()]}`;el.append(c);d.setDate(d.getDate()+1)}
+  }
+  const dias=n=>`${n===1?'día seguido':'días seguidos'}`;
+  function render(){
+    const A=stats('ella'), J=stats('yo'), {cur,best}=A;
+    $('rchNmA').textContent=nm('ella'); $('rchNmJ').textContent=nm('yo'); $('rchWnA').textContent=nm('ella'); $('rchWnJ').textContent=nm('yo');
+    $('rchN').textContent=cur; $('rchL').textContent=dias(cur); $('rchFire').classList.toggle('off',!cur);
+    $('rchNJ').textContent=J.cur; $('rchLJ').textContent=dias(J.cur); $('rchFireJ').classList.toggle('off',!J.cur);
+    $('rchSub').textContent=soyElla?'entra todos los días y desbloquea premios':`así van ${C.ella} y tú entrando a nuestro lugar`;
+    week($('rchWeek'),A.set); week($('rchWeekJ'),J.set);
     const next=PR.find(p=>best<p.d);
-    if(next){const base=[...PR].reverse().find(p=>p.d<=best);const from=0;
+    if(next){
       $('rchBar').style.width=Math.min(100,Math.round(cur/next.d*100))+'%';
       $('rchNext').textContent=cur?`Faltan ${next.d-cur} ${next.d-cur===1?'día':'días'} para desbloquear: ${next.e} ${next.t}`:(soyElla?'Entra mañana otra vez y empieza tu racha 🔥':`${C.ella} todavía no empieza una racha nueva`);}
     else{$('rchBar').style.width='100%';$('rchNext').textContent=PR.length?'¡Desbloqueaste todos los premios! 🏆':''}
-    try{if(window.AndroidApp&&AndroidApp.setRacha)AndroidApp.setRacha(soyElla?cur:stats('yo').cur)}catch(e){}
-    {const o=stats('yo');$('rchOther').textContent=soyElla?`💙 Racha de ${C.yo}: ${o.cur} ${o.cur===1?'día seguido':'días seguidos'} 🔥`:`💙 Tu racha: ${o.cur} ${o.cur===1?'día seguido':'días seguidos'} 🔥`}
+    try{if(window.AndroidApp&&AndroidApp.setRacha)AndroidApp.setRacha(soyElla?cur:J.cur)}catch(e){}
+    $('rchOther').textContent=`Mejor racha · ${nm('ella')}: ${A.best} · ${nm('yo')}: ${J.best} 🏅`;
     const box=$('rchPrizes'); box.innerHTML='';
     PR.forEach(p=>{const ok=best>=p.d,b=document.createElement('button');b.className='rch-p '+(ok?'ok':'lock');
       b.innerHTML=`<span class="e">${ok?esc(p.e):'🔒'}</span><span><b>${ok?esc(p.t):'Premio sorpresa'}</b><small>${p.d} días seguidos${ok?' · ¡desbloqueado!':''}</small>${ok&&open===p.d?'<p>'+esc(p.x)+'</p>':''}</span>`;
       if(ok)b.onclick=()=>{open=open===p.d?null:p.d;render()}; box.append(b)});
   }
+  /* solo cuenta si de verdad se abrió la app (no con la vista previa ni con la app bloqueada) */
   function visit(){
-    if(!soyElla){const k='yo:'+DK(MXD()), ex=S.all().find(x=>x.id===k); if(!ex)S.add({id:k,a:Date.now(),u:Date.now()}); else if(!NEWER(ex,'rrc')){ex.a=ex.u=Date.now();S.save()} return}
-    const k=DK(MXD()); const before=stats().best;
-    const ex=S.all().find(x=>x.id===k);
-    if(!ex){S.add({id:k,a:Date.now(),u:Date.now()})}else if(!NEWER(ex,'rrc')){ex.a=ex.u=Date.now();S.save()}
-    const after=stats().best;
+    if(PV_MODE||document.body.classList.contains('locked'))return;
+    const now=Date.now(), id=(ME==='yo'?'yo:':'')+DK(MXD()), before=stats('ella').best;
+    const ex=S.all().find(x=>x.id===id);
+    if(!ex){S.add({id,w:ME,n:1,a:now,u:now,ls:now})}
+    else if(!NEWER(ex,'rrc')||ex.x){ex.a=ex.u=ex.ls=now;ex.n=1;delete ex.x;S.save()}
+    if(!soyElla)return;
+    const after=stats('ella').best;
     PR.filter(p=>before<p.d&&after>=p.d).forEach(p=>{let done=false;try{done=localStorage.getItem('racha-av-'+p.d)===RK+'.'+CUTOF('rrc');localStorage.setItem('racha-av-'+p.d,RK+'.'+CUTOF('rrc'))}catch(e){}
       if(!done){avisar(`🔥 ${C.ella} lleva ${p.d} días seguidos entrando y desbloqueó: ${p.e} ${p.t}`,'racha');setTimeout(()=>burst(30),600)}});
   }
-  render(); window.addEventListener('unlocked',visit); if(EDIT)setTimeout(visit,1500); document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!document.body.classList.contains('locked'))visit()});
+  render(); window.addEventListener('unlocked',visit); if(EDIT)setTimeout(visit,1500); document.addEventListener('visibilitychange',()=>{if(!document.hidden)visit()});
+  setInterval(()=>{if(!document.hidden)visit()},60e3);
 })();
 
 /* ====== Compartir en WhatsApp, Facebook, Instagram… ====== */
@@ -3629,28 +3667,54 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const soyElla=VIEWER()==='ella', $=id=>document.getElementById(id);
   const S=SHARED('insignias.bin','i','insignias-cache',100,render);
   const L=k=>{try{const v=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(v)?v:[]}catch(e){return []}}, live=a=>a.filter(x=>!x.x);
-  function best(){const set=new Set(L('racha-cache').filter(x=>!String(x.id).includes(':')).map(x=>String(x.id)));let b=0,run=0,prev=null;[...set].sort().forEach(k=>{const t=new Date(k+'T12:00:00');run=prev&&(t-prev)/864e5<1.5?run+1:1;b=Math.max(b,run);prev=t});return b}
+  /* racha por persona, con el reinicio de racha incluido (viene de la sección Racha de visitas) */
+  function rb(w){if(window.RACHA)return window.RACHA.best(w);const set=new Set(L('racha-cache').filter(x=>!x.x&&(w==='yo'?String(x.id).startsWith('yo:'):!String(x.id).includes(':'))).map(x=>String(x.id).replace(/^yo:/,'')));let b=0,run=0,prev=null;[...set].sort().forEach(k=>{const t=new Date(k+'T12:00:00');run=prev&&(t-prev)/864e5<1.5?run+1:1;b=Math.max(b,run);prev=t});return b}
   function counts(){
     const by={};live(L('preguntas-cache')).forEach(x=>{by[x.d]=(by[x.d]||0)+1});
     return {dias:Math.floor((Date.now()-new Date(C.inicio+'T00:00:00'))/864e5), notas:live(L('notas-cache')).length, voz:live(L('voz-cache')).length,
-      fotos:(C.fotos||[]).length+L('fotos-ale-cache').length, racha:best(), extrano:live(L('extrano-cache')).length, diario:live(L('diario-cache')).length,
+      fotos:(C.fotos||[]).length+L('fotos-ale-cache').length, racha:rb('ella'), rachaJ:rb('yo'), extrano:live(L('extrano-cache')).length, diario:live(L('diario-cache')).length,
       preg:Object.values(by).filter(c=>c>=2).length, retos:live(L('retos-cache')).length, recetas:live(L('recetas-cache')).length,
       pelis:L('pelis-cache').filter(x=>!x.x&&x.c==='d').length, planes:L('planes-cache').filter(x=>!x.x&&x.c==='d').length};
   }
-  const B=[['d30','dias',30,'🌱','Nuestro primer mes'],['d100','dias',100,'💯','100 días juntos'],['d183','dias',183,'🌗','Medio año'],['d365','dias',365,'🏆','¡Un año juntos!'],
-    ['n10','notas',10,'💌','10 notitas'],['n50','notas',50,'📮','50 notitas'],['v5','voz',5,'🎙️','5 mensajes de voz'],['f20','fotos',20,'📸','20 fotos juntos'],
-    ['r7','racha',7,'🔥',`${C.ella}: 7 días seguidos`],['r30','racha',30,'☄️',`${C.ella}: 30 días seguidos`],['e50','extrano',50,'🥺','Nos extrañamos 50 veces'],
-    ['di10','diario',10,'📔','10 momentos en el diario'],['p15','preg',15,'💭','15 preguntas contestadas'],['t4','retos',4,'🎯','4 retos cumplidos'],
-    ['re5','recetas',5,'🍳','5 recetas juntos'],['pe10','pelis',10,'🍿','10 pelis vistas'],['pl5','planes',5,'🎉','5 planes cumplidos']];
+  /* [id, contador, meta, emoji, título, sección de la app a la que pertenece]
+     Mapa insignia → sección (solo se muestra, se cuenta en «x de y» y se avisa si esa sección es visible para quien la ve):
+       d30 d100 d183 d365 (días juntos)      → contador   (el contador de «nuestro tiempo»)
+       n10 n50 (notitas)                     → buzon      (Buzón de notitas)
+       v5 (mensajes de voz)                  → voz        (Mensajes de voz)
+       f20 (fotos juntos)                    → momentos   (galería/carrusel de fotos; allí se suben y se ven)
+       r7 r30 (racha de Ale) / j7 j30 (Jon)  → racha      (Racha de visitas)
+       e50 (nos extrañamos)                  → extrano    (Te extraño)
+       di10 (momentos en el diario)          → diario
+       p15 (preguntas contestadas)           → pregunta   (Pregunta del día)
+       t4 (retos cumplidos)                  → reto       (Reto de la semana)
+       re5 (recetas)                         → recetas
+       pe10 (pelis vistas)                   → pelis
+       pl5 (planes cumplidos)                → planes
+     Hoy ninguna insignia depende de cumpleaños/aniversario/San Valentín (secciones con fecha), pero si algún día se liga una,
+     basta con poner su id de sección: «fuera» (fuera de fecha según C.fechasVer 'auto') y «oculta» (C.ocultas) la esconden igual. */
+  const B=[['d30','dias',30,'🌱','Nuestro primer mes','contador'],['d100','dias',100,'💯','100 días juntos','contador'],['d183','dias',183,'🌗','Medio año','contador'],['d365','dias',365,'🏆','¡Un año juntos!','contador'],
+    ['n10','notas',10,'💌','10 notitas','buzon'],['n50','notas',50,'📮','50 notitas','buzon'],['v5','voz',5,'🎙️','5 mensajes de voz','voz'],['f20','fotos',20,'📸','20 fotos juntos','momentos'],
+    ['r7','racha',7,'🔥',`${C.ella}: 7 días seguidos`,'racha'],['r30','racha',30,'☄️',`${C.ella}: 30 días seguidos`,'racha'],
+    ['j7','rachaJ',7,'🔥',`${C.yo}: 7 días seguidos`,'racha'],['j30','rachaJ',30,'☄️',`${C.yo}: 30 días seguidos`,'racha'],
+    ['e50','extrano',50,'🥺','Nos extrañamos 50 veces','extrano'],
+    ['di10','diario',10,'📔','10 momentos en el diario','diario'],['p15','preg',15,'💭','15 preguntas contestadas','pregunta'],['t4','retos',4,'🎯','4 retos cumplidos','reto'],
+    ['re5','recetas',5,'🍳','5 recetas juntos','recetas'],['pe10','pelis',10,'🍿','10 pelis vistas','pelis'],['pl5','planes',5,'🎉','5 planes cumplidos','planes']];
+  /* ¿la sección de esta insignia se ve hoy para quien mira? (C.ocultas: 'ella' = oculta para Ale, 'dos' = para los dos; clases oculta/fuera = lo mismo ya aplicado en pantalla y secciones con fecha) */
+  const OC=(C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{};
+  function visible(id){
+    const v=OC[id]; if(v==='dos'||(v==='ella'&&VIEWER()==='ella'))return false;
+    const el=document.getElementById(id); return !!el&&!el.classList.contains('oculta')&&!el.classList.contains('fuera');
+  }
+  const VB=()=>B.filter(b=>visible(b[5]));
   let open=null;
   function render(){
     const c=counts(), got={}; S.all().forEach(x=>got[x.id]=x);
-    const n=B.filter(b=>got[b[0]]||c[b[1]]>=b[2]).length;
-    $('insTop').textContent=`${n} de ${B.length} desbloqueadas`;
-    if(n&&window.SHARE&&!$('insTop').nextElementSibling.classList.contains('sh-btn')){const sb=SHARE.btn('📤 Compartir nuestras insignias',async()=>{const c=counts(),got={};S.all().forEach(x=>got[x.id]=x);const L=B.filter(b=>got[b[0]]||c[b[1]]>=b[2]);
-      SHARE.blob(await SHARE.card({emoji:'🏅',title:'Nuestras insignias',big:L.length+' de '+B.length,sub:L.map(b=>b[3]).join(' ')}))});sb.style.display='block';sb.style.margin='-4px auto 14px';$('insTop').after(sb)}
+    const V=VB(), n=V.filter(b=>got[b[0]]||c[b[1]]>=b[2]).length;
+    $('insTop').textContent=`${n} de ${V.length} desbloqueadas`;
+    if(n&&window.SHARE&&!$('insTop').nextElementSibling.classList.contains('sh-btn')){const sb=SHARE.btn('📤 Compartir nuestras insignias',async()=>{const c=counts(),got={};S.all().forEach(x=>got[x.id]=x);const V=VB(),L=V.filter(b=>got[b[0]]||c[b[1]]>=b[2]);
+      SHARE.blob(await SHARE.card({emoji:'🏅',title:'Nuestras insignias',big:L.length+' de '+V.length,sub:L.map(b=>b[3]).join(' ')}))});sb.style.display='block';sb.style.margin='-4px auto 14px';$('insTop').after(sb)}
     const g=$('insGrid'); g.innerHTML='';
-    B.forEach(([k,f,goal,e,t])=>{const ok=!!got[k]||c[f]>=goal, el=document.createElement('button'); el.className='ins '+(ok?'ok':'lock');
+    V.forEach(([k,f,goal,e,t])=>{const ok=!!got[k]||c[f]>=goal, el=document.createElement('button'); el.className='ins '+(ok?'ok':'lock');
       const when=got[k]?new Date(got[k].a).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}):'';
       el.innerHTML=`<span class="e">${e}</span><b>${esc(t)}</b>`+(ok?`<small>${open===k&&when?'desde el '+esc(when):'¡desbloqueada!'}</small>`:`<small>${Math.min(c[f],goal)} / ${goal}</small><div class="pb"><i style="width:${Math.round(Math.min(1,c[f]/goal)*100)}%"></i></div>`);
       el.onclick=()=>{open=open===k?null:k;render()}; g.append(el)});
@@ -3660,12 +3724,12 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     if(document.body.classList.contains('locked'))return;
     const c=counts(), have=new Set(S.all().map(x=>x.id)); let first=false;
     try{first=!localStorage.getItem('insig-init');localStorage.setItem('insig-init','1')}catch(e){}
-    const nuevas=B.filter(b=>!have.has(b[0])&&c[b[1]]>=b[2]); if(!nuevas.length){render();return}
+    const nuevas=VB().filter(b=>!have.has(b[0])&&c[b[1]]>=b[2]); if(!nuevas.length){render();return}
     nuevas.forEach(b=>{S.all().push({id:b[0],a:Date.now(),u:Date.now()})}); S.save();
     if(first&&nuevas.length>1)return;
     nuevas.forEach((b,i)=>setTimeout(()=>{pop(b);const m=`🏅 Desbloquearon la insignia «${b[4]}» ${b[3]}`;if(soyElla)avisar(m,'insignia');else avisarElla(m,'insignia')},i*4500));
   }
-  render(); window.addEventListener('unlocked',()=>setTimeout(check,5000)); if(EDIT)setTimeout(check,5000);
+  render(); setTimeout(render,600); window.addEventListener('racha',()=>{try{render()}catch(e){}}); window.addEventListener('unlocked',()=>setTimeout(check,5000)); if(EDIT)setTimeout(check,5000);
   setInterval(check,30000); document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(check,3000)});
 })();
 
