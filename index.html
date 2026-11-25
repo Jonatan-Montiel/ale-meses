@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fcSU+Za8Dng5ZCJ96YdAbkJuAmSnXULtClYfkErRrVM='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-3F/osCaZdm3nSmExGIKWj6tmV3INCVih2fb8ISNHdT4='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1294,7 +1294,6 @@
 <body class="locked">
 <div id="lock">
   <div class="lock-ico" id="lockIco">🔒</div>
-  <div class="lock-q">¿Cuándo empezó todo?</div>
   <div class="pin-dots" id="pinDots"><i></i><i></i><i></i><i></i></div>
   <div class="pin-msg" id="pinMsg"></div>
   <div class="pad" id="pad"></div>
@@ -2426,7 +2425,8 @@ galRender();
   const MAX=5, WAIT=5*60*1000, IDLE=5*60*1000, AWAY=2*60*1000;
   const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}}, set=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
   let v='', open=false, cd=null;
-  ['1','2','3','4','5','6','7','8','9','♥','0','⌫'].forEach(k=>{
+  ['1','2','3','4','5','6','7','8','9','','0','⌫'].forEach(k=>{
+    if(!k){const sp=document.createElement('span');sp.setAttribute('aria-hidden','true');pad.appendChild(sp);return}
     const b=document.createElement('button'); b.textContent=k; if(k==='♥'||k==='⌫')b.className='ghost';
     if(k==='♥')b.setAttribute('aria-label','Borrar todo'); if(k==='⌫')b.setAttribute('aria-label','Borrar uno');
     b.addEventListener('click',()=>press(k)); pad.appendChild(b);
@@ -2462,7 +2462,7 @@ galRender();
   }
   function ok(){
     set('pin-fails','0');
-    document.getElementById('lockIco').textContent='🔓'; msg.textContent=VIEWER()==='yo'?'Bienvenido, '+C.yo+' 💙':'Bienvenida, mi amor ♥';
+    document.getElementById('lockIco').textContent='🔓'; msg.textContent='';
     setTimeout(()=>{lock.classList.add('out');document.body.classList.remove('locked');burst(45);open=true;last=Date.now();window.dispatchEvent(new Event('unlocked'))},600);
     setTimeout(()=>{if(open)lock.style.display='none'},1500);
   }
