@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-StGKtB/aLo+U8GIY43ZzRmdzJZo3Nyph9Rip8Q2mRZM='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-pSix4aKOi8eeX4tZSiBYrdugyA05KfhhdS4o2Wi74Q8='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -798,6 +798,7 @@
   html.lite .subtabs.sc{background:color-mix(in srgb,var(--bartop,#5e1532) 92%,transparent)}
   html.lite .pr-dot,html.lite .bell.has,html.lite .cap-ico,html.lite .rch-fire,html.lite .hh{animation:none!important}
   html.lite #hearts .fh{will-change:transform}
+  .ver-chk{margin-top:8px;justify-self:start;border:0;border-radius:999px;padding:8px 14px;background:var(--rose,#e8577f);color:#fff;font:800 13px 'Nunito',sans-serif;cursor:pointer}.ver-chk:disabled{opacity:.6}.ver-msg{font-size:12.5px}
   .th-box .ver-w{margin-top:10px}.th-box .ver{background:rgba(120,40,70,.07)!important;border:0;color:#3d1f2a}.th-box .ver span{opacity:.7}.th-box .ver a{color:#b3204f}
   .th-out .logout{display:block;width:100%;margin:10px 0 0;text-align:left;padding:12px 14px;border-radius:14px;background:rgba(120,40,70,.07);border:0;color:#7a2244;font:800 14px 'Nunito',sans-serif;cursor:pointer}
   body.light .th-out .logout{background:rgba(0,0,0,.05)}
@@ -3973,14 +3974,29 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     const o=S.all().find(x=>x.id===oth&&!x.x), mv=mine(), num=v=>+String(v).replace(/\D/g,'')||0;
     const hbl=!hbDone?'':hb&&hb.t?`<div>📲 Su app: <b>instalada</b> <span>· activa ${ago(+hb.t)}</span></div>`:(o&&num(o.v)>=29?`<div>⚠️ <b>Sin señal de su app</b> en las últimas 12 h <span>· puede que la haya desinstalado o que el celular la tenga dormida</span></div>`:`<div><span>📲 Si tiene la app instalada se verá aquí cuando los dos tengan la v29</span></div>`);
     const st=v=>v==='web'||!latest?'':num(v)>=latest?' ✅':' ⚠️';
+    if(me==='ella'){ // para Ale: solo su versión y el botón, sin el detalle de versiones
+      box.innerHTML=A?`<div class="ver ver-ella"><div>📱 Tu app: <b>${esc(lbl(mv))}</b>${st(mv)}</div><button type="button" class="ver-chk">🔄 Buscar actualización</button><div class="ver-msg"></div></div>`:'';
+      const c2=box.querySelector('.ver-chk'); if(c2)c2.onclick=chk;
+      const bar=document.getElementById('updBar'); if(A&&latest&&num(mv)<latest&&!bar&&window.__showUpd)window.__showUpd(); return}
     box.innerHTML=`<div class="ver"><b>📱 Versiones de la app</b>
       <div>Tú: <b>${esc(lbl(mv))}</b>${st(mv)}</div>
       <div>${esc(nm(oth))}: <b>${o?esc(lbl(o.v)):'todavía no se sabe'}</b>${o?st(o.v)+' <span>· visto '+fmtDia(o.u)+' '+fmtHora(o.u)+'</span>':''}</div>
       ${hbl}
       ${latest?`<div>La más nueva: <b>v${latest}</b></div>`:''}
-      ${A&&latest&&num(mv)<latest?`<a href="${url(me)}" target="_blank" rel="noopener">⬇️ Actualizar mi app</a>`:''}</div>`;
+      ${A&&latest&&num(mv)<latest?`<a href="${url(me)}" target="_blank" rel="noopener">⬇️ Actualizar mi app</a>`:''}
+      ${A?'<button type="button" class="ver-chk">🔄 Buscar actualización</button><div class="ver-msg"></div>':''}</div>`;
+    const ck=box.querySelector('.ver-chk'); if(ck)ck.onclick=chk;
     const bar=document.getElementById('updBar'); if(A&&latest&&num(mv)<latest&&!bar&&window.__showUpd)window.__showUpd();
   }
+  // botón «Buscar actualización»: pregunta la versión más nueva en ese momento y, si hay, la descarga
+  async function chk(){const b=box.querySelector('.ver-chk'),m=box.querySelector('.ver-msg');if(!b)return;b.disabled=true;b.textContent='🔄 Buscando…';m.textContent='';
+    let v=0;for(const u of ['dl/version.json','https://raw.githubusercontent.com/Jonatan-Montiel/ale-meses/main/dl/version.json']){try{const r=await fetch(u+'?t='+Date.now(),{cache:'no-store'});if(r.ok){const j=await r.json();v=+j.vc||0;if(v)break}}catch(e){}}
+    const cur=+String(mine()).replace(/\D/g,'')||0;
+    if(!v){m.textContent='No pude revisar ahorita. Revisa tu internet e intenta otra vez.';b.disabled=false;b.textContent='🔄 Buscar actualización';return}
+    latest=v;try{localStorage.setItem('ver-latest',JSON.stringify({v,t:Date.now()}))}catch(e){}
+    if(cur>=v){render();const m2=box.querySelector('.ver-msg');if(m2)m2.textContent='✅ Ya tienes la versión más reciente (v'+v+')';return}
+    render();const m2=box.querySelector('.ver-msg');if(m2)m2.textContent='⬇️ Hay una nueva (v'+v+'). Se está descargando: ábrela e instálala encima, no se borra nada.';
+    location.href=url(me)}
   const mv=mine(); const ex=S.all().find(x=>x.id===me);
   setTimeout(()=>{const ex=S.all().find(x=>x.id===me);if(!ex||ex.v!==mv||Date.now()-(ex.u||0)>6*3600e3){if(ex){ex.v=mv;ex.x=0;ex.u=Date.now();S.save()}else S.add({id:me,v:mv,a:Date.now(),u:Date.now()})}},2500);
   if(!latest)fetch('dl/version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{const m=j&&j.vc?[0,j.vc]:null;if(m){latest=+m[1];try{localStorage.setItem('ver-latest',JSON.stringify({v:latest,t:Date.now()}))}catch(e){}render()}}).catch(()=>{});
