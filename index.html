@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-83OGn8xxpQdSZH3J0a2hliFB6bvyHpOm6azHLtpGokQ='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-IUpCpslv7Zkg+1W8PdUfaQGwgXtrlw/vR6Jd4OR5fbI='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -798,7 +798,9 @@
   html.lite .subtabs.sc{background:color-mix(in srgb,var(--bartop,#5e1532) 92%,transparent)}
   html.lite .pr-dot,html.lite .bell.has,html.lite .cap-ico,html.lite .rch-fire,html.lite .hh{animation:none!important}
   html.lite #hearts .fh{will-change:transform}
-  .th-lite{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.07);text-align:left;cursor:pointer}.th-lite small{display:block;font-size:12px;opacity:.7;margin-top:2px}.th-lite input{width:22px;height:22px;accent-color:var(--rose,#e8577f);flex:none}
+  .th-out .logout{display:block;width:100%;margin:10px 0 0;text-align:left;padding:12px 14px;border-radius:14px;background:rgba(120,40,70,.07);border:0;color:#7a2244;font:800 14px 'Nunito',sans-serif;cursor:pointer}
+  body.light .th-out .logout{background:rgba(0,0,0,.05)}
+  .th-lite{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding:12px 14px;border-radius:14px;background:rgba(120,40,70,.07);text-align:left;cursor:pointer}.th-lite small{display:block;font-size:12px;opacity:.7;margin-top:2px}.th-lite input{width:22px;height:22px;accent-color:var(--rose,#e8577f);flex:none}
   body.light .th-lite{background:rgba(0,0,0,.05)}
   .tab-off{content-visibility:auto;contain-intrinsic-size:auto 0;position:absolute!important;left:-10000px!important;top:0!important;width:100%!important;height:0!important;padding:0!important;overflow:hidden!important;visibility:hidden!important;pointer-events:none!important}
   nav.tabbar{display:flex;gap:2px;padding:6px;max-width:96vw;width:max-content}
@@ -4098,7 +4100,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const hero=document.getElementById('inicio'); if(!hero)return;
   const b=document.createElement('button'); b.className='th-btn'; b.textContent='🎨'; b.setAttribute('aria-label','Cambiar tema'); hero.append(b);
   const sh=document.createElement('div'); sh.className='th-sheet';
-  sh.innerHTML='<div class="th-box"><h3>Elige un tema 🎨</h3><p>se queda guardado en este celular</p><div class="th-grid"></div><div class="th-sub">✨ Lo que flota en el fondo</div><div class="th-emo"></div><form class="th-own"><input maxlength="40" placeholder="o escribe tus emojis, ej. 🐻🍕💗"><button>Usar</button></form><label class="th-lite"><span><b>⚡ Modo ligero</b><small>más rápido en celulares sencillos: menos efectos y animaciones</small></span><input type="checkbox"></label><button class="btn small" style="margin-top:16px">Listo ♥</button></div>';
+  sh.innerHTML='<div class="th-box"><h3>Elige un tema 🎨</h3><p>se queda guardado en este celular</p><div class="th-grid"></div><div class="th-sub">✨ Lo que flota en el fondo</div><div class="th-emo"></div><form class="th-own"><input maxlength="40" placeholder="o escribe tus emojis, ej. 🐻🍕💗"><button>Usar</button></form><div class="th-sub">⚙️ Este celular</div><label class="th-lite"><span><b>⚡ Modo ligero</b><small>más rápido en celulares sencillos: menos efectos y animaciones</small></span><input type="checkbox"></label><div class="th-out"></div><button class="btn small" style="margin-top:16px">Listo ♥</button></div>';
+  {const lb=document.getElementById('logoutBtn'),w=sh.querySelector('.th-out');if(lb&&w){const p=lb.parentNode;w.append(lb);if(p&&!p.children.length)p.remove()}}
   {const lc=sh.querySelector('.th-lite input');const sync=()=>{lc.checked=document.documentElement.classList.contains('lite')};sync();window.addEventListener('lite',sync);
    lc.onchange=()=>{try{localStorage.setItem('modo-ligero',lc.checked?'1':'0')}catch(e){}window.LITE=lc.checked;document.documentElement.classList.toggle('lite',lc.checked)}}
   document.body.append(sh);
