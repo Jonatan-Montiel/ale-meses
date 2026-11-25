@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ggoxx+h7m+hUA63gi0VTwjSMTAaTJogQscMezLDnefw='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-yVigio/bhwpfDXvJlmd53rKJH3aljmW7o05/ytBIjNQ='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -4547,7 +4547,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const bell=document.createElement('button'); bell.className='bell'; bell.setAttribute('aria-label','Pendientes'); bell.innerHTML='🔔<b></b>'; document.body.append(bell);
   const ps=document.createElement('div'); ps.className='pend-ov'; document.body.append(ps);
   let dis=new Set(); try{dis=new Set(JSON.parse(localStorage.getItem('pend-quitados')||'[]'))}catch(e){}
-  const dk=v=>v.k+'|'+v.t, VIS=()=>PEND.all().filter(v=>!dis.has(dk(v))); window.PEND_VIS=VIS;
+  const dk=v=>v.k+'|'+v.t, VIS=()=>PEND.all().filter(v=>{if(dis.has(dk(v)))return false;try{const id=window.SEC_OF&&SEC_OF(v),e=id&&document.getElementById(id);if(e&&e.classList.contains('oculta'))return false}catch(x){}return true}); window.PEND_VIS=VIS;
   const quitar=v=>{if(v.del)v.del();else{dis.add(dk(v));try{localStorage.setItem('pend-quitados',JSON.stringify([...dis].slice(-200)))}catch(e){}}count();render();try{window.TABNAV&&TABNAV.refresh()}catch(e){}};
   function swipe(b,v){
     let x0=null,y0=0,dx=0,drag=false;
@@ -4764,7 +4764,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   function dots(){DOT=new Set();try{(window.PEND_VIS?PEND_VIS():PEND.all()).forEach(x=>{if(!x||!(x.n>0))return;const id=sidOf(x);if(id&&id!=='inicio'&&document.getElementById(id)&&!document.getElementById(id).classList.contains('oculta'))DOT.add(id)})}catch(e){}
     const tabs=new Set([...DOT].map(id=>document.getElementById(id).dataset.tab));
     nav.querySelectorAll('button').forEach(b=>b.classList.toggle('dot',tabs.has(b.dataset.k)&&b.dataset.k!==cur));renderSub()}
-  window.TABNAV={GRP,gOf,setGrp,cur:()=>cur,dots:()=>DOT,refresh:()=>dots()};
+  window.SEC_OF=sidOf; window.TABNAV={GRP,gOf,setGrp,cur:()=>cur,dots:()=>DOT,refresh:()=>dots()};
   /* etiqueta en cada sección: para quién es */
   {const FOR={hoy:'cada',cumple:'ella',racha:'ella',cancion:'ella',carta:'ella',cartames:'ella',abrela:'ella',escribir:'ella',razones:'ella',galleta:'ella',medidor:'ella',sorpresas:'ella',capsula:'ella',rasca:'ella',vales:'ella',adivina:'ella',misavisos:'ella',
      parajon:'yo',cumpleyo:'yo'};
@@ -4777,6 +4777,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
      const [c,t0]=lab(FOR[sec.id]||'dos'),t=DOS2[sec.id]||t0,b=document.createElement('div');b.className='for-tag '+c;b.textContent=t;h.after(b)})}
   let cur=null;
   function setTab(k,keep){
+    if(!nav.querySelector('button[data-k="'+k+'"]')){const f=nav.querySelector('button[data-k]');k=f?f.dataset.k:'inicio'}
     if(k===cur)return; cur=k;
     apply();
     nav.querySelectorAll('button').forEach(b=>b.classList.toggle('cur',b.dataset.k===k));
@@ -4787,7 +4788,9 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   }
   TABS.forEach(([k,i,n])=>{if(![...document.querySelectorAll('main section')].some(s=>s.dataset.tab===k&&!s.classList.contains('oculta')))return;const b=document.createElement('button');b.dataset.k=k;b.innerHTML=`<span>${i}</span>${esc(n)}`;b.onclick=()=>setTab(k);nav.append(b)});
   const orig=Element.prototype.scrollIntoView;
-  Element.prototype.scrollIntoView=function(...a){try{const s=this.closest&&this.closest('main section');if(s){if(s.dataset.tab&&s.dataset.tab!==cur)setTab(s.dataset.tab,true);
+  Element.prototype.scrollIntoView=function(...a){try{const s=this.closest&&this.closest('main section');
+    if(s&&(this.closest('.oculta')||!nav.querySelector('button[data-k="'+s.dataset.tab+'"]'))){setTab('inicio');window.scrollTo(0,0);return}
+    if(s){if(s.dataset.tab&&s.dataset.tab!==cur)setTab(s.dataset.tab,true);
     if(s.dataset.grp&&GRP[s.dataset.tab]&&gOf(s.dataset.tab)!==s.dataset.grp){curG[s.dataset.tab]=s.dataset.grp;saveG();apply()}
     if(s.classList.contains('dash-sec')&&!s.classList.contains('dash-open')&&window.DASH_OPEN)DASH_OPEN(s.id,true)}}catch(e){}return orig.apply(this,a)};
   PEND.on(dots);
