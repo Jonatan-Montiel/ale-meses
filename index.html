@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-0m/g6GU8v5ldk1nM5h6Y+bpou7de4Z8Idh0bQ7cblKE='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-StGKtB/aLo+U8GIY43ZzRmdzJZo3Nyph9Rip8Q2mRZM='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1179,6 +1179,7 @@
   .pr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.pr-stats b{display:block;font-size:18px}.pr-top{margin-top:10px;font-size:13px;opacity:.85}
   .pr-vi{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:5px 0;border-top:1px dashed rgba(247,198,211,.12)}.pr-vi span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pr-vi em{font-style:normal;opacity:.6;white-space:nowrap}.pr-vi em.ok{opacity:1;color:#6fc3ff}
   body.light .pr-card{background:#fff;border-color:rgba(120,40,70,.12)}
+  .zb-b.wait{filter:grayscale(1);opacity:.45}.zb-b.nope{animation:zbS .35s}
   .zb-btn{display:block;margin:14px auto 0;border:1px solid rgba(247,198,211,.35);background:rgba(255,255,255,.08);color:inherit;border-radius:999px;padding:10px 18px;font:800 14px 'Nunito',sans-serif;cursor:pointer}.zb-btn:disabled{opacity:.55}
   body.light .zb-btn{background:#fff;border-color:rgba(120,40,70,.2)}
   @keyframes zbS{0%,100%{transform:translateX(0)}15%{transform:translate(-9px,2px) rotate(-1deg)}30%{transform:translate(8px,-2px) rotate(1deg)}45%{transform:translate(-7px,1px)}60%{transform:translate(6px,-1px)}75%{transform:translate(-3px,0)}}
@@ -1553,7 +1554,6 @@
       <button type="submit" aria-label="Enviar">➤</button>
     </form>
     <div class="kb-st" id="nbSt"></div>
-    <button type="button" class="zb-btn" id="zbBtn">📳 Mandar un zumbido</button>
   </section>
 
   <!-- DIARIO -->
@@ -4703,19 +4703,22 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
 
 /* ====== Zumbidos 📳 ====== */
 (function(){
-  const me=VIEWER(), oth=me==='yo'?'ella':'yo', nm=w=>w==='yo'?C.yo:C.ella, btn=document.getElementById('zbBtn');
+  const me=VIEWER(), oth=me==='yo'?'ella':'yo', nm=w=>w==='yo'?C.yo:C.ella;
   const K='zb-last', GAP=60e3;
   const last=()=>{try{return +(localStorage.getItem(K)||0)}catch(e){return 0}};
+  // el botón vive arriba (junto a 👀): gris mientras pasa el minuto
+  window.ZB_LEFT=()=>Math.max(0,GAP-(Date.now()-last()));
   let tm=null;
-  const paint=()=>{if(!btn)return;const r=GAP-(Date.now()-last());clearTimeout(tm);
-    if(r>0){btn.disabled=true;btn.textContent='📳 Zumbido enviado · otro en '+Math.ceil(r/1000)+' s';tm=setTimeout(paint,1000)}
-    else{btn.disabled=false;btn.textContent='📳 Mandarle un zumbido a '+nm(oth)}};
-  window.ZUMBIDO=()=>{if(Date.now()-last()<GAP){paint();return}
+  const paint=()=>{clearTimeout(tm);const r=ZB_LEFT();
+    document.querySelectorAll('.zb-b').forEach(b=>{b.classList.toggle('wait',r>0);b.setAttribute('aria-label',r>0?'Zumbido enviado · otro en '+Math.ceil(r/1000)+' s':'Mandarle un zumbido a '+nm(oth));b.title=b.getAttribute('aria-label')});
+    if(r>0)tm=setTimeout(paint,Math.min(r,1000)+20)};
+  window.ZB_PAINT=paint;
+  window.ZUMBIDO=()=>{if(Date.now()-last()<GAP){paint();const b=document.querySelector('.zb-b');if(b){b.classList.remove('nope');void b.offsetWidth;b.classList.add('nope')}return}
     try{localStorage.setItem(K,String(Date.now()))}catch(e){}
     avisar(`📳 ${C.ella} te mandó un zumbido`,'zumbido');
     try{navigator.vibrate&&navigator.vibrate(60)}catch(e){} burst(10); paint();
-    if(me==='yo'&&MUTE_E.on()){const st=document.getElementById('nbSt');if(st){st.textContent='🔕 Tus avisos a '+C.ella+' están en pausa: este zumbido no le va a llegar';setTimeout(()=>{st.textContent=''},5000)}}};
-  if(btn)btn.onclick=window.ZUMBIDO; paint();
+    if(me==='yo'&&MUTE_E.on()){const t=document.createElement('div');t.className='zb-toast';t.textContent='🔕 Tus avisos a '+C.ella+' están en pausa: este zumbido no le va a llegar';document.body.append(t);setTimeout(()=>t.remove(),3200)}
+    else{const t=document.createElement('div');t.className='zb-toast';t.textContent='📳 ¡Zumbido enviado a '+nm(oth)+'!';document.body.append(t);setTimeout(()=>t.remove(),1600)}};
   // cuando te llega uno con la app abierta (lo avisa la app de Android)
   window.__zumbido=()=>{document.body.classList.remove('zb');void document.body.offsetWidth;document.body.classList.add('zb');setTimeout(()=>document.body.classList.remove('zb'),1500);
     const t=document.createElement('div');t.className='zb-toast';t.textContent='📳 ¡'+nm(oth)+' te mandó un zumbido! 💗';document.body.append(t);setTimeout(()=>t.remove(),2600)};
@@ -4988,6 +4991,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     subBar.innerHTML=''; const gs=GRP[cur]||[], g=gOf(cur);
     gs.filter(([k])=>[...document.querySelectorAll('main section')].some(s=>s.dataset.tab===cur&&s.dataset.grp===k&&!s.classList.contains('oculta'))).forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.className=(k===g?'cur':'')+([...DOT].some(id=>{const s=document.getElementById(id);return s&&s.dataset.tab===cur&&s.dataset.grp===k})&&k!==g?' dot':'');b.onclick=()=>setGrp(cur,k);subBar.append(b)});
     const ix=document.createElement('button');ix.type='button';ix.className='st-idx';ix.textContent='🔎';ix.setAttribute('aria-label','Todas las secciones');ix.onclick=()=>window.IDX_OPEN&&IDX_OPEN();subBar.append(ix);
+    {const zb=document.createElement('button');zb.type='button';zb.className='st-idx zb-b';zb.textContent='📳';zb.onclick=()=>window.ZUMBIDO&&ZUMBIDO();subBar.append(zb);window.ZB_PAINT&&setTimeout(ZB_PAINT)}
     if(window.PR_ON){const pb=document.createElement('button');pb.type='button';pb.className='st-idx pr-b'+(window.PR_LIVE?' live':'');pb.textContent='👀';pb.setAttribute('aria-label','Cómo vamos');pb.onclick=()=>window.PR_OPEN&&PR_OPEN();subBar.append(pb)}
     const tb=document.createElement('button');tb.type='button';tb.className='st-idx';tb.textContent='🎨';tb.setAttribute('aria-label','Cambiar tema');tb.onclick=()=>window.TEMA_OPEN&&TEMA_OPEN();subBar.append(tb);
     subBar.classList.remove('tight');requestAnimationFrame(()=>{if(subBar.scrollWidth>subBar.clientWidth+1)subBar.classList.add('tight')});
