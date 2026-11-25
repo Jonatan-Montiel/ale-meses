@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-OLhNazGMIC7OfXUJYaLuGAKLHnClzsbhjQwSM7F6dRU='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-3WvJ/Cy1EWpShby3u/TjwHFoH7w7+XbJzgKgADrpptc='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1153,6 +1153,19 @@
   .tb-ch button{border:1px solid rgba(247,198,211,.3);background:rgba(255,255,255,.08);color:inherit;border-radius:999px;padding:6px 10px;font:700 12.5px 'Nunito';cursor:pointer}
   .tb-ch button.ok{opacity:.55;text-decoration:line-through;cursor:default}
   body.light .tb-ch button{background:#fff;border-color:rgba(120,40,70,.18);color:#3d1f2a}
+  .pr-card{background:rgba(255,255,255,.06);border:1px solid rgba(247,198,211,.18);border-radius:18px;padding:14px 16px;margin:10px 0}
+  .pr-card h4{margin:0 0 8px;font-size:15px}.pr-card small{opacity:.7;font-size:12.5px}
+  .pr-on{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}.pr-on b{flex:1;font-size:15px}.pr-on small{width:100%;padding-left:22px}
+  .pr-dot{width:12px;height:12px;border-radius:50%;background:#3ddc84;box-shadow:0 0 0 0 rgba(61,220,132,.6);animation:prp 1.8s infinite}.pr-dot.off{background:rgba(247,198,211,.4);animation:none}
+  @keyframes prp{70%{box-shadow:0 0 0 9px rgba(61,220,132,0)}100%{box-shadow:0 0 0 0 rgba(61,220,132,0)}}
+  .pr-warn{width:100%;margin-top:8px;padding:10px;border-radius:12px;background:rgba(232,87,127,.15);font-size:13.5px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+  .pr-btn{border:0;border-radius:999px;padding:7px 14px;background:var(--rose,#e8577f);color:#fff;font:inherit;font-size:13px;cursor:pointer}
+  .pr-ruta div{display:flex;gap:10px;font-size:13.5px;padding:4px 0;border-top:1px dashed rgba(247,198,211,.12)}.pr-ruta div:first-child{border-top:0}.pr-ruta .h{opacity:.6;min-width:62px;font-variant-numeric:tabular-nums}.pr-ruta .ev{color:var(--rose,#f7a8c0)}
+  .pr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.pr-stats b{display:block;font-size:18px}.pr-top{margin-top:10px;font-size:13px;opacity:.85}
+  .pr-vi{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:5px 0;border-top:1px dashed rgba(247,198,211,.12)}.pr-vi span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pr-vi em{font-style:normal;opacity:.6;white-space:nowrap}.pr-vi em.ok{opacity:1;color:#6fc3ff}
+  body.light .pr-card{background:#fff;border-color:rgba(120,40,70,.12)}
+  .nb-vis{font-size:11.5px;opacity:.6}.nb-vis.ok{opacity:1;color:#fff;font-weight:800}
+  #presencia>h2::before{content:'👀'}
   .tb-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .tb-t{position:relative;text-align:left;background:rgba(255,247,240,.07);border:1px solid rgba(247,198,211,.18);border-radius:20px;padding:14px;color:inherit;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-height:104px}
   .tb-t .tb-i{font-size:24px;line-height:1}
@@ -1919,6 +1932,13 @@
     <div class="sub">lo de todos los días, en un vistazo ☀️</div>
     <div class="card tb-prog" id="tbProg"></div>
     <div class="tb-grid" id="tbGrid"></div>
+  </section>
+
+  <!-- PRESENCIA -->
+  <section id="presencia">
+    <h2>Cómo vamos</h2>
+    <div class="sub" id="prSub">si está en la app, qué vio y qué ya leyó 👀</div>
+    <div id="prBox"></div>
   </section>
 
   <!-- BUENAS NOCHES -->
@@ -3157,6 +3177,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
   const me=()=>{if(EDIT)return 'yo';try{return localStorage.getItem('yo-soy')||''}catch(e){return ''}};
   const keep=()=>{try{localStorage.setItem(CK,JSON.stringify(notes))}catch(e){}};
   const name=w=>w==='yo'?C.yo:C.ella;
+  window.addEventListener('uso',()=>{try{render()}catch(e){}});
   let render=function(){
     const live=notes.filter(x=>!x.x&&NEWER(x,'rnb')).sort((a,b)=>a.a-b.a).slice(-60), m=me();
     list.innerHTML=live.length?'':'<div class="nb-empty">aún no hay notitas… ¡escribe la primera! 💌</div>';
@@ -3169,7 +3190,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
       if(x.w!==vw){const h=document.createElement('button');h.className='lk';h.textContent=lk[vw]?'❤️':'🤍';h.setAttribute('aria-label','Me gusta');
         h.onclick=()=>{const on=!(x.lk||{})[vw];x.lk=Object.assign({},x.lk,{[vw]:on?Date.now():0});x.u=Date.now();changed();if(on){burst(6);avisar(`❤️ ${C.ella} le dio like a tu notita: “${x.t.slice(0,80)}”`,'like')}};
         meta.append(h)}
-      else if(lk[oth]){const g=document.createElement('span');g.className='lk-got';g.textContent='❤️';g.title='A '+name(oth)+' le gustó';meta.append(g)}
+      if(x.w===vw&&window.USO_VISTO){const v=USO_VISTO('buzon',x.a);if(v!==null){const g=document.createElement('span');g.className='nb-vis'+(v?' ok':'');g.textContent=v?'✓✓ '+fmtHora(v):'✓';g.title=v?'Lo vio':'Enviado';meta.append(g)}}
+      if(x.w===vw&&lk[oth]){const g=document.createElement('span');g.className='lk-got';g.textContent='❤️';g.title='A '+name(oth)+' le gustó';meta.append(g)}
       if(x.w!==vw){const rb=document.createElement('button');rb.className='lk re';rb.textContent=(x.re&&x.re[vw])||'😊';rb.setAttribute('aria-label','Reaccionar');rb.onclick=()=>REACT(rb,x,vw,changed,'notita: “'+String(x.t).slice(0,60)+'”');meta.append(rb)}
       else if(x.re&&x.re[oth]){const g=document.createElement('span');g.className='lk-got';g.textContent=x.re[oth];g.title=name(oth)+' reaccionó';meta.append(g)}
       if(x.w===m){const b=document.createElement('button');b.textContent='✕';let armed=false;
@@ -4513,6 +4535,121 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   ELLA_PREF.on(render); render();
 })();
 
+/* ====== Saber si el otro está usando la app (en línea, visto, ruta, resumen, días sin entrar) ====== */
+(function(){
+  const sec=document.getElementById('presencia'); if(!sec)return;
+  const me=VIEWER(), oth=me==='yo'?'ella':'yo', nm=w=>w==='yo'?C.yo:C.ella, $=id=>document.getElementById(id);
+  const AC=(C.actividad&&typeof C.actividad==='object')?C.actividad:{};
+  // F(f,w): ¿w puede ver eso del otro?  Por defecto Jon sí y Ale no
+  const F=(f,w)=>{const o=AC[f]||{};return w==='yo'?o.yo!==false:o.ella===true};
+  const FEATS=['online','visto','ruta','resumen','inactiva'];
+  const veo=f=>F(f,me), meVen=f=>F(f,oth);
+  const dias=Math.max(1,Math.min(30,parseInt((AC.inactiva||{}).dias)||3));
+  const today=()=>DK(MXD());
+  const S=SHARED('uso.bin','u','uso-cache',40,()=>{render();window.dispatchEvent(new Event('uso'))});
+  const recs=w=>S.all().filter(x=>!x.x&&x.w===w);
+  /* ---------- lo mío: solo se guarda si al otro le toca verlo ---------- */
+  const graba=FEATS.some(meVen);
+  let R=null, dirty=false;
+  const rec=()=>{const id=me+':'+today();if(!R||R.id!==id){R=S.all().find(x=>x.id===id)||null;if(!R){R={id,w:me,d:today(),ms:0,n:0,sec:{},r:[],lv:{},a:Date.now(),u:Date.now()};S.all().push(R)}}return R};
+  const flush=()=>{if(!graba||!dirty)return;dirty=false;const r=rec();r.ls=Date.now();r.u=Date.now();S.save()};
+  const unlocked=()=>!document.body.classList.contains('locked');
+  const label=id=>{const s=$(id);const h=s&&s.querySelector(':scope>h2');return id==='inicio'?'Inicio':h?h.textContent.trim():id};
+  if(graba){
+    let t0=null; const tick=()=>{const on=!document.hidden&&unlocked();const now=Date.now();if(t0&&on){const r=rec();r.ms=(r.ms||0)+Math.min(now-t0,60e3);dirty=true}t0=on?now:null};
+    setInterval(tick,15e3);
+    let away=0;
+    const sesion=()=>{const r=rec();r.n=(r.n||0)+1;dirty=true;flush()};
+    window.addEventListener('unlocked',()=>{t0=Date.now();sesion()});
+    document.addEventListener('visibilitychange',()=>{tick();if(document.hidden){away=Date.now();flush()}else if(unlocked()&&away&&Date.now()-away>5*60e3)sesion()});
+    window.addEventListener('pagehide',()=>{tick();flush()});
+    setInterval(flush,90e3);
+    // qué secciones ve (si se queda al menos 1.5 s)
+    // la sección que está a la mitad de la pantalla, si se queda ahí ~2 s
+    let cand=null, seenId=null;
+    setInterval(()=>{if(document.hidden||!unlocked()||document.querySelector('.modal.open,.pend-ov.open,#hoyOv.open'))return;
+      const e=document.elementFromPoint(innerWidth/2,innerHeight*.45), s=e&&e.closest&&e.closest('main section[id]'), id=s&&!s.classList.contains('tab-off')?s.id:null;
+      if(!id||id==='presencia'){cand=null;return}
+      if(id!==cand){cand=id;return}
+      if(id===seenId)return; seenId=id;
+      const r=rec(),now=Date.now();r.sec[id]=(r.sec[id]||0)+1;r.lv[id]=now;r.r.push([now,id]);if(r.r.length>40)r.r=r.r.slice(-40);dirty=true},1000);
+    window.addEventListener('unlocked',()=>{seenId=null});
+  }
+  /* ---------- en línea: señal cifrada por ntfy mientras la app está abierta ---------- */
+  const topic=async w=>{const d=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('nl-pr:'+KEY_B64+':'+w)));return 'nlpr'+[...d.slice(0,12)].map(b=>b.toString(16).padStart(2,'0')).join('')};
+  if(meVen('online')){
+    let lastP=0;
+    const ping=async on=>{try{if(!KEY_B64)return;if(on&&Date.now()-lastP<100e3)return;lastP=on?Date.now():0;const t=Date.now();
+      const b=await encBuf(new TextEncoder().encode(JSON.stringify({t,on:on?1:0})));let s='';b.forEach(c=>s+=String.fromCharCode(c));
+      await fetch('https://ntfy.sh/'+await topic(me),{method:'POST',body:btoa(s),keepalive:true})}catch(e){}};
+    window.addEventListener('unlocked',()=>ping(true));
+    document.addEventListener('visibilitychange',()=>{if(!unlocked())return;ping(!document.hidden)});
+    setInterval(()=>{if(!document.hidden&&unlocked())ping(true)},30e3);
+  }
+  let pr=null;
+  async function poll(){if(!veo('online')||!KEY_B64)return;try{
+    const r=await fetch('https://ntfy.sh/'+await topic(oth)+'/json?poll=1&since=12h',{cache:'no-store'});if(!r.ok)return;const M=[];
+    (await r.text()).split('\n').forEach(l=>{try{const x=JSON.parse(l);if(x.event==='message'&&x.message)M.push(x.message)}catch(e){}});
+    for(const m of M.slice(-12)){try{const u=Uint8Array.from(atob(String(m).trim()),c=>c.charCodeAt(0));const o=JSON.parse(new TextDecoder().decode(await decBuf(u.buffer)));if(o&&o.t&&(!pr||o.t>=pr.t))pr=o}catch(e){}}
+    render()}catch(e){}}
+  const visto=()=>{let t=0;recs(oth).forEach(x=>{if((x.ls||0)>t)t=x.ls});if(pr&&pr.t>t)t=pr.t;return t};
+  const enLinea=()=>!!(pr&&pr.on&&Date.now()-pr.t<3*60e3);
+  const ago=t=>{const m=Math.max(0,Math.round((Date.now()-t)/6e4));return m<2?'hace un momento':m<60?'hace '+m+' min':m<1440?'hace '+Math.round(m/60)+' h':(()=>{const d=Math.floor(m/1440);return d===1?'ayer':'hace '+d+' días'})()};
+  /* ---------- visto (para las notitas y lo que le dejas) ---------- */
+  const lvOf=id=>{let t=0;recs(oth).forEach(x=>{const v=(x.lv||{})[id]||0;if(v>t)t=v});return t};
+  window.USO_VISTO=(id,t)=>{if(!veo('visto'))return null;const v=lvOf(id);return v&&v>=t?v:0};
+  /* ---------- pintar ---------- */
+  const mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+  const fmtMs=ms=>{const m=Math.round(ms/6e4);return m<1?'<1 min':m<60?m+' min':Math.floor(m/60)+' h '+(m%60?m%60+' min':'')};
+  function render(){
+    const any=FEATS.some(veo); sec.hidden=!any; if(!any)return;
+    const box=$('prBox'); box.innerHTML='';
+    // en línea / última vez
+    const lv=visto(), sinDatos=!lv;
+    if(veo('online')||veo('inactiva')){const c=mk('div','pr-card pr-on');
+      if(veo('online')&&enLinea()){c.classList.add('live');c.append(mk('span','pr-dot'),mk('b',null,nm(oth)+' está en la app ahora 💗'))}
+      else{c.append(mk('span','pr-dot off'),mk('b',null,sinDatos?'Todavía no hay datos de '+nm(oth):nm(oth)+' entró '+ago(lv)));
+        if(!sinDatos)c.append(mk('small',null,fmtDia(lv)+' · '+fmtHora(lv)))}
+      if(veo('inactiva')&&!sinDatos&&Date.now()-lv>dias*864e5){const w=mk('div','pr-warn','😢 '+nm(oth)+' no entra desde hace '+Math.floor((Date.now()-lv)/864e5)+' días');
+        const b=mk('button','pr-btn','💌 Mándale algo bonito');b.type='button';b.onclick=()=>GOTO('buzon');w.append(b);c.append(w)}
+      box.append(c)}
+    // ruta de hoy
+    if(veo('ruta')){const c=mk('div','pr-card');c.append(mk('h4',null,'🧭 Lo que vio hoy'));
+      const r=(recs(oth).find(x=>x.d===today())||{}).r||[];
+      let ev=[];try{ev=(window.ACT?ACT.all():[]).filter(x=>!x.x&&x.w===oth&&x.k!=='entrada'&&DK(MXD(x.a||0))===today()).map(x=>[x.a,null,x.t])}catch(e){}
+      const L=r.map(([t,id])=>[t,id]).concat(ev).sort((a,b)=>a[0]-b[0]).slice(-14);
+      if(!L.length)c.append(mk('small',null,'hoy todavía no ha entrado'));
+      else{const ul=mk('div','pr-ruta');L.forEach(([t,id,tx])=>{const li=mk('div',tx?'ev':'');li.append(mk('span','h',fmtHora(t)),mk('span',null,tx||label(id)));ul.append(li)});c.append(ul)}
+      box.append(c)}
+    // resumen de la semana
+    if(veo('resumen')){const c=mk('div','pr-card');c.append(mk('h4',null,'📊 Su semana'));
+      const d0=new Date(MXD());d0.setDate(d0.getDate()-6);const k0=DK(d0);
+      const W=recs(oth).filter(x=>x.d>=k0);
+      if(!W.length)c.append(mk('small',null,'todavía no hay datos de esta semana'));
+      else{const ms=W.reduce((s,x)=>s+(x.ms||0),0),n=W.reduce((s,x)=>s+(x.n||0),0),cnt={};W.forEach(x=>Object.entries(x.sec||{}).forEach(([k,v])=>{if(k!=='inicio')cnt[k]=(cnt[k]||0)+v}));
+        const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>label(k));
+        const g=mk('div','pr-stats');[[W.filter(x=>(x.n||0)||(x.ms||0)).length+'/7','días que entró'],[fmtMs(ms),'en la app (aprox.)'],[n,n===1?'vez que abrió':'veces que abrió']].forEach(([v,l])=>{const s=mk('div');s.append(mk('b',null,String(v)),mk('small',null,l));g.append(s)});
+        c.append(g);if(top.length)c.append(mk('div','pr-top','💗 Lo que más ve: '+top.join(' · ')))}
+      box.append(c)}
+    // lo último que le dejaste y si ya lo vio
+    if(veo('visto')){const c=mk('div','pr-card');c.append(mk('h4',null,'✓✓ Lo último que le dejaste'));
+      const LS=k=>{try{const v=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(v)?v:[]}catch(e){return []}};
+      const L=[...LS('notas-cache').filter(x=>!x.x&&x.w===me).map(x=>['buzon','💌 '+String(x.t||'').slice(0,60),x.a]),
+        ...LS('voz-cache').filter(x=>!x.x&&x.w===me).map(x=>['voz','🎙️ Mensaje de voz',x.a]),
+        ...LS('dibujos-cache').filter(x=>!x.x&&x.w===me).map(x=>['pizarra','🎨 Un dibujito',x.a])].filter(x=>x[2]).sort((a,b)=>b[2]-a[2]).slice(0,6);
+      if(!L.length)c.append(mk('small',null,'todavía no le dejas notitas, voz ni dibujitos'));
+      else L.forEach(([id,t,a])=>{const v=lvOf(id),r=mk('div','pr-vi');r.append(mk('span',null,t));r.append(mk('em',v>=a?'ok':'',v>=a?'✓✓ visto '+fmtHora(v):'✓ enviado'));c.append(r)});
+      box.append(c)}
+    // aviso en la campana si lleva días sin entrar
+    if(veo('inactiva')&&!sinDatos&&Date.now()-lv>dias*864e5)PEND.set('uso-inactiva',{n:1,t:'😢 '+nm(oth)+' lleva '+Math.floor((Date.now()-lv)/864e5)+' días sin entrar',sid:'presencia',go:()=>GOTO('presencia')});
+    else PEND.set('uso-inactiva',null);
+  }
+  render(); setTimeout(poll,2500);
+  setInterval(()=>{if(!document.hidden&&!sec.classList.contains('tab-off'))poll()},30e3);
+  setInterval(()=>{if(!document.hidden)render()},60e3);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
+})();
+
 /* ====== Lo nuevo del otro en la campana (para Ale y para Jon) ====== */
 (function(){
   let show=()=>{};
@@ -4745,7 +4882,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
 /* ====== Pestañas ====== */
 (function(){
   const J=VIEWER()==='yo';
-  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','aniversario','sanvalentin','cumple','cumpleyo','racha','resumen','insignias','animo','termo','sello','distancia','horoscopo','pregunta','extrano','tablero','noches','undia','mapa','final']],
+  const TABS=[['inicio','🏠','Inicio',['inicio','contador','hoy','presencia','aniversario','sanvalentin','cumple','cumpleyo','racha','resumen','insignias','animo','termo','sello','distancia','horoscopo','pregunta','extrano','tablero','noches','undia','mapa','final']],
     ['nosotros','💑','Nosotros',['detalles','cancion','momentos','albumes','polaroid','historia','diario','cielo','constelacion','arbol','sorpresas','capsula']],
     ['cartas','💌','Cartas',['carta','cartames','abrela','buzon','voz','botella','pizarra','escribir','razones','galleta','medidor','abrazo','tregua']],
     ['juegos','🎮','Juegos',['probable','fotoreto','elige','debo','corazones','rasca','vales','memorama','rompecabezas','adivina','ruleta','comida']],
@@ -5658,6 +5795,7 @@ const SCHEMA=[
   {g:'⚙️ General'},
   {t:'Página inactiva',special:'inactiva'},
   {t:'Ocultar secciones',special:'ocultas'},
+  {t:'Saber si usa la app',special:'actividad'},
   {t:'Nombres, fecha y candado',f:[['ella','Su nombre','text'],['yo','Tu nombre (firma)','text'],['inicio','Fecha en que empezó todo','date'],['pin','Código del candado (4 números)','text']]},
   {t:'Saludos según la hora',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
   {g:'🏠 Inicio'},
@@ -5792,6 +5930,17 @@ function initEditor(){
       paint();
       body.append(section('💤 '+sec.t,[h('div',{class:'ed-note'},'Con un botón, '+(D.ella||'Ale')+' deja de ver la página y solo le aparece un aviso de que está inactiva. Nada se borra: al reactivarla todo vuelve a estar igual. Tú sigues viendo todo aquí en el editor.'),
         tg,st,h('label',{class:'ed-lab'},h('span',null,'Título que verá'),t1),h('label',{class:'ed-lab'},h('span',null,'Mensaje que verá'),t2)]));
+      return;
+    }
+    if(sec.special==='actividad'){
+      D.actividad=(D.actividad&&typeof D.actividad==='object'&&!Array.isArray(D.actividad))?D.actividad:{}; const A=D.actividad, E=D.ella||'Ale';
+      const rows=[['online','🟢 En línea ahora','si tiene la app abierta en este momento, o cuándo entró por última vez'],['visto','✓✓ Visto','si ya vio las notitas, voces y dibujitos que le dejas'],
+        ['ruta','🧭 Lo que vio hoy','las secciones que abrió y lo que hizo, con la hora'],['resumen','📊 Resumen de la semana','días que entró, tiempo aproximado y lo que más ve'],['inactiva','😢 Días sin entrar','avisa en la campanita cuando lleve varios días sin entrar']];
+      const cb=(f,w)=>{const c=h('input',{type:'checkbox'});const o=A[f]||{};c.checked=w==='yo'?o.yo!==false:o.ella===true;c.addEventListener('change',()=>{A[f]=A[f]||{};A[f][w]=c.checked;markDirty()});return h('label',{style:'display:flex;gap:6px;align-items:center;font-size:13px;font-weight:600'},c,w==='yo'?'Yo veo lo de '+E:E+' ve lo mío')};
+      const list=h('div',null); rows.forEach(([f,t,d])=>list.append(h('div',{style:'padding:10px 0;border-top:1px solid rgba(247,198,211,.15)'},h('div',{style:'font-weight:800;font-size:14.5px'},t),h('div',{class:'ed-note',style:'margin:2px 0 6px'},d),h('div',{style:'display:flex;flex-wrap:wrap;gap:6px 16px'},cb(f,'yo'),cb(f,'ella')))));
+      const di=h('input',{class:'ed-in',type:'number',min:'1',max:'30',value:String((A.inactiva||{}).dias||3),style:'max-width:90px'}); di.addEventListener('input',()=>{A.inactiva=A.inactiva||{};A.inactiva.dias=Math.max(1,Math.min(30,parseInt(di.value)||3));markDirty()});
+      body.append(section('👀 '+sec.t,[h('div',{class:'ed-note'},'Activa o apaga cada cosa por separado. «Yo veo lo de '+E+'» es lo que tú ves de ella; «'+E+' ve lo mío» es lo que ella ve de ti. Lo de cada quien solo se guarda si al otro le toca verlo, y todo va cifrado. Se aplica cuando toques «Guardar cambios».'),list,
+        h('div',{style:'display:flex;align-items:center;gap:10px;margin-top:8px'},h('span',{style:'font-weight:700;font-size:14px'},'Avisar cuando lleve estos días sin entrar:'),di)]));
       return;
     }
     if(sec.special==='ocultas'){
