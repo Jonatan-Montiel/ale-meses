@@ -14,7 +14,8 @@ import org.json.JSONObject;
 
 class Notif {
     // v30: canal nuevo con el tono propio (el sonido de un canal no se puede cambiar después de crearlo)
-    static final String CH = "avisos2", CH_ZB = "zumbido";
+    static final String CH = "avisos3", CH_ZB = "zumbido";
+    static final long[] VIB = {0, 250, 120, 250};
     static final long[] VIB_ZB = {0, 400, 150, 400, 150, 700};
 
     static Uri snd(Context c, String n) { return Uri.parse("android.resource://" + c.getPackageName() + "/raw/" + n); }
@@ -31,6 +32,9 @@ class Notif {
             ch.enableLights(true);
             ch.setLightColor(Color.parseColor("#e85d84"));
             ch.setSound(snd(c, "tono"), aa);
+            // v31: que también vibre (en modo vibrar el tono no suena y sin esto no se sentía nada)
+            ch.enableVibration(true);
+            ch.setVibrationPattern(VIB);
             nm.createNotificationChannel(ch);
             NotificationChannel z = new NotificationChannel(CH_ZB, "Zumbidos 📳", NotificationManager.IMPORTANCE_HIGH);
             z.setDescription("Cuando " + quien + " te manda un zumbido");
@@ -40,7 +44,7 @@ class Notif {
             z.setLightColor(Color.parseColor("#e85d84"));
             z.setSound(snd(c, "zumbido"), aa);
             nm.createNotificationChannel(z);
-            try { nm.deleteNotificationChannel("avisos"); } catch (Exception ignored) { }
+            for (String old : new String[]{"avisos", "avisos2"}) try { nm.deleteNotificationChannel(old); } catch (Exception ignored) { }
         }
     }
 
@@ -116,7 +120,7 @@ class Notif {
                 .setStyle(new Notification.BigTextStyle().bigText(msg))
                 .setAutoCancel(true)
                 .setContentIntent(pi);
-        if (Build.VERSION.SDK_INT < 26) b.setPriority(Notification.PRIORITY_HIGH).setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS).setSound(snd(c, "tono"));
+        if (Build.VERSION.SDK_INT < 26) b.setPriority(Notification.PRIORITY_HIGH).setDefaults(Notification.DEFAULT_LIGHTS).setVibrate(VIB).setSound(snd(c, "tono"));
         if (actions) {
             String[][] A = {{"love", "❤️ Me encanta"}, {"extrano", "🥺 Te extraño"}};
             for (int k = 0; k < A.length; k++) {
