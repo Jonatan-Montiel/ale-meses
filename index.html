@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-uKvpj+g62iYHqD+kMp2HxkMHB7szeQsinDF2uzWx/sY='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-IExqQHXcrzLvaGFFvL37IF1FBrjYsk/sIQATlLAWWeI='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1171,6 +1171,11 @@
   .pr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.pr-stats b{display:block;font-size:18px}.pr-top{margin-top:10px;font-size:13px;opacity:.85}
   .pr-vi{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:5px 0;border-top:1px dashed rgba(247,198,211,.12)}.pr-vi span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pr-vi em{font-style:normal;opacity:.6;white-space:nowrap}.pr-vi em.ok{opacity:1;color:#6fc3ff}
   body.light .pr-card{background:#fff;border-color:rgba(120,40,70,.12)}
+  .zb-btn{display:block;margin:14px auto 0;border:1px solid rgba(247,198,211,.35);background:rgba(255,255,255,.08);color:inherit;border-radius:999px;padding:10px 18px;font:800 14px 'Nunito',sans-serif;cursor:pointer}.zb-btn:disabled{opacity:.55}
+  body.light .zb-btn{background:#fff;border-color:rgba(120,40,70,.2)}
+  @keyframes zbS{0%,100%{transform:translateX(0)}15%{transform:translate(-9px,2px) rotate(-1deg)}30%{transform:translate(8px,-2px) rotate(1deg)}45%{transform:translate(-7px,1px)}60%{transform:translate(6px,-1px)}75%{transform:translate(-3px,0)}}
+  body.zb main,body.zb .subtabs{animation:zbS .45s ease-in-out 3}
+  .zb-toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:99;background:rgba(30,6,16,.9);color:#fff;border-radius:22px;padding:18px 24px;font:800 18px 'Nunito',sans-serif;text-align:center;box-shadow:0 14px 40px rgba(0,0,0,.5);animation:pop .4s}
   .nb-vis{font-size:11.5px;opacity:.6}.nb-vis.ok{opacity:1;color:#fff;font-weight:800}
   #presencia>h2::before{content:'👀'}
   .tb-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -1540,6 +1545,7 @@
       <button type="submit" aria-label="Enviar">➤</button>
     </form>
     <div class="kb-st" id="nbSt"></div>
+    <button type="button" class="zb-btn" id="zbBtn">📳 Mandar un zumbido</button>
   </section>
 
   <!-- DIARIO -->
@@ -2223,7 +2229,7 @@ function avisarElla(txt,tipo){
   ACT_LOG(m,tipo,'yo');
   if(!AV.ntfyElla||MUTE_E.on())return;
   try{if(ELLA_PREF.off()[tipo])return}catch(e){}
-  const title=({noches:'🌙 Buenas noches',tregua:'🕊️ Botón de tregua',lista:'🛒 Nuestra lista',bingo:'🎯 Bingo de citas',historia:'📜 Nuestra historia',botella:'🍾 Mensaje en una botella',debo:'😘 Me debes…',dibujo:'🎨 Un dibujito',corazones:'💗 Corazones escondidos',insignia:'🏅 ¡Nueva insignia!',fotoreto:'📸 Reto de fotos',sello:'🗓️ El sello del día',probable:'🤔 ¿Quién es más probable?',fotocom:'📸 Nuestras fotos',detalle:'💝 Un detalle de '+C.yo,termo:'🌡️ ¿Cuánto te extraña '+C.yo+'?',nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo,deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',extrano:'🥺 '+C.yo+' te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ A '+C.yo+' le gustó',parajon:'💙 '+C.yo}[tipo])||'💗 '+C.yo;
+  const title=({zumbido:'📳 ¡Zumbido!',noches:'🌙 Buenas noches',tregua:'🕊️ Botón de tregua',lista:'🛒 Nuestra lista',bingo:'🎯 Bingo de citas',historia:'📜 Nuestra historia',botella:'🍾 Mensaje en una botella',debo:'😘 Me debes…',dibujo:'🎨 Un dibujito',corazones:'💗 Corazones escondidos',insignia:'🏅 ¡Nueva insignia!',fotoreto:'📸 Reto de fotos',sello:'🗓️ El sello del día',probable:'🤔 ¿Quién es más probable?',fotocom:'📸 Nuestras fotos',detalle:'💝 Un detalle de '+C.yo,termo:'🌡️ ¿Cuánto te extraña '+C.yo+'?',nota:'💌 Notita de '+C.yo,voz:'🎙️ Mensaje de voz de '+C.yo,pregunta:'💭 Pregunta del día',animo:'🌤️ ¿Cómo se siente '+C.yo+'?',cartames:'✉️ Carta del mes',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',peli:'🍿 Pelis y series',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',abrazo:'🤗 Un abrazo de '+C.yo,deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',extrano:'🥺 '+C.yo+' te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ A '+C.yo+' le gustó',parajon:'💙 '+C.yo}[tipo])||'💗 '+C.yo;
   NTFY({topic:AV.ntfyElla.trim(),title,message:m,tags:['love_letter'],priority:4,click:location.origin+location.pathname+'?ir='+encodeURIComponent(tipo||'')}).catch(()=>{});
 }
 function avisar(txt,tipo){
@@ -2236,7 +2242,7 @@ function avisar(txt,tipo){
   try{const k='av-last-'+tipo,l=+(localStorage.getItem(k)||AV_LAST[tipo]||0);if(gap&&Date.now()-l<gap)return;AV_LAST[tipo]=Date.now();localStorage.setItem(k,String(Date.now()))}catch(e){}
   const quien=soyYo?C.yo:C.ella;
   if(soyYo){ txt=txt.split(C.ella+' ').join(C.yo+' ').replace(/ te (dejó|mandó)/,' le $1'); }
-  const title=({noches:'🌙 Buenas noches',tregua:'🕊️ Botón de tregua',lista:'🛒 Nuestra lista',bingo:'🎯 Bingo de citas',historia:'📜 Nuestra historia',botella:'🍾 Mensaje en una botella',debo:'😘 Me debes…',dibujo:'🎨 Un dibujito',corazones:'💗 Corazones escondidos',insignia:'🏅 ¡Nueva insignia!',fotoreto:'📸 Reto de fotos',sello:'🗓️ El sello del día',probable:'🤔 ¿Quién es más probable?',fotocom:'📸 Nuestras fotos',detalle:'💝 Un detalle para ti',termo:'🌡️ ¿Cuánto te extraña?',vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',especial:'💝 Fecha especial',parajon:'💙 Para '+C.yo,extrano:'🥺 Te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ Le gustó',cumple:'🎂 Cumpleaños',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
+  const title=({zumbido:'📳 ¡Zumbido!',noches:'🌙 Buenas noches',tregua:'🕊️ Botón de tregua',lista:'🛒 Nuestra lista',bingo:'🎯 Bingo de citas',historia:'📜 Nuestra historia',botella:'🍾 Mensaje en una botella',debo:'😘 Me debes…',dibujo:'🎨 Un dibujito',corazones:'💗 Corazones escondidos',insignia:'🏅 ¡Nueva insignia!',fotoreto:'📸 Reto de fotos',sello:'🗓️ El sello del día',probable:'🤔 ¿Quién es más probable?',fotocom:'📸 Nuestras fotos',detalle:'💝 Un detalle para ti',termo:'🌡️ ¿Cuánto te extraña?',vale:'🎟️ Vale canjeado',nota:'💌 Notita de '+quien,ruleta:'🎡 Ruleta de citas',abrela:'💌 Abrió una carta',abrazo:'🤗 Un abrazo',rasca:'🌠 Rasca y gana',plan:'📝 Nuestros planes',aprender:'📚 Cosas que aprender',evento:'🗓️ Lo que viene',foto:'📷 Fotos nuevas',recuerdo:'📷 Un recuerdo nuevo',sorpresa:'🎁 Sorpresa del mes',capsula:'⏳ Cápsula del tiempo',secreto:'🤫 Mensaje secreto',racha:'🔥 Racha de visitas',animo:'🌤️ ¿Cómo se siente?',voz:'🎙️ Mensaje de voz',cartames:'✉️ Carta del mes',comida:'🍽️ ¿Qué comemos?',especial:'💝 Fecha especial',parajon:'💙 Para '+C.yo,extrano:'🥺 Te extraña',receta:'🍳 Nuestro recetario',adivina:'🔍 Adivina la foto',like:'❤️ Le gustó',cumple:'🎂 Cumpleaños',pregunta:'💭 Pregunta del día',deseo:'🎁 Lista de deseos',diario:'📔 Nuestro diario',reto:'🎯 Reto de la semana',peli:'🍿 Pelis y series',entrada:'👀 '+quien+' está en la app'}[tipo]||'💗 '+quien); const title2=title.includes(quien)?title:title+' · '+quien;
   NTFY({topic:AV.ntfy.trim(),title:title2,message:txt,tags:['heart'],priority:4,click:location.origin+location.pathname+'?ir='+encodeURIComponent(tipo||'')}).catch(()=>{});
 }
 const VIEWER=()=>{if(EDIT)return 'yo';try{if(localStorage.getItem('yo-soy')==='yo')return 'yo'}catch(e){}return 'ella'};
@@ -4540,9 +4546,9 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   if(VIEWER()!=='ella'){sec.remove();return}
   const LIST=[['nota','💌 Te deja una notita'],['voz','🎙️ Te manda un mensaje de voz'],['like','❤️ Le da like a lo tuyo'],['extrano','🥺 Te dice que te extraña'],['pregunta','💭 Contesta la pregunta del día'],
     ['animo','🌤️ Dice cómo se siente'],['diario','📔 Guarda un momento en el diario'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Cosas que aprender'],['peli','🍿 Pelis y series'],
-    ['evento','🗓️ Agrega algo a «Lo que viene»'],['deseo','🎁 Lista de deseos'],['receta','🍳 Agrega una receta'],['reto','🎯 Reto de la semana'],['insignia','🏅 Desbloquean una insignia'],['probable','🤔 Vota en «¿Quién es más probable?»'],['botella','🍾 Encuentra tu mensaje en una botella'],['debo','😘 Anota o paga algo en «Me debes…»'],['dibujo','🎨 Te manda un dibujito'],['corazones','💗 Encuentra todos los corazones escondidos'],['fotoreto','📸 Sube su foto del reto de la semana'],['sello','🗓️ Elige el sello de su día'],['fotocom','💬 Comenta o le da ❤️ a una foto'],['detalle','💝 Te deja un detalle (canción, reto, foto o antojo)'],['termo','🌡️ Te dice cuánto te extraña'],['foto','📷 Sube fotos'],['recuerdo','📷 Guarda un recuerdo'],['parajon','💙 Usa lo que le dejas en «Para Jon»'],['noches','🌙 Te manda las buenas noches'],['tregua','🕊️ Usa el botón de tregua'],['lista','🛒 Agrega algo a «Nuestra lista»'],['bingo','🎯 Marca algo en el bingo de citas'],['historia','📜 Agrega un momento a «Nuestra historia»']];
+    ['evento','🗓️ Agrega algo a «Lo que viene»'],['deseo','🎁 Lista de deseos'],['receta','🍳 Agrega una receta'],['reto','🎯 Reto de la semana'],['insignia','🏅 Desbloquean una insignia'],['probable','🤔 Vota en «¿Quién es más probable?»'],['botella','🍾 Encuentra tu mensaje en una botella'],['debo','😘 Anota o paga algo en «Me debes…»'],['dibujo','🎨 Te manda un dibujito'],['corazones','💗 Encuentra todos los corazones escondidos'],['fotoreto','📸 Sube su foto del reto de la semana'],['sello','🗓️ Elige el sello de su día'],['fotocom','💬 Comenta o le da ❤️ a una foto'],['detalle','💝 Te deja un detalle (canción, reto, foto o antojo)'],['termo','🌡️ Te dice cuánto te extraña'],['foto','📷 Sube fotos'],['recuerdo','📷 Guarda un recuerdo'],['parajon','💙 Usa lo que le dejas en «Para Jon»'],['zumbido','📳 Te manda un zumbido'],['noches','🌙 Te manda las buenas noches'],['tregua','🕊️ Usa el botón de tregua'],['lista','🛒 Agrega algo a «Nuestra lista»'],['bingo','🎯 Marca algo en el bingo de citas'],['historia','📜 Agrega un momento a «Nuestra historia»']];
   /* solo las opciones de secciones que Ale sí ve */
-  const SEC={nota:['buzon'],voz:['voz'],like:['buzon'],extrano:['extrano'],pregunta:['pregunta'],animo:['animo'],diario:['diario'],plan:['planes'],aprender:['aprender'],peli:['pelis'],evento:['viene'],deseo:['deseos'],receta:['recetas'],reto:['reto'],insignia:['insignias'],probable:['probable'],botella:['botella'],debo:['debo'],dibujo:['pizarra'],corazones:['corazones'],fotoreto:['fotoreto'],sello:['sello'],fotocom:['momentos','albumes'],detalle:['detalles'],termo:['termo'],foto:['momentos','albumes','polaroid'],recuerdo:['momentos','albumes','diario'],parajon:['parajon'],noches:['noches'],tregua:['tregua'],lista:['lista'],bingo:['bingo'],historia:['historia']};
+  const SEC={nota:['buzon'],voz:['voz'],like:['buzon'],extrano:['extrano'],pregunta:['pregunta'],animo:['animo'],diario:['diario'],plan:['planes'],aprender:['aprender'],peli:['pelis'],evento:['viene'],deseo:['deseos'],receta:['recetas'],reto:['reto'],insignia:['insignias'],probable:['probable'],botella:['botella'],debo:['debo'],dibujo:['pizarra'],corazones:['corazones'],fotoreto:['fotoreto'],sello:['sello'],fotocom:['momentos','albumes'],detalle:['detalles'],termo:['termo'],foto:['momentos','albumes','polaroid'],recuerdo:['momentos','albumes','diario'],parajon:['parajon'],zumbido:['buzon'],noches:['noches'],tregua:['tregua'],lista:['lista'],bingo:['bingo'],historia:['historia']};
   const O=(C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{};
   const ve=id=>{const e=document.getElementById(id);return !!e&&!e.hidden&&O[id]!=='ella'&&O[id]!=='dos'};
   const visible=k=>!SEC[k]||SEC[k].some(ve);
@@ -4671,6 +4677,26 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   setInterval(()=>{if(!document.hidden&&!sec.classList.contains('tab-off'))poll()},30e3);
   setInterval(()=>{if(!document.hidden)render()},60e3);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
+})();
+
+/* ====== Zumbidos 📳 ====== */
+(function(){
+  const me=VIEWER(), oth=me==='yo'?'ella':'yo', nm=w=>w==='yo'?C.yo:C.ella, btn=document.getElementById('zbBtn');
+  const K='zb-last', GAP=60e3;
+  const last=()=>{try{return +(localStorage.getItem(K)||0)}catch(e){return 0}};
+  let tm=null;
+  const paint=()=>{if(!btn)return;const r=GAP-(Date.now()-last());clearTimeout(tm);
+    if(r>0){btn.disabled=true;btn.textContent='📳 Zumbido enviado · otro en '+Math.ceil(r/1000)+' s';tm=setTimeout(paint,1000)}
+    else{btn.disabled=false;btn.textContent='📳 Mandarle un zumbido a '+nm(oth)}};
+  window.ZUMBIDO=()=>{if(Date.now()-last()<GAP){paint();return}
+    try{localStorage.setItem(K,String(Date.now()))}catch(e){}
+    avisar(`📳 ${C.ella} te mandó un zumbido`,'zumbido');
+    try{navigator.vibrate&&navigator.vibrate(60)}catch(e){} burst(10); paint();
+    if(me==='yo'&&MUTE_E.on()){const st=document.getElementById('nbSt');if(st){st.textContent='🔕 Tus avisos a '+C.ella+' están en pausa: este zumbido no le va a llegar';setTimeout(()=>{st.textContent=''},5000)}}};
+  if(btn)btn.onclick=window.ZUMBIDO; paint();
+  // cuando te llega uno con la app abierta (lo avisa la app de Android)
+  window.__zumbido=()=>{document.body.classList.remove('zb');void document.body.offsetWidth;document.body.classList.add('zb');setTimeout(()=>document.body.classList.remove('zb'),1500);
+    const t=document.createElement('div');t.className='zb-toast';t.textContent='📳 ¡'+nm(oth)+' te mandó un zumbido! 💗';document.body.append(t);setTimeout(()=>t.remove(),2600)};
 })();
 
 /* ====== Lo nuevo del otro en la campana (para Ale y para Jon) ====== */

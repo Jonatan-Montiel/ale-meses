@@ -75,6 +75,9 @@ public class MainActivity extends Activity {
     String goTo = null; JSONArray share = null; boolean pageReady = false;
     long loadedAt = 0, pausedAt = 0;
     WebView wv;
+    static volatile MainActivity cur;
+    /** Zumbido con la app abierta: la página tiembla. */
+    static void zumbidoEnPagina() { MainActivity a = cur; if (a == null || a.wv == null) return; a.runOnUiThread(() -> { try { if (a.wv != null) a.wv.evaluateJavascript("window.__zumbido&&__zumbido()", null); } catch (Exception ignored) { } }); }
     ValueCallback<Uri[]> fileCb;
     PermissionRequest pendingPerm;
     SharedPreferences sp;
@@ -248,6 +251,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         Notif.appVisible = true; // lo que llegue mientras la ve, ya lo ve en la página
+        cur = this;
         if (Loc.on(this)) new Thread(() -> Loc.sync(getApplicationContext())).start();
         new Thread(() -> Beat.send(getApplicationContext())).start();
         Updater.check(this); // cada vez que la abre (máximo cada 30 min) revisa si hay versión nueva
@@ -258,6 +262,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         Notif.appVisible = false;
+        if (cur == this) cur = null;
         pausedAt = System.currentTimeMillis();
         super.onPause();
     }
