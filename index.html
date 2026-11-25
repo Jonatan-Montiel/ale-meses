@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-bMaEQgrHheF3y9bLsrceVM0xpclDMEiHgDvH3bA8ekQ='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-alGrlJeP8hG92OKSkQVhChV8hLx55kx0j/2mu9PNEa8='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -6790,7 +6790,11 @@ function initEditor(){
       const file=h('input',{type:'file',accept:'image/*',multiple:true,style:'display:none'});
       file.addEventListener('change',()=>{uploadPhotos([...file.files]);file.value=''});
       const render=()=>{grid.innerHTML='';const arr=D.fotos;
-        arr.forEach((src,i)=>grid.append(h('div',{class:'ed-ph'},h('img',{src:PHOTO_CACHE.get(src)||src,alt:''}),h('b',null,String(i+1)),tools(arr,i,render))));
+        arr.forEach((src,i)=>{
+          /* las fotos .bin están cifradas: si aún no se descifran (lazy en segundo plano) se pone un marcador y se cambia por la foto real al estar lista; nunca se apunta el <img> al .bin */
+          const enc=/\.bin$/.test(src), im=h('img',{src:enc?(PHOTO_CACHE.get(src)||'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'):src,alt:''});
+          if(enc&&!PHOTO_CACHE.has(src))photoBlobURL(src).then(u=>{if(u)im.src=u}).catch(()=>{});
+          grid.append(h('div',{class:'ed-ph'},im,h('b',null,String(i+1)),tools(arr,i,render)))});
         grid.append(h('button',{class:'ed-ph add',onclick:()=>file.click()},h('span',null,'⬆️'),'Agregar fotos'))};
       async function uploadPhotos(files){
         const R=ghRepo(),t=ghToken(); if(!R||!t){msg.textContent='Primero conecta GitHub (arriba) para poder subir fotos.';msg.className='ed-note bad';conSec.classList.add('open');return}
