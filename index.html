@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-pSix4aKOi8eeX4tZSiBYrdugyA05KfhhdS4o2Wi74Q8='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fHqAnNvMmr78V0JpACFZaUWxmM0RfALc0XWtACGY3hY='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1180,6 +1180,13 @@
   .pr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.pr-stats b{display:block;font-size:18px}.pr-top{margin-top:10px;font-size:13px;opacity:.85}
   .pr-vi{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:5px 0;border-top:1px dashed rgba(247,198,211,.12)}.pr-vi span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pr-vi em{font-style:normal;opacity:.6;white-space:nowrap}.pr-vi em.ok{opacity:1;color:#6fc3ff}
   body.light .pr-card{background:#fff;border-color:rgba(120,40,70,.12)}
+  .dp-chips{display:flex;gap:8px;justify-content:center;margin:12px 0 14px;flex-wrap:wrap}.dp-chips button{border:1px solid rgba(247,198,211,.3);background:rgba(255,255,255,.07);color:inherit;border-radius:999px;padding:8px 16px;font:800 14px 'Nunito',sans-serif;cursor:pointer}.dp-chips button.cur{background:var(--rose,#e8577f);border-color:transparent;color:#fff}
+  body.light .dp-chips button{background:#fff;border-color:rgba(120,40,70,.18)}body.light .dp-chips button.cur{background:var(--rose,#e8577f)}
+  section.duo-nob>.dp-chips{display:none}
+  .dp-off{position:absolute!important;left:-10000px!important;width:100%!important;height:0!important;overflow:hidden!important;visibility:hidden!important;pointer-events:none!important}
+  .dp-ban{font-size:13px;text-align:center;opacity:.85;margin:0 auto 12px;max-width:440px;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.06)}body.light .dp-ban{background:rgba(120,40,70,.06)}
+  .dp-lock>*:not(.dp-ban){pointer-events:none!important;user-select:none;filter:saturate(.55);opacity:.7}
+  .pj-dl{font-size:12.5px;opacity:.75;margin:4px 2px -2px;display:block;text-align:left}
   .zb-b.wait{filter:grayscale(1);opacity:.45}.zb-b.nope{animation:zbS .35s}
   .zb-btn{display:block;margin:14px auto 0;border:1px solid rgba(247,198,211,.35);background:rgba(255,255,255,.08);color:inherit;border-radius:999px;padding:10px 18px;font:800 14px 'Nunito',sans-serif;cursor:pointer}.zb-btn:disabled{opacity:.55}
   body.light .zb-btn{background:#fff;border-color:rgba(120,40,70,.2)}
@@ -4379,26 +4386,56 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   nuevo();
 })();
 
+/* ====== Secciones de los dos: «Para ti» / «Para el otro» ======
+   Lo que Jon le deja a Ale (editor) y lo que Ale le deja a Jon (antes «Para Jon») viven en la misma sección.
+   Cada quien solo puede abrir/canjear lo suyo; lo del otro se ve con candado (o para configurarlo). */
+const DUO=[['vales','vale'],['rasca','rasca'],['carta','cartaj'],['cartames','mes'],['abrela','carta'],['razones','razon'],['galleta','fortuna'],['sorpresas','sorpresa'],['capsula','capsula'],['hoy','msg']];
+const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
+(function(){
+  const $=id=>document.getElementById(id), E=VIEWER()==='ella';
+  {const pj=$('parajon');if(pj){pj.classList.add('oculta');pj.hidden=true}}
+  const mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+  const setPane=(s,p)=>{s.dataset.pane=p;s.querySelectorAll(':scope>.dp-chips button').forEach(b=>b.classList.toggle('cur',b.dataset.p===p));
+    s.querySelector(':scope>.dp-a').classList.toggle('dp-off',p!=='a');s.querySelector(':scope>.dp-b').classList.toggle('dp-off',p!=='b');
+    window.dispatchEvent(new CustomEvent('duo',{detail:{id:s.id,p}}));window.dispatchEvent(new Event('resize'))};
+  window.DUO_GO=(id,p)=>{const s=$(id);if(!s)return;if(s.querySelector(':scope>.dp-chips'))setPane(s,p||'b');s.scrollIntoView({behavior:'smooth'})};
+  DUO.forEach(([id,k])=>{const s=$(id);if(!s)return;
+    if(id==='hoy'&&!E)return; // a Jon su mensaje del día de Ale ya le sale en la tarjeta
+    const keep=c=>c.tagName==='H2'||c.classList.contains('sub')||c.classList.contains('for-tag');
+    const a=mk('div','dp-pane dp-a'), b=mk('div','dp-pane dp-b'), sl=mk('div','pj-slot'); sl.dataset.k=k; b.append(sl);
+    [...s.children].forEach(c=>{if(!keep(c))a.append(c)});
+    const ch=mk('div','dp-chips');
+    const own=E?'a':'b', oth=E?'b':'a', OT=E?C.yo:C.ella;
+    [[own,(E?'💗':'💙')+' Para ti'],[oth,(E?'💙':'💗')+' Para '+OT]].forEach(([p,l])=>{const bt=mk('button',null,l);bt.type='button';bt.dataset.p=p;bt.onclick=()=>setPane(s,p);ch.append(bt)});
+    if(!E){a.classList.add('dp-lock');a.prepend(mk('div','dp-ban','🔒 Esto es para '+C.ella+': solo ella lo puede abrir. Lo cambias en el editor ✏️'))}
+    else b.prepend(mk('div','dp-ban','💙 Esto es para '+C.yo+': tú se lo dejas y solo él lo puede abrir'));
+    s.append(ch,a,b); s.classList.add('duo'); setPane(s,own);
+  });
+})();
+
 /* ====== Para Jon (lo llena Ale) + cumpleaños de Jon ====== */
 (function(){
-  const $=id=>document.getElementById(id), sec=$('parajon'), box=$('pjBox'), tabs=$('pjTabs'), cs=$('cumpleyo'), cb=$('cyBox');
+  const $=id=>document.getElementById(id), sec=$('parajon'), tabs=$('pjTabs'), cs=$('cumpleyo'), cb=$('cyBox'); let box=$('pjBox');
+  const SLOTS=()=>[...document.querySelectorAll('.pj-slot')];
+  const goK=k=>()=>window.DUO_GO&&DUO_GO(PJSEC[k]||'vales','b');
   const S=SHARED('parajon.bin','p','parajon-cache',600,render);
   const soyJon=()=>VIEWER()==='yo';
   const live=k=>S.all().filter(x=>!x.x&&x.k===k&&NEWER(x,'rpj')).sort((a,b)=>a.a-b.a);
   const add=o=>S.add(Object.assign({id:UID(),a:Date.now(),u:Date.now()},o));
   const upd=(x,o)=>{Object.assign(x,o,{u:Date.now()});S.save()};
   const del=(btn,x)=>{let armed=false;btn.onclick=()=>{if(!armed){armed=true;btn.textContent='¿Borrar?';setTimeout(()=>{armed=false;btn.textContent='✕'},2500);return}upd(x,{x:1})}};
-  const T=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['cartaj','💌 Una carta'],['mes','✉️ Carta del mes'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana']];
+  const T=[['msg','💬 Mensajes'],['razon','🫙 Razones'],['cartaj','💌 Una carta'],['mes','✉️ Carta del mes'],['carta','📬 Ábrela cuando'],['vale','🎟️ Vales'],['rasca','🌠 Rasca y gana'],['fortuna','🥠 Galleta'],['sorpresa','🎁 Sorpresas'],['capsula','⏳ Cápsula']];
+  let fortuna=null, surOpen=null, capOpen=false;
   let tab='msg', razon=null, carta=null, pick=null, scratching=false, cjOpen=false, mesOpen=null, mesSel=0;
   function pjReset(){let ch=false;const cv=CUTOF('rpjv'),cr=CUTOF('rpjr'),cc=CUTOF('rpjc'),now=Date.now();
     S.all().forEach(x=>{if(x.x)return;
       if(cv&&x.k==='vale'&&x.c&&x.c<=cv){delete x.c;x.u=now;ch=true}
       if(cr&&(x.k==='ticket'||x.k==='win')&&(x.a||0)<=cr){x.x=1;x.u=now;ch=true}
       if(cr&&x.k==='premio'&&x.used&&x.used<=cr){delete x.used;x.u=now;ch=true}
-      if(cc&&(x.k==='cartaj'||x.k==='mes'||x.k==='carta')&&x.o&&x.o<=cc){delete x.o;x.u=now;ch=true}});
+      if(cc&&(x.k==='cartaj'||x.k==='mes'||x.k==='carta'||x.k==='sorpresa'||x.k==='capsula')&&x.o&&x.o<=cc){delete x.o;x.u=now;ch=true}});
     if(ch)S.save()}
-  const PJO=k=>{const v=((C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{})['pj-'+k];return v==='dos'||(v==='ella'&&VIEWER()==='ella')}, TV=()=>T.filter(([k])=>!PJO(k));
-  window.PJ_GO=t=>{if(t)tab=t;render();GOTO('parajon')};
+  const PJO=k=>{const O=(C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{},h=v=>v==='dos'||(v==='ella'&&VIEWER()==='ella');return h(O['pj-'+k])||h(O.parajon)}, TV=()=>T.filter(([k])=>!PJO(k));
+  window.PJ_GO=t=>{render();goK(t||'carta')()};
   const doy=()=>{const n=MXD();return Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)};
   const el=(h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
   function todayMsg(){if(PJO('msg'))return null;const L=live('msg');return L.length?L[doy()%L.length]:null}
@@ -4417,18 +4454,21 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const fecha=t=>new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
   const paper=(t,head)=>`<div class="paper">${head?`<p style="font-weight:800;text-align:center">${esc(head)}</p>`:''}${FILL(t).split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')}<p class="sign">— ${esc(C.ella)} 💙</p></div>`;
   function pending(){
-    {const now=MXD().getTime(),cm=live('mes').filter(x=>!x.o&&opensAt(+x.m)<=now).length,cj=live('cartaj').filter(x=>!x.o).length,go=k=>()=>{tab=k;render();sec.scrollIntoView({behavior:'smooth'})};
+    {const now=MXD().getTime(),cm=live('mes').filter(x=>!x.o&&opensAt(+x.m)<=now).length,cj=live('cartaj').filter(x=>!x.o).length,go=goK;
      PEND.set('pj-mes',{n:cm,t:cm===1?'✉️ Ya puedes abrir una carta del mes de '+C.ella:'✉️ '+cm+' cartas del mes de '+C.ella+' para abrir',go:go('mes')});
      PEND.set('pj-cartaj',{n:cj,t:'💌 '+C.ella+' te escribió una carta',go:go('cartaj')});}
     const c=live('carta').filter(x=>!x.o).length, v=live('vale').filter(x=>!x.c).length, r=Math.max(0,live('ticket').length-live('win').length);
-    const go=k=>()=>{tab=k;render();sec.scrollIntoView({behavior:'smooth'})};
+    const go=goK;
+    {const td=DK(MXD()),su=live('sorpresa').filter(x=>!x.o&&x.f&&x.f<=td).length,cp=live('capsula').filter(x=>!x.o&&x.f&&x.f<=td).length;
+     PEND.set('pj-sorpresa',{n:su,t:su===1?'🎁 Ya puedes abrir una sorpresa de '+C.ella:'🎁 '+su+' sorpresas de '+C.ella+' para abrir',go:go('sorpresa')});
+     PEND.set('pj-capsula',{n:cp,t:'⏳ Ya se abrió la cápsula del tiempo de '+C.ella,go:go('capsula')})}
     PEND.set('pj-carta',{n:c,t:c===1?'📬 1 carta de '+C.ella+' sin abrir':'📬 '+c+' cartas de '+C.ella+' sin abrir',go:go('carta')});
     PEND.set('pj-vale',{n:v,t:v===1?'🎟️ 1 vale por canjear':'🎟️ '+v+' vales por canjear',go:go('vale')});
     PEND.set('pj-rasca',{n:r,t:r===1?'🌠 1 rasca y gana por raspar':'🌠 '+r+' rasca y gana por raspar',go:go('rasca')});
   }
   function form(fields,btnTxt,onSave){
     const f=document.createElement('form'); f.className='di-add card pj-f'; f.autocomplete='off';
-    fields.forEach(([k,ph,type,max])=>{const i=document.createElement(type==='ta'?'textarea':'input');i.className='pq-in';i.name=k;i.placeholder=ph;i.maxLength=max||200;if(type==='ta')i.rows=3;f.append(i)});
+    fields.forEach(([k,ph,type,max])=>{const i=document.createElement(type==='ta'?'textarea':'input');i.className='pq-in';i.name=k;i.placeholder=ph;i.maxLength=max||200;if(type==='ta')i.rows=3;if(type==='date'){i.type='date';i.title=ph;const l=document.createElement('label');l.className='pj-dl';l.textContent=ph;f.append(l)}f.append(i)});
     const b=document.createElement('button');b.className='btn small';b.textContent=btnTxt;f.append(b);
     f.onsubmit=e=>{e.preventDefault();const v={};fields.forEach(([k])=>v[k]=f.elements[k].value.trim());if(!v[fields[0][0]])return f.elements[fields[0][0]].focus();f.reset();f.querySelectorAll('input,textarea').forEach(i=>{i.dataset.fresh=1});onSave(v);burst(10)};
     return f;
@@ -4440,8 +4480,8 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
       const d=document.createElement('button');d.className='ds-b';d.textContent='✕';del(d,x);r.querySelector('.ds-f').append(d);l.append(r)});
     return l;
   }
-  function keepVals(){const m={};[box,cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(i.value)m[i.placeholder]=i.value}));return m}
-  function putVals(m){[box,cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(m[i.placeholder]!=null&&!i.dataset.fresh)i.value=m[i.placeholder]}))}
+  function keepVals(){const m={};[...SLOTS(),cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(i.value)m[i.placeholder]=i.value}));return m}
+  function putVals(m){[...SLOTS(),cb].forEach(r=>r.querySelectorAll('input,textarea').forEach(i=>{if(m[i.placeholder]!=null&&!i.dataset.fresh)i.value=m[i.placeholder]}))}
   function render(){
     if(scratching){jonDaily();return}
     try{pjReset()}catch(e){}
@@ -4450,10 +4490,9 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     sec.querySelector('h2').textContent=soyJon()?'De '+C.ella+' para ti':'Para '+C.yo;
     sec.querySelector('.sub').textContent=soyJon()?'todo lo que '+C.ella+' te dejó 💙':'cosas que le dejas a '+C.yo+' 💙';
     tabs.innerHTML='';
-    if(PJO(tab))tab=(TV()[0]||[])[0]||null;
-    if(!tab){box.innerHTML='';putVals(kv);return}
-    TV().forEach(([k,n])=>{const b=document.createElement('button');b.className=k===tab?'cur':'';b.textContent=n;b.onclick=()=>{tab=k;render()};tabs.append(b)});
-    box.innerHTML=''; (soyJon()?JON:ALE)[tab]();
+    SLOTS().forEach(sl=>{const k=sl.dataset.k,s=sl.closest('section');const off=PJO(k);if(s)s.classList.toggle('duo-nob',off);
+      if(off&&s&&s.dataset.pane==='b'){const c=s.querySelector(':scope>.dp-chips button[data-p="a"]');if(c)c.click()}
+      box=sl; sl.innerHTML=''; if(off)return; try{(soyJon()?JON:ALE)[k]()}catch(e){console.error(e)}});
     putVals(kv);
   }
   const ALE={
@@ -4490,9 +4529,20 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
       b.onclick=()=>{if(!P.filter(p=>!p.used).length){alertBox('Primero agrega al menos un premio abajo 👇');return}add({k:'ticket'});burst(16);avisar(`🌠 ${C.ella} te regaló un rasca y gana`,'parajon')};
       g.append(b); box.append(g,
       form([['t','Premio (ej. Te invito a cenar)','in',120],['e','Emoji (opcional)','in',4]],'➕ Agregar premio',v=>add({k:'premio',t:v.t,e:v.e||'🎁'})),
-      listAle(P,x=>esc(x.e||'🎁')+' '+esc(x.t)+(x.used?' <b style="color:#2e9d5b">✓ ya lo ganó</b>':'')))}
+      listAle(P,x=>esc(x.e||'🎁')+' '+esc(x.t)+(x.used?' <b style="color:#2e9d5b">✓ ya lo ganó</b>':'')))},
+    fortuna(){box.append(el(`<div class="pj-note">Mensajitos para la galleta de ${esc(C.yo)}: cada vez que la rompa le sale uno al azar 🥠</div>`),
+      form([['t','Una fortuna para '+C.yo+' (ej. Hoy te va a ir increíble)','in',160]],'🥠 Agregar a su galleta',v=>add({k:'fortuna',t:v.t})),
+      listAle(live('fortuna'),x=>esc(x.t)))},
+    sorpresa(){box.append(el(`<div class="pj-note">Sorpresas para ${esc(C.yo)} que se abren en la fecha que elijas 🎁</div>`),
+      form([['n','Nombre de la sorpresa (ej. 9 meses)','in',60],['f','Se abre el','date'],['t','Lo que le quieres decir','ta',1500],['e','Emoji (opcional)','in',4]],'🎁 Guardar sorpresa',v=>{if(!v.t||!v.f)return;add({k:'sorpresa',e:v.e||'🎁',n:v.n,f:v.f,t:v.t});avisar(`🎁 ${C.ella} te dejó una sorpresa (se abre el ${fecha(new Date(v.f+'T12:00:00'))})`,'parajon')}),
+      listAle(live('sorpresa').slice().sort((a,b)=>String(a.f).localeCompare(String(b.f))),x=>esc(x.e||'🎁')+' '+esc(x.n||'Sorpresa')+`<br><small>se abre el ${x.f?fecha(new Date(x.f+'T12:00:00')):'?'}</small>`+(x.o?` <b style="color:#2e9d5b">✓ la abrió el ${fmtDia(x.o)}</b>`:'')))},
+    capsula(){const L=live('capsula'),cur=L[L.length-1];
+      box.append(el(`<div class="pj-note">Un mensaje para ${esc(C.yo)} que no podrá abrir hasta la fecha que elijas ⏳</div>`));
+      const f=form([['f','Se abre el','date'],['t','Tu mensaje para el futuro','ta',4000]],cur?'⏳ Guardar cambios':'⏳ Guardar cápsula',v=>{if(!v.t||!v.f)return;if(cur)upd(cur,{f:v.f,t:v.t,o:0});else{add({k:'capsula',f:v.f,t:v.t});avisar(`⏳ ${C.ella} te dejó una cápsula del tiempo (se abre el ${fecha(new Date(v.f+'T12:00:00'))})`,'parajon')}});
+      if(cur){f.elements.f.value=cur.f||'';f.elements.t.value=cur.t;f.elements.f.dataset.fresh=f.elements.t.dataset.fresh='1';f.elements.t.rows=6}
+      box.append(f);if(cur)box.append(el(`<div class="pj-note">${cur.o?`✓ ${esc(C.yo)} la abrió el ${fmtDia(cur.o)}`:`Se abre el ${cur.f?fecha(new Date(cur.f+'T12:00:00')):'?'}`}</div>`))}
   };
-  function alertBox(t){const n=el(`<div class="kb-st">${esc(t)}</div>`);box.prepend(n);setTimeout(()=>n.remove(),3000)}
+  function alertBox(t){const n=el(`<div class="zb-toast">${esc(t)}</div>`);document.body.append(n);setTimeout(()=>n.remove(),2600)}
   const empty=t=>el(`<div class="nb-empty">${t}</div>`);
   const JON={
     msg(){const m=todayMsg(); box.append(m?el(`<div class="card"><div class="daily-l">Mensaje de hoy de ${esc(C.ella)}</div><div class="daily">${esc(m.t)}</div><div class="cu-t">— ${esc(C.ella)} 💙</div></div>`):empty(esc(C.ella)+' todavía no te escribe mensajes del día 💭'))},
@@ -4524,7 +4574,21 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
         const wrap=el(`<div class="scratch"><div class="prize"><div class="prize-emoji">${esc(pick.e||'🎁')}</div><div class="prize-title">¡Ganaste!</div><div class="prize-text">${esc(pick.t)}</div></div><canvas></canvas></div>`);
         box.append(wrap,el(`<div class="tap">raspa con tu dedito ✨</div>`)); scratch(wrap.querySelector('canvas'),()=>{const p=pick;pick=null;upd(p,{used:Date.now()});add({k:'win',p:p.id,t:p.t,e:p.e});if(window.confetti)confetti(60);burst(20);avisar(`🌠 ${C.ella} raspó su rasca y gana: ${p.e||'🎁'} ${p.t}`,'parajon')});
       } else box.append(empty('cuando '+esc(C.ella)+' te regale un rasca y gana aparecerá aquí 🌠'));
-      if(W.length)box.append(el(`<div class="wheel-used" style="margin-top:14px"><div class="wu-t">Lo que has ganado:</div>${W.slice().reverse().map(w=>`<span class="wu" style="text-decoration:none">${esc(w.e||'🎁')} ${esc(w.t)} · ${fmtDia(w.a)}</span>`).join('')}</div>`))}
+      if(W.length)box.append(el(`<div class="wheel-used" style="margin-top:14px"><div class="wu-t">Lo que has ganado:</div>${W.slice().reverse().map(w=>`<span class="wu" style="text-decoration:none">${esc(w.e||'🎁')} ${esc(w.t)} · ${fmtDia(w.a)}</span>`).join('')}</div>`))},
+    fortuna(){const L=live('fortuna');if(!L.length){box.append(empty('cuando '+esc(C.ella)+' te deje fortunas, aquí podrás romper tu galleta 🥠'));return}
+      const b=el(`<button class="pj-env" aria-label="Romper galleta"><div class="pj-env-e">🥠</div><div>${fortuna?'Otra galleta':'Rompe tu galleta'}</div><small>toca para ver tu suerte</small></button>`);
+      b.onclick=()=>{let x;do{x=L[Math.floor(Math.random()*L.length)]}while(L.length>1&&x===fortuna);fortuna=x;burst(10);render()};box.append(b);
+      if(fortuna)box.append(el(`<div class="paper"><p style="text-align:center;font-size:18px">«${esc(FILL(fortuna.t))}»</p><p class="sign">— ${esc(C.ella)} 💙</p></div>`))},
+    sorpresa(){const L=live('sorpresa').slice().sort((a,b)=>String(a.f).localeCompare(String(b.f))),td=DK(MXD());if(!L.length){box.append(empty('aquí aparecerán las sorpresas que te deje '+esc(C.ella)+' 🎁'));return}
+      const g=document.createElement('div');g.className='whens';
+      L.forEach(x=>{const ok=x.f&&x.f<=td,b=el(`<button class="when${x.o?' read':''}"><div class="when-e">${ok?esc(x.e||'🎁'):'🔒'}</div><div class="when-t">${esc(x.n||'Sorpresa')}</div><small style="opacity:.7">${ok?'ya la puedes abrir':'se abre el '+fecha(new Date(x.f+'T12:00:00'))}</small></button>`);
+        b.onclick=()=>{if(!ok){alertBox('🔒 Esta sorpresa se abre el '+fecha(new Date(x.f+'T12:00:00')));return}surOpen=surOpen===x?null:x;if(!x.o){upd(x,{o:Date.now()});avisar(`🎁 ${C.ella} abrió la sorpresa «${x.n||'Sorpresa'}» que le dejaste`,'parajon');burst(20)}else render()};g.append(b)});
+      box.append(g);if(surOpen)box.append(el(paper(surOpen.t,(surOpen.e||'🎁')+' '+(surOpen.n||'Sorpresa'))))},
+    capsula(){const L=live('capsula'),x=L[L.length-1],td=DK(MXD());if(!x){box.append(empty(esc(C.ella)+' todavía no te deja una cápsula del tiempo ⏳'));return}
+      if(!(x.f&&x.f<=td)){box.append(el(`<div class="pj-env" style="cursor:default"><div class="pj-env-e">🔒</div><div>Cápsula del tiempo de ${esc(C.ella)}</div><small>se abre el ${fecha(new Date(x.f+'T12:00:00'))}</small></div>`));return}
+      if(!capOpen){const b=el(`<button class="pj-env" aria-label="Abrir cápsula"><div class="pj-env-e">⏳</div><div>Ya puedes abrir la cápsula de ${esc(C.ella)}</div><small>toca para abrirla</small></button>`);
+        b.onclick=()=>{capOpen=true;if(!x.o){upd(x,{o:Date.now()});avisar(`⏳ ${C.ella} abrió la cápsula del tiempo que le dejaste`,'parajon')}else render();burst(30)};box.append(b);return}
+      box.append(el(paper(x.t,'⏳ Cápsula del tiempo')))}
   };
   function scratch(cv,done){
     requestAnimationFrame(()=>{const r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1; cv.width=r.width*dpr; cv.height=r.height*dpr; const x=cv.getContext('2d'); x.scale(dpr,dpr);
@@ -4567,6 +4631,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
       let d=false;try{const k='cumpleyo-av-'+now.getFullYear();d=localStorage.getItem(k)==='1';localStorage.setItem(k,'1')}catch(e){}
       if(!d)avisar(`🎂 ${C.ella} abrió la carta de cumpleaños que le escribiste`,'parajon')}};
   }
+  window.addEventListener('duo',e=>{if(e.detail&&e.detail.p==='b')render()});
   render();
 })();
 
@@ -4578,7 +4643,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     ['animo','🌤️ Dice cómo se siente'],['diario','📔 Guarda un momento en el diario'],['plan','📝 Agrega o cumple un plan'],['aprender','📚 Cosas que aprender'],['peli','🍿 Pelis y series'],
     ['evento','🗓️ Agrega algo a «Lo que viene»'],['deseo','🎁 Lista de deseos'],['receta','🍳 Agrega una receta'],['reto','🎯 Reto de la semana'],['insignia','🏅 Desbloquean una insignia'],['probable','🤔 Vota en «¿Quién es más probable?»'],['botella','🍾 Encuentra tu mensaje en una botella'],['debo','😘 Anota o paga algo en «Me debes…»'],['dibujo','🎨 Te manda un dibujito'],['corazones','💗 Encuentra todos los corazones escondidos'],['fotoreto','📸 Sube su foto del reto de la semana'],['sello','🗓️ Elige el sello de su día'],['fotocom','💬 Comenta o le da ❤️ a una foto'],['detalle','💝 Te deja un detalle (canción, reto, foto o antojo)'],['termo','🌡️ Te dice cuánto te extraña'],['foto','📷 Sube fotos'],['recuerdo','📷 Guarda un recuerdo'],['parajon','💙 Usa lo que le dejas en «Para Jon»'],['zumbido','📳 Te manda un zumbido'],['noches','🌙 Te manda las buenas noches'],['tregua','🕊️ Usa el botón de tregua'],['lista','🛒 Agrega algo a «Nuestra lista»'],['bingo','🎯 Marca algo en el bingo de citas'],['historia','📜 Agrega un momento a «Nuestra historia»']];
   /* solo las opciones de secciones que Ale sí ve */
-  const SEC={nota:['buzon'],voz:['voz'],like:['buzon'],extrano:['extrano'],pregunta:['pregunta'],animo:['animo'],diario:['diario'],plan:['planes'],aprender:['aprender'],peli:['pelis'],evento:['viene'],deseo:['deseos'],receta:['recetas'],reto:['reto'],insignia:['insignias'],probable:['probable'],botella:['botella'],debo:['debo'],dibujo:['pizarra'],corazones:['corazones'],fotoreto:['fotoreto'],sello:['sello'],fotocom:['momentos','albumes'],detalle:['detalles'],termo:['termo'],foto:['momentos','albumes','polaroid'],recuerdo:['momentos','albumes','diario'],parajon:['parajon'],zumbido:['buzon'],noches:['noches'],tregua:['tregua'],lista:['lista'],bingo:['bingo'],historia:['historia']};
+  const SEC={nota:['buzon'],voz:['voz'],like:['buzon'],extrano:['extrano'],pregunta:['pregunta'],animo:['animo'],diario:['diario'],plan:['planes'],aprender:['aprender'],peli:['pelis'],evento:['viene'],deseo:['deseos'],receta:['recetas'],reto:['reto'],insignia:['insignias'],probable:['probable'],botella:['botella'],debo:['debo'],dibujo:['pizarra'],corazones:['corazones'],fotoreto:['fotoreto'],sello:['sello'],fotocom:['momentos','albumes'],detalle:['detalles'],termo:['termo'],foto:['momentos','albumes','polaroid'],recuerdo:['momentos','albumes','diario'],parajon:['vales','rasca','carta','cartames','abrela','razones','galleta','sorpresas','capsula'],zumbido:['buzon'],noches:['noches'],tregua:['tregua'],lista:['lista'],bingo:['bingo'],historia:['historia']};
   const O=(C.ocultas&&typeof C.ocultas==='object')?C.ocultas:{};
   const ve=id=>{const e=document.getElementById(id);return !!e&&!e.hidden&&O[id]!=='ella'&&O[id]!=='dos'};
   const visible=k=>!SEC[k]||SEC[k].some(ve);
@@ -4977,7 +5042,6 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     ['cartas','💌','Cartas',['carta','cartames','abrela','buzon','voz','botella','pizarra','escribir','razones','galleta','medidor','abrazo','tregua']],
     ['juegos','🎮','Juegos',['probable','fotoreto','elige','debo','corazones','rasca','vales','memorama','rompecabezas','adivina','ruleta','comida']],
     ['planes','📝','Planes',['planes','viene','lista','bingo','aprender','pelis','recetas','reto','deseos']],
-    ['parajon','💙',J?'De '+C.ella:'Para '+C.yo,['parajon']],
     ['avisos','🔔','Avisos',['misavisos']]];
   const nav=document.querySelector('nav'); nav.innerHTML=''; nav.classList.add('tabbar');
   TABS.forEach(([k,,,ids])=>ids.forEach(id=>{const s=document.getElementById(id);if(s)s.dataset.tab=k}));
@@ -5001,7 +5065,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const subBar=document.createElement('div'); subBar.className='subtabs'; document.querySelector('main').prepend(subBar);
   {let on=null,q=false;const sc=()=>{q=false;const v=window.scrollY>4;if(v!==on){on=v;subBar.classList.toggle('sc',v)}};window.addEventListener('scroll',()=>{if(!q){q=true;requestAnimationFrame(sc)}},{passive:true});sc()}
   const PK={botella:'botella',cartames:'cartames',dibujo:'pizarra',fotocom:'momentos',fotoreto:'fotoreto',likes:'buzon',notas:'buzon',pregunta:'pregunta',probable:'probable',resumen:'resumen',reto:'reto',voz:'voz'};
-  const sidOf=x=>x.sid||PK[x.k]||(/^dt-/.test(x.k)?'detalles':/^pj-/.test(x.k)?'parajon':(!x.act&&document.getElementById(x.k))?x.k:null);
+  const sidOf=x=>x.sid||PK[x.k]||(/^dt-/.test(x.k)?'detalles':/^pj-/.test(x.k)?(PJSEC[x.k.slice(3)]||'vales'):(!x.act&&document.getElementById(x.k))?x.k:null);
   let DOT=new Set();
   function renderSub(){
     subBar.innerHTML=''; const gs=GRP[cur]||[], g=gOf(cur);
@@ -5019,13 +5083,13 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     nav.querySelectorAll('button').forEach(b=>b.classList.toggle('dot',tabs.has(b.dataset.k)&&b.dataset.k!==cur));renderSub()}
   window.SEC_OF=sidOf; window.TABNAV={GRP,gOf,setGrp,cur:()=>cur,dots:()=>DOT,refresh:()=>dots()};
   /* etiqueta en cada sección: para quién es */
-  {const FOR={hoy:'cada',cumple:'ella',racha:'ella',cancion:'ella',carta:'ella',cartames:'ella',abrela:'ella',escribir:'ella',razones:'ella',galleta:'ella',medidor:'ella',sorpresas:'ella',capsula:'ella',rasca:'ella',vales:'ella',adivina:'ella',misavisos:'ella',
+  {const FOR={hoy:'cada',cumple:'ella',racha:'ella',cancion:'ella',escribir:'ella',medidor:'ella',adivina:'ella',misavisos:'ella',
      parajon:'yo',cumpleyo:'yo'};
    const E=VIEWER()==='ella';
    const lab=k=>k==='dos'?['dos','💞 De los dos']:k==='cada'?[E?'ella':'yo',E?'💗 Para ti · de '+C.yo:'💙 Para ti · de '+C.ella]
      :k==='ella'?['ella',E?'💗 Para ti · de '+C.yo:'💗 Para '+C.ella+' · así lo ve ella']:['yo',E?'💙 Para '+C.yo+' · tú se lo dejas':'💙 Para ti · de '+C.ella];
    {const o=E?C.yo:C.ella;const a=document.getElementById('nbSub'),b=document.getElementById('vzSub');if(a)a.textContent=`notitas entre ${o} y tú: los dos escriben y se contestan 💌`;if(b)b.textContent=`mensajes de voz entre ${o} y tú: los dos graban y escuchan 🎙️`}
-   const DOS2={buzon:'💞 De los dos · los dos escriben',voz:'💞 De los dos · los dos graban'};
+   const DOS2={buzon:'💞 De los dos · los dos escriben',voz:'💞 De los dos · los dos graban'};['carta','cartames','abrela','razones','galleta','sorpresas','capsula','rasca','vales'].forEach(k=>DOS2[k]='💞 De los dos · cada quien lo suyo');
    document.querySelectorAll('main section[id]').forEach(sec=>{if(sec.id==='inicio'||sec.id==='final')return;const h=sec.querySelector(':scope>h2');if(!h)return;
      const [c,t0]=lab(FOR[sec.id]||'dos'),t=DOS2[sec.id]||t0,b=document.createElement('div');b.className='for-tag '+c;b.textContent=t;h.after(b)})}
   let cur=null;
@@ -5047,7 +5111,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
     if(s.dataset.grp&&GRP[s.dataset.tab]&&gOf(s.dataset.tab)!==s.dataset.grp){curG[s.dataset.tab]=s.dataset.grp;saveG();apply()}
     if(s.classList.contains('dash-sec')&&!s.classList.contains('dash-open')&&window.DASH_OPEN)DASH_OPEN(s.id,true)}}catch(e){}return orig.apply(this,a)};
   PEND.on(dots);
-  window.GOTO=id=>{const s=document.getElementById(id);if(s)s.scrollIntoView({behavior:'smooth'})};
+  window.GOTO=id=>{if(id==='parajon'){const p=(window.PEND_VIS?PEND_VIS():[]).find(x=>/^pj-/.test(x.k)&&x.n>0);if(window.DUO_GO){DUO_GO(p?PJSEC[p.k.slice(3)]:'vales','b');return}}const s=document.getElementById(id);if(s)s.scrollIntoView({behavior:'smooth'})};
   const after=()=>{const g=window.__goAfterUnlock,sh=window.__pendingShare;window.__goAfterUnlock=window.__pendingShare=null;if(!g&&!sh)return;
     const ov=document.getElementById('hoyOv');if(ov&&ov.classList.contains('open'))document.getElementById('hoyBtn').click();
     setTimeout(()=>{if(sh&&window.__sharePhotos)__sharePhotos(sh);else if(g)(window.GO_ANY||GOTO)(g)},ov&&ov.classList.contains('open')?600:100)};
