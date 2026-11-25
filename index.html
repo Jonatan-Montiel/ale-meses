@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-LAx3jZdB75PrLa25NWOW+dg8y3lcEJZ4tZyN4Q0vPGo='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-71C7duDjlqrIMbjDL750FbaskO4gmAjTfPxd9d8ydoI='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -350,8 +350,6 @@
   body.light .sec-ed{background:rgba(42,10,24,.88);border-color:rgba(247,198,211,.55)}
   .sec-ed-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.sec-ed-f .ed-status{flex:1 1 100%}
   .sec-ed-f .ed-btn.pv-b{background:rgba(255,255,255,.12);border:1.5px solid rgba(247,198,211,.4);color:#fff7f0}
-  .ed-only{outline:2px dashed rgba(247,198,211,.6);outline-offset:-2px;opacity:.9;border-radius:14px}
-  .ed-only-ban{background:rgba(247,198,211,.18);border:1px dashed rgba(247,198,211,.6);color:#fff7f0;font:700 12px 'Nunito',sans-serif;border-radius:12px;padding:7px 12px;margin:0 0 10px;text-align:center}
   .ale-pv{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;background:var(--wine,#2a0a18)}
   .ale-pv-h{display:flex;align-items:center;gap:10px;padding:10px 12px;background:linear-gradient(135deg,var(--bartop,#5e1532),var(--rose,#e8577f));color:#fff;font:800 14px 'Nunito',sans-serif}
   .ale-pv-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -4365,7 +4363,7 @@ try{if(window.AndroidApp){const E=VIEWER()==='ella';window.AndroidApp.setTopic(E
   const sec=document.getElementById('cumple'), box=document.getElementById('cuBox');
   if(VIEWER()==='yo')sec.querySelector('h2').textContent='El cumpleaños de '+C.ella;
   const raw=String(C.cumple||''), mm=+raw.slice(5,7), dd=+raw.slice(8,10);
-  if(!mm||!dd){ if(EDIT){box.innerHTML='<div class="card"><div class="daily-l">Solo tú ves esto</div><div style="font-size:15px">Pon la fecha de su cumpleaños en el editor («Cumpleaños de '+esc(C.ella)+'») y aquí aparecerá la cuenta regresiva 🎂</div></div>'} else sec.hidden=true; return; }
+  if(!mm||!dd){ sec.hidden=true; return; }
   const now=MXD(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
   let next=new Date(now.getFullYear(),mm-1,dd); if(next<today)next=new Date(now.getFullYear()+1,mm-1,dd);
   const days=Math.round((next-today)/864e5), isB=days===0, ella=VIEWER()==='ella';
@@ -4731,7 +4729,8 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   function cumple(){
     const raw=String(C.cumpleYo||''), mm=+raw.slice(5,7), dd=+raw.slice(8,10);
     cs.querySelector('h2').textContent=soyJon()?'Tu cumpleaños':'El cumpleaños de '+C.yo;
-    if(!mm||!dd){cs.hidden=!EDIT;cb.innerHTML=EDIT?'<div class="card"><div style="font-size:15px">Pon tu fecha de cumpleaños en el editor («Cumpleaños de '+esc(C.yo)+'») 🎂</div></div>':'';return}
+    if(!mm||!dd){cs.hidden=true;cb.innerHTML='';return}
+    cs.hidden=false;
     const now=MXD(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
     let next=new Date(now.getFullYear(),mm-1,dd); if(next<today)next=new Date(now.getFullYear()+1,mm-1,dd);
     const days=Math.round((next-today)/864e5), isB=days===0, fecha=`${dd} de ${MESN[mm-1]}`;
@@ -5009,7 +5008,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   {const mk=()=>bell.classList.toggle('muted',VIEWER()==='yo'&&MUTE_E.on());mk();window.addEventListener('muteElla',mk);setInterval(mk,6e4)}
   const ps=document.createElement('div'); ps.className='pend-ov'; document.body.append(ps);
   let dis=new Set(); try{dis=new Set(JSON.parse(localStorage.getItem('pend-quitados')||'[]'))}catch(e){}
-  const dk=v=>v.k+'|'+v.t, VIS=()=>PEND.all().filter(v=>{if(dis.has(dk(v)))return false;try{const id=window.SEC_OF&&SEC_OF(v),e=id&&document.getElementById(id);if(e&&e.classList.contains('oculta'))return false}catch(x){}return true}); window.PEND_VIS=VIS;
+  const dk=v=>v.k+'|'+v.t, VIS=()=>PEND.all().filter(v=>{if(dis.has(dk(v)))return false;try{const id=window.SEC_OF&&SEC_OF(v),e=id&&document.getElementById(id);if(e&&(e.hidden||e.classList.contains('oculta')||e.classList.contains('fuera')))return false}catch(x){}return true}); window.PEND_VIS=VIS;
   const quitar=v=>{if(v.del)v.del();else{dis.add(dk(v));try{localStorage.setItem('pend-quitados',JSON.stringify([...dis].slice(-200)))}catch(e){}}count();render();try{window.TABNAV&&TABNAV.refresh()}catch(e){}};
   function swipe(b,v){
     let x0=null,y0=0,dx=0,drag=false;
@@ -5118,11 +5117,14 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   const sv=document.getElementById('sanvalentin'), svb=document.getElementById('svBox');
   const S=SHARED('especiales.bin','e','especiales-cache',20,()=>renderSV());
   function renderSV(){
-    if(!(M===2&&Dd<=14)&&!(EDIT&&new URLSearchParams(location.search).has('vista'))){sv.hidden=true;return}
-    sv.hidden=false; const day=M===2&&Dd===14, left=14-Dd;
-    const mine=S.all().find(x=>x.id==='sv-ella-'+Y&&!x.x);
+    const siempre=!!(C.fechasVer&&C.fechasVer.sanvalentin==='siempre');
+    if(!(M===2&&Dd<=14)&&!siempre){sv.hidden=true;return}
+    sv.hidden=false;
+    const td0=new Date(Y,M-1,Dd); let tgt=new Date(Y,1,14); if(tgt<td0)tgt=new Date(Y+1,1,14);
+    const TY=tgt.getFullYear(), left=Math.round((tgt-td0)/864e5), day=left===0, enFeb=M===2&&Dd<=14;
+    const mine=S.all().find(x=>x.id==='sv-ella-'+TY&&!x.x);
     let h='';
-    if(!day)h=`<div class="card cu"><div class="cu-e">💝</div><div class="daily-l">San Valentín · 14 de febrero</div><div class="cu-n"><b>${left}</b><span>${left===1?'día':'días'}</span></div><div class="cu-t">${left===1?'¡mañana es nuestro día! 💘':'ya casi es nuestro día 💕'}</div></div>`;
+    if(!day)h=`<div class="card cu"><div class="cu-e">💝</div><div class="daily-l">San Valentín · 14 de febrero</div><div class="cu-n"><b>${left}</b><span>${left===1?'día':'días'}</span></div><div class="cu-t">${left===1?'¡mañana es nuestro día! 💘':enFeb?'ya casi es nuestro día 💕':'faltan '+left+' días para San Valentín 💝'}</div></div>`;
     else h=`<div class="card cu today"><div class="cu-e">💝</div><h3 class="cu-h">¡Feliz San Valentín, ${esc(J?C.yo:C.ella)}!</h3><div class="cu-t">hoy y siempre, tú 💘</div>
       ${(!J&&C.cartaSanValentin)?'<button class="btn small" id="svOpen">💌 Abrir mi carta de San Valentín</button>':''}${(J&&mine)?'<button class="btn small" id="svOpen">💌 Abrir la carta de '+esc(C.ella)+'</button>':''}</div>`;
     svb.innerHTML=h;
@@ -5135,7 +5137,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
       const f=document.createElement('div');f.className='di-add card pj-f';
       f.innerHTML=`<div class="daily-l">Tu carta de San Valentín para ${esc(C.yo)} 🤫</div><textarea class="pq-in" rows="4" maxlength="3000" placeholder="${esc(C.yo)} la podrá abrir el 14 de febrero">${mine?esc(mine.t):''}</textarea><button class="btn small">💌 Guardar</button><div class="kb-st"></div>`;
       f.querySelector('button').onclick=()=>{const t=f.querySelector('textarea').value.trim();if(!t)return;
-        if(mine){mine.t=t;mine.u=Date.now();S.save()}else{S.add({id:'sv-ella-'+Y,t,a:Date.now(),u:Date.now()});avisar(`🤫 ${C.ella} te escribió algo para San Valentín`,'especial')}
+        if(mine){mine.t=t;mine.u=Date.now();S.save()}else{S.add({id:'sv-ella-'+TY,t,a:Date.now(),u:Date.now()});avisar(`🤫 ${C.ella} te escribió algo para San Valentín`,'especial')}
         f.querySelector('.kb-st').textContent='💌 Guardada';burst(10)};
       svb.append(f);
     }
@@ -5214,7 +5216,8 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   Object.entries(GRP).forEach(([t,gs])=>{const def=gs.find(g=>!g[2])||gs[0];document.querySelectorAll('main section').forEach(s=>{if(s.dataset.tab!==t)return;const g=gs.find(g=>g[2]&&g[2].includes(s.id));s.dataset.grp=(g||def)[0]})});
   const curG={}; try{Object.assign(curG,JSON.parse(sessionStorage.getItem('grp')||'{}'))}catch(e){}
   const saveG=()=>{try{sessionStorage.setItem('grp',JSON.stringify(curG))}catch(e){}};
-  const gVis=(t,k)=>[...document.querySelectorAll('main section')].some(s=>s.dataset.tab===t&&s.dataset.grp===k&&!s.classList.contains('oculta'));
+  const isOff=s=>s.hidden||s.classList.contains('oculta')||s.classList.contains('fuera');
+  const gVis=(t,k)=>[...document.querySelectorAll('main section')].some(s=>s.dataset.tab===t&&s.dataset.grp===k&&!isOff(s));
   const gOf=t=>{const gs=GRP[t];if(!gs)return null;if(gs.some(g=>g[0]===curG[t])&&gVis(t,curG[t]))return curG[t];const v=gs.find(g=>gVis(t,g[0]));return (v||gs[0])[0]};
   const subBar=document.createElement('div'); subBar.className='subtabs'; document.querySelector('main').prepend(subBar);
   {let on=null,q=false;const sc=()=>{q=false;const v=window.scrollY>4;if(v!==on){on=v;subBar.classList.toggle('sc',v)}};window.addEventListener('scroll',()=>{if(!q){q=true;requestAnimationFrame(sc)}},{passive:true});sc()}
@@ -5223,7 +5226,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   let DOT=new Set();
   function renderSub(){
     subBar.innerHTML=''; const gs=GRP[cur]||[], g=gOf(cur);
-    gs.filter(([k])=>[...document.querySelectorAll('main section')].some(s=>s.dataset.tab===cur&&s.dataset.grp===k&&!s.classList.contains('oculta'))).forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.className=(k===g?'cur':'')+([...DOT].some(id=>{const s=document.getElementById(id);return s&&s.dataset.tab===cur&&s.dataset.grp===k})&&k!==g?' dot':'');b.onclick=()=>setGrp(cur,k);subBar.append(b)});
+    gs.filter(([k])=>[...document.querySelectorAll('main section')].some(s=>s.dataset.tab===cur&&s.dataset.grp===k&&!isOff(s))).forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.className=(k===g?'cur':'')+([...DOT].some(id=>{const s=document.getElementById(id);return s&&s.dataset.tab===cur&&s.dataset.grp===k})&&k!==g?' dot':'');b.onclick=()=>setGrp(cur,k);subBar.append(b)});
     const ix=document.createElement('button');ix.type='button';ix.className='st-idx';ix.textContent='🔎';ix.setAttribute('aria-label','Todas las secciones');ix.onclick=()=>window.IDX_OPEN&&IDX_OPEN();subBar.append(ix);
     {const zb=document.createElement('button');zb.type='button';zb.className='st-idx zb-b';zb.textContent='📳';zb.onclick=()=>window.ZUMBIDO&&ZUMBIDO();subBar.append(zb);window.ZB_PAINT&&setTimeout(ZB_PAINT)}
     if(window.PR_ON){const pb=document.createElement('button');pb.type='button';pb.className='st-idx pr-b'+(window.PR_LIVE?' live':'');pb.textContent='👀';pb.setAttribute('aria-label','Cómo vamos');pb.onclick=()=>window.PR_OPEN&&PR_OPEN();subBar.append(pb)}
@@ -5232,7 +5235,7 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   }
   function apply(){const g=gOf(cur);document.querySelectorAll('main section').forEach(s=>s.classList.toggle('tab-off',s.dataset.tab!==cur||(!!g&&!!s.dataset.grp&&s.dataset.grp!==g)));renderSub()}
   function setGrp(t,k,keep){curG[t]=k;saveG();if(t===cur){apply();if(!keep)window.scrollTo(0,0);window.dispatchEvent(new Event('resize'))}}
-  function dots(){DOT=new Set();try{(window.PEND_VIS?PEND_VIS():PEND.all()).forEach(x=>{if(!x||!(x.n>0))return;const id=sidOf(x);if(id&&id!=='inicio'&&document.getElementById(id)&&!document.getElementById(id).classList.contains('oculta'))DOT.add(id)})}catch(e){}
+  function dots(){DOT=new Set();try{(window.PEND_VIS?PEND_VIS():PEND.all()).forEach(x=>{if(!x||!(x.n>0))return;const id=sidOf(x);if(id&&id!=='inicio'&&document.getElementById(id)&&!isOff(document.getElementById(id)))DOT.add(id)})}catch(e){}
     const tabs=new Set([...DOT].map(id=>document.getElementById(id).dataset.tab));
     nav.querySelectorAll('button').forEach(b=>b.classList.toggle('dot',tabs.has(b.dataset.k)&&b.dataset.k!==cur));renderSub()}
   window.SEC_OF=sidOf; window.TABNAV={GRP,gOf,setGrp,cur:()=>cur,dots:()=>DOT,refresh:()=>dots()};
@@ -5260,13 +5263,16 @@ const PJSEC={};DUO.forEach(([id,k])=>PJSEC[k]=id);
   function buildNav(){
     nav.querySelectorAll('button[data-k]').forEach(b=>b.remove());
     const ed=nav.querySelector('.tab-ed');
-    TABS.forEach(([k,i,n])=>{if(![...document.querySelectorAll('main section')].some(s=>s.dataset.tab===k&&!s.classList.contains('oculta')))return;const b=document.createElement('button');b.dataset.k=k;b.innerHTML=`<span>${i}</span>${esc(n)}`;b.onclick=()=>setTab(k);if(ed)nav.insertBefore(b,ed);else nav.append(b)});
+    TABS.forEach(([k,i,n])=>{if(![...document.querySelectorAll('main section')].some(s=>s.dataset.tab===k&&!isOff(s)))return;const b=document.createElement('button');b.dataset.k=k;b.innerHTML=`<span>${i}</span>${esc(n)}`;b.onclick=()=>setTab(k);if(ed)nav.insertBefore(b,ed);else nav.append(b)});
   }
   buildNav();
+  {const secs=[...document.querySelectorAll('main section')], sig=()=>secs.map(s=>isOff(s)?1:0).join(''); let lastS=sig();
+   const chk=()=>{const n=sig();if(n!==lastS){lastS=n;try{window.TABNAV.rebuild()}catch(e){}}};
+   secs.forEach(s=>{try{new MutationObserver(chk).observe(s,{attributes:true,attributeFilter:['hidden','class']})}catch(e){}})}
   window.TABNAV.rebuild=()=>{buildNav();nav.querySelectorAll('button[data-k]').forEach(b=>b.classList.toggle('cur',b.dataset.k===cur));apply();dots()};
   const orig=Element.prototype.scrollIntoView;
   Element.prototype.scrollIntoView=function(...a){try{const s=this.closest&&this.closest('main section');
-    if(s&&(this.closest('.oculta')||!nav.querySelector('button[data-k="'+s.dataset.tab+'"]'))){setTab('inicio');window.scrollTo(0,0);return}
+    if(s&&(isOff(s)||this.closest('.oculta')||!nav.querySelector('button[data-k="'+s.dataset.tab+'"]'))){setTab('inicio');window.scrollTo(0,0);return}
     if(s){if(s.dataset.tab&&s.dataset.tab!==cur)setTab(s.dataset.tab,true);
     if(s.dataset.grp&&GRP[s.dataset.tab]&&gOf(s.dataset.tab)!==s.dataset.grp){curG[s.dataset.tab]=s.dataset.grp;saveG();apply()}
     if(s.classList.contains('dash-sec')&&!s.classList.contains('dash-open')&&window.DASH_OPEN)DASH_OPEN(s.id,true)}}catch(e){}return orig.apply(this,a)};
@@ -5639,7 +5645,8 @@ function REACT(btn,x,w,save,what){
     const md=s=>{s=String(s||'');const m=+s.slice(5,7),d=+s.slice(8,10);return m&&d?[m,d]:null};
     const near=([mm,dd],before,after)=>{const n=MXD(),t=new Date(n.getFullYear(),n.getMonth(),n.getDate());
       return [-1,0,1].some(o=>{const diff=Math.round((new Date(t.getFullYear()+o,mm-1,dd)-t)/864e5);return diff<=before&&diff>=-after})};
-    const apply=()=>[['cumple',md(C.cumple),30,2],['cumpleyo',md(C.cumpleYo),30,2],['aniversario',md(C.inicio),30,7]].forEach(([id,d,b,a])=>{const s=$(id);if(s&&d)s.classList.toggle('fuera',!near(d,b,a))});
+    const FV=id=>!!(C.fechasVer&&C.fechasVer[id]==='siempre');
+    const apply=()=>[['cumple',md(C.cumple),30,2],['cumpleyo',md(C.cumpleYo),30,2],['aniversario',md(C.inicio),30,7]].forEach(([id,d,b,a])=>{const s=$(id);if(s&&d)s.classList.toggle('fuera',!FV(id)&&!near(d,b,a))});
     apply(); setInterval(apply,3600e3);
   });
 
@@ -5677,7 +5684,7 @@ function REACT(btn,x,w,save,what){
       const g=$('tbGrid'); g.innerHTML='';
       D.forEach(([id,ic,tt])=>{const s=$(id);if(!s||s.hidden||s.classList.contains('oculta'))return;let r=['',''];try{r=ST[id]()}catch(e){}
         const b=mk('button','tb-t'+(r[1]?' '+r[1]:''));b.type='button';b.append(mk('span','tb-i',ic),mk('b',null,tt),mk('small',null,r[0]));b.onclick=()=>DASH_OPEN(id);g.append(b)});
-      const vis=id=>{const s=$(id);return !s||!s.classList.contains('oculta')};
+      const vis=id=>{const s=$(id);return !s||(!s.hidden&&!s.classList.contains('oculta'))};
       const it=P.filter(p=>p[0]==='entrar'||vis(p[0])).map(p=>{let ok=false;try{ok=p[3]()}catch(e){}return [p,ok]}), done=it.filter(x=>x[1]).length, pct=Math.round(done/it.length*100);
       const pr=$('tbProg'); pr.innerHTML='';
       const ring=mk('div','tb-ring'); ring.style.background=`conic-gradient(var(--rose) ${pct}%, rgba(247,198,211,.2) 0)`; ring.append(mk('b',null,done+'/'+it.length));
@@ -6173,28 +6180,14 @@ function initEditor(){
   // ¿esta entrada se edita dentro de su sección de la página? (si no existe o está oculta/vacía, va al panel)
   function inlineEl(e){
     if(!e.sec||!e.f)return null;
-    return document.getElementById(e.sec)||null;
+    const el=document.getElementById(e.sec);
+    return el&&!(el.hidden||el.classList.contains('oculta')||el.classList.contains('fuera'))?el:null;
   }
-  // en modo edición, las secciones ocultas por su propio módulo (fecha / sin contenido) se muestran SOLO para Jon.
-  // Lo que Jon ocultó a propósito («Ocultar secciones» → «a los dos») NO se muestra hasta que lo haga visible.
-  const ED_O=(CUR.ocultas&&typeof CUR.ocultas==='object')?CUR.ocultas:{};
-  const edUserHid=id=>ED_O[id]==='dos';
-  function edShow(el,id){
-    if(edUserHid(id))return;
-    const wasHid=el.hidden||el.classList.contains('oculta');
-    if(!wasHid)return;
-    el.hidden=false;el.classList.remove('oculta');el.classList.add('ed-only');
-    let ban=el.querySelector(':scope>.ed-only-ban');
-    if(!ban){ban=h('div',{class:'ed-only-ban'});el.prepend(ban)}
-    ban.textContent='👁️ Solo tú ves esta sección para editarla · solo aparece en su fecha / todavía no tiene contenido';
-  }
-  {const seen=new Set();
-   SCHEMA.forEach(e=>{if(!e.sec||!e.f||seen.has(e.sec))return;seen.add(e.sec);const el=document.getElementById(e.sec);if(!el||edUserHid(e.sec))return;
-     edShow(el,e.sec);
-     // algunos módulos vuelven a ocultarla más tarde (p. ej. por fecha): se mantiene visible para Jon
-     try{let busy=false;new MutationObserver(()=>{if(busy)return;if(!(el.hidden||el.classList.contains('oculta')))return;busy=true;edShow(el,e.sec);try{window.TABNAV&&TABNAV.rebuild&&TABNAV.rebuild()}catch(x){}busy=false}).observe(el,{attributes:true,attributeFilter:['hidden','class']})}catch(x){}});
-   try{window.TABNAV&&TABNAV.rebuild&&TABNAV.rebuild()}catch(x){}}
-  function grpShown(i){for(let j=i+1;j<SCHEMA.length&&!SCHEMA[j].g;j++){if(!inlineEl(SCHEMA[j]))return true}return false}
+  // Una sección que ahora no se ve (por fecha, sin contenido u oculta) NO se muestra en la app ni para Jon:
+  // su editor aparece en el panel, bajo «Secciones que ahora no se ven».
+  const secOff=id=>{const el=document.getElementById(id);return !!el&&(el.hidden||el.classList.contains('oculta')||el.classList.contains('fuera'))};
+  const hidEnt=e=>!!(e.sec&&e.f&&secOff(e.sec));
+  function grpShown(i){for(let j=i+1;j<SCHEMA.length&&!SCHEMA[j].g;j++){if(!inlineEl(SCHEMA[j])&&!hidEnt(SCHEMA[j]))return true}return false}
   let D=JSON.parse(JSON.stringify(CUR)), dirty=false;
   const markDirty=()=>{dirty=true;saveBtn.textContent='Guardar cambios •'};
   document.body.classList.add('editing');
@@ -6214,11 +6207,11 @@ function initEditor(){
     const close=()=>{ov.remove();document.body.classList.remove('ale-pv-open');document.removeEventListener('keydown',esc2)};
     const esc2=ev=>{if(ev.key==='Escape')close()};
     const el0=document.getElementById(id), Oo=(CUR.ocultas&&typeof CUR.ocultas==='object')?CUR.ocultas:{};
-    const hidAle=Oo[id]==='ella'||Oo[id]==='dos', hidDate=!hidAle&&!!el0&&el0.classList.contains('ed-only'), force=hidAle||hidDate;
+    const hidAle=Oo[id]==='ella'||Oo[id]==='dos', force=hidAle;
     const fr=h('iframe',{class:'ale-pv-f',title:'Vista previa',src:location.pathname+'?ver=ella&pv=1&ir='+encodeURIComponent(id)+(force?'&pvshow='+encodeURIComponent(id):'')+location.hash});
     const ov=h('div',{class:'ale-pv'},
       h('div',{class:'ale-pv-h'},h('div',{class:'ale-pv-t'},'Así lo ve '+(CUR.ella||'Ale')+' · '+title),h('button',{class:'ale-pv-x',type:'button','aria-label':'Cerrar',onclick:close},'✕')),
-      force?h('div',{class:'ale-pv-n'},hidAle?'🙈 '+(CUR.ella||'Ale')+' no ve esta sección ahora (está oculta para ella). Así se vería si la muestras:':'📅 Esta sección solo le aparece en su fecha; así se verá:'):null,
+      force?h('div',{class:'ale-pv-n'},hidAle?'🙈 '+(CUR.ella||'Ale')+' no ve esta sección ahora (está oculta para ella). Así se vería si la muestras:':''):null,
       dirty?h('div',{class:'ale-pv-n'},'Tienes cambios sin guardar; aquí se ve lo último guardado'):null,fr);
     document.body.append(ov);document.body.classList.add('ale-pv-open');document.addEventListener('keydown',esc2);
   }
@@ -6229,7 +6222,8 @@ function initEditor(){
 
   // Ayuda de comodines
   if(!KEY_B64) body.append(h('div',{class:'ed-help',html:'⚠️ Abre esta página con tu link de edición completo (el que trae <b>#k=…</b>) para poder guardar.'}));
-  body.append(h('div',{class:'ed-jump'},...SCHEMA.filter((x,i)=>x.g&&grpShown(i)).map(x=>h('button',{onclick:()=>{const e=document.getElementById('edg-'+x.g.replace(/[^a-záéíóúñ]/gi,''));if(e)body.scrollTo({top:e.offsetTop-8,behavior:'smooth'})}},x.g))));
+  const jumpBox=h('div',{class:'ed-jump'},...SCHEMA.filter((x,i)=>x.g&&grpShown(i)).map(x=>h('button',{onclick:()=>{const e=document.getElementById('edg-'+x.g.replace(/[^a-záéíóúñ]/gi,''));if(e)body.scrollTo({top:e.offsetTop-8,behavior:'smooth'})}},x.g)));
+  body.append(jumpBox);
   body.append(h('div',{class:'ed-help',html:'Puedes escribir <b>{ella}</b>, <b>{yo}</b>, <b>{meses}</b> (ej. «8 meses»), <b>{Meses}</b> (ej. «Ocho meses») y <b>{toques}</b>: se actualizan solos cada mes.'}));
 
   // Conexión GitHub
@@ -6268,7 +6262,9 @@ function initEditor(){
   
 
   // Secciones de contenido
+  const hidEnts=[];
   SCHEMA.forEach((sec,si)=>{
+    if(hidEnt(sec)){hidEnts.push(sec);return}
     {const host=inlineEl(sec);
       if(host){
         const key='sec-ed-'+sec.t; let open=false; try{open=sessionStorage.getItem(key)==='1'}catch(e){}
@@ -6317,6 +6313,8 @@ function initEditor(){
       const TN={inicio:'🏠 Inicio',nosotros:'💑 Nosotros',cartas:'💌 Cartas',juegos:'🎮 Juegos',planes:'📝 Planes',parajon:'💙 De '+(D.ella||'Ale')};
       const ORD=['inicio','nosotros','cartas','juegos','planes','parajon','avisos'];
       const secs=[...document.querySelectorAll('main section[id]')].filter(x=>x.querySelector(':scope>h2')&&!['misavisos'].includes(x.id)).sort((a,b)=>ORD.indexOf(a.dataset.tab||'inicio')-ORD.indexOf(b.dataset.tab||'inicio'));
+      D.fechasVer=(D.fechasVer&&typeof D.fechasVer==='object'&&!Array.isArray(D.fechasVer))?D.fechasVer:{};
+      const FECHAS=['cumple','cumpleyo','aniversario','sanvalentin'];
       const cnt=h('div',{class:'ed-note'}), list=h('div',null);
       const paintC=ch=>{const n=Object.values(D.ocultas).filter(Boolean).length;cnt.textContent=(n?('Tienes '+n+(n===1?' sección oculta.':' secciones ocultas.')):'Todas las secciones están visibles.')+(ch?' Se aplica cuando toques «Guardar cambios».':'')};
       let last='';
@@ -6330,9 +6328,16 @@ function initEditor(){
         const sel=h('select',{class:'ed-in',style:'max-width:150px;padding:6px 8px'});
         [['','👁️ Visible'],['ella','🙈 Ocultar a '+(D.ella||'Ale')],['dos','🚫 Ocultar a los dos']].forEach(([v,l])=>{const o=h('option',{value:v},l);if((D.ocultas[x.id]||'')===v)o.selected=true;sel.append(o)});
         sel.addEventListener('change',()=>{if(sel.value)D.ocultas[x.id]=sel.value;else delete D.ocultas[x.id];markDirty();paintC(true)});
-        list.append(h('div',{style:'display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;border-top:1px solid rgba(247,198,211,.12)'},h('span',{style:'font-weight:700;font-size:14px'},x.n),sel))});
+        let ctl=sel;
+        if(FECHAS.includes(x.id)){
+          const fs=h('select',{class:'ed-in',style:'max-width:190px;padding:6px 8px;font-size:12px'});
+          [['auto','📅 Solo cerca de su fecha'],['siempre','👁️ Mostrar siempre']].forEach(([v,l])=>{const o=h('option',{value:v},l);if((D.fechasVer[x.id]||'auto')===v)o.selected=true;fs.append(o)});
+          fs.addEventListener('change',()=>{if(fs.value==='siempre')D.fechasVer[x.id]='siempre';else delete D.fechasVer[x.id];markDirty();paintC(true)});
+          ctl=h('div',{style:'display:flex;flex-direction:column;gap:4px;align-items:flex-end'},sel,fs);
+        }
+        list.append(h('div',{style:'display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;border-top:1px solid rgba(247,198,211,.12)'},h('span',{style:'font-weight:700;font-size:14px'},x.n),ctl))});
       paintC();
-      body.append(section('🙈 '+sec.t,[h('div',{class:'ed-note'},'Elige qué secciones no se ven. «Ocultar a '+(D.ella||'Ale')+'» la quita solo de su app; «a los dos» la quita también de la tuya. Nada se borra: si la vuelves a poner visible, todo sigue ahí.'),cnt,list]));
+      body.append(section('🙈 '+sec.t,[h('div',{class:'ed-note'},'Elige qué secciones no se ven. «Ocultar a '+(D.ella||'Ale')+'» la quita solo de su app; «a los dos» la quita también de la tuya. Nada se borra: si la vuelves a poner visible, todo sigue ahí.'),h('div',{class:'ed-note'},'📅 Cumpleaños, aniversario y San Valentín solo se ven cerca de su fecha. Si quieres que se vean todo el año, elige «Mostrar siempre» en su fila.'),cnt,list]));
       return;
     }
     if(sec.special==='avisos'){
@@ -6565,6 +6570,12 @@ function initEditor(){
     }
     body.append(section(sec.t, sec.f.map(fd=>field(fd))));
   });
+  if(hidEnts.length){
+    body.append(h('div',{class:'ed-group',id:'edg-ocultas-ahora'},'📅 Secciones que ahora no se ven'),
+      h('div',{class:'ed-note'},'Estas secciones no aparecen en la app ahora (por fecha u ocultas). Aquí puedes editar su contenido.'));
+    hidEnts.forEach(sec=>body.append(section(sec.t,sec.f.map(fd=>field(fd)))));
+    if(jumpBox)jumpBox.append(h('button',{onclick:()=>{const e=document.getElementById('edg-ocultas-ahora');if(e)body.scrollTo({top:e.offsetTop-8,behavior:'smooth'})}},'📅 No se ven'));
+  }
   body.append(conSec);
 
   function section(title,kids,open){
