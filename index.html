@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-l23ItRc1p4CJH4lWydaIYWlH1OnEJZCCIl0t26gCpJg='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wLxW3qzrIG4aFQTNiD+x3mbFnRKoocG1ZHP0KRr64aw='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2827,6 +2827,8 @@ const WHENS=C.abrela.map(o=>[o.emoji,FILL(o.cuando),FILL(o.texto)]);
   window.addEventListener('unlocked',()=>{if(VIEWER()!=='yo')avisar(`👀 ${C.ella} entró a nuestra app`,'entrada');if(shown)return;shown=true;
     // la pantalla del mensaje sale solo la primera vez de cada día
     // …o cuando Jon la reinicia desde el editor
+    /* interruptores del editor «pantalla del día al abrir» (C.pantallaDia.ella / .yo; ausente = activado). La vista previa no cambia. */
+    if(!PV_MODE&&C.pantallaDia&&C.pantallaDia[VIEWER()==='yo'?'yo':'ella']===false){setTimeout(()=>window.dispatchEvent(new Event('hoyClosed')),600);return}
     const k=DK(MXD()), rc=String(CUTOF('rhoy')); let seen='',sr='0'; try{seen=localStorage.getItem('hoy-visto')||'';sr=localStorage.getItem('hoy-visto-r')||'0'}catch(e){}
     if(seen===k&&sr===rc)return;
     try{localStorage.setItem('hoy-visto',k);localStorage.setItem('hoy-visto-r',rc)}catch(e){}
@@ -6342,7 +6344,7 @@ const SCHEMA=[
   {t:'Nombres, fecha y candado',f:[['ella','Su nombre','text'],['yo','Tu nombre (firma)','text'],['inicio','Fecha en que empezó todo','date'],['pin','Código del candado (4 números)','text']]},
   {t:'Saludos según la hora',sec:'inicio',f:[['saludos.manana','Mañana (5 am – 12 pm)','text'],['saludos.tarde','Tarde (12 – 7 pm)','text'],['saludos.noche','Noche','text']]},
   {g:'🏠 Inicio'},
-  {t:'Mensaje del día',sec:'hoy',f:[['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2]]},
+  {t:'Mensaje del día',sec:'hoy',f:[['pantallaDia.ella','Mostrar a {ella} la pantalla del día al abrir (el mensaje en grande, la primera vez de cada día)','switch'],['pantallaDia.yo','Mostrármela a mí (la pantalla del día al abrir)','switch'],['mensajeFijo','Lo que siempre le aparece abajo del mensaje del día','textarea',2]]},
   {t:'Horóscopo del amor',sec:'horoscopo',f:[['horoscopo','Predicciones (salen dos distintas cada día; puedes usar {ella} y {yo})','list']]},
   {t:'Corazones escondidos',sec:'corazones',f:[['corazonesN','¿Cuántos corazones esconder cada mes? (3 a 12, normalmente 6)','text'],['premioCorazones','Premio cuando los encuentre todos (opcional)','textarea',2]]},
   {t:'Reto de fotos (uno por semana)',sec:'fotoreto',f:[['retosFoto','Temas (cambia cada lunes)','list']]},
@@ -6828,7 +6830,7 @@ function initEditor(){
     }else if(type==='switch'){
       const cb=h('input',{type:'checkbox',style:'width:22px;height:22px;flex:none;accent-color:#e85d84'});cb.checked=getP(D,path)!==false;
       cb.addEventListener('change',()=>{setP(D,path,cb.checked);markDirty()});
-      wrap.append(h('label',{class:'ed-lab',style:'display:flex;align-items:center;gap:10px;cursor:pointer'},cb,h('span',{style:'font-weight:700'},label)));
+      wrap.append(h('label',{class:'ed-lab',style:'display:flex;align-items:center;gap:10px;cursor:pointer'},cb,h('span',{style:'font-weight:700'},String(label).replace(/\{ella\}/g,D.ella||'Ale').replace(/\{yo\}/g,D.yo||'Jon'))));
     }else if(type==='textarea'){
       const t=h('textarea',{class:'ed-in',rows:extra||4});t.value=getP(D,path)??'';
       t.addEventListener('input',()=>{setP(D,path,t.value);markDirty();autosize(t)});
