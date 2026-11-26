@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-XrmdcbQ2eMCqTfnbjfYkf4g91114Bd3sicuZcTJ66r0='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-l23ItRc1p4CJH4lWydaIYWlH1OnEJZCCIl0t26gCpJg='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -3735,7 +3735,8 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
 /* ====== Modo noche (11 pm – 5 am) ====== */
 (function(){
   const box=document.getElementById('nite'), ella=VIEWER()==='ella';
-  const night=()=>{const h=MXD().getHours();return h>=23||h<5};
+  const enabled=()=>!(C.modoNoche&&C.modoNoche.on===false); /* interruptor del editor «Activar modo noche»: apagado = nunca aviso ni tema nocturno */
+  const night=()=>{if(!enabled())return false;const h=MXD().getHours();return h>=23||h<5};
   const key=()=>{const d=MXD();if(d.getHours()<5)d.setDate(d.getDate()-1);return 'noche-off-'+DK(d)};
   const off=()=>{try{return localStorage.getItem(key())==='1'}catch(e){return false}};
   const tema=()=>{try{return localStorage.getItem('tema')||'vino'}catch(e){return 'vino'}};
@@ -6346,7 +6347,7 @@ const SCHEMA=[
   {t:'Corazones escondidos',sec:'corazones',f:[['corazonesN','¿Cuántos corazones esconder cada mes? (3 a 12, normalmente 6)','text'],['premioCorazones','Premio cuando los encuentre todos (opcional)','textarea',2]]},
   {t:'Reto de fotos (uno por semana)',sec:'fotoreto',f:[['retosFoto','Temas (cambia cada lunes)','list']]},
   {t:'¿Quién es más probable que…?',sec:'probable',f:[['probable','Preguntas (una distinta cada día; escribe solo el final, ej. «se quede dormido viendo una peli»)','list']]},
-  {t:'Modo noche (11 pm – 5 am)',sec:'noches',f:[['buenasNoches','Mensajes de buenas noches para Ale (cambia uno cada noche)','list']]},
+  {t:'Modo noche (11 pm – 5 am)',f:[['modoNoche.on','Activar modo noche (aviso y tema nocturno de 11 pm a 5 am)','switch'],['buenasNoches','Mensajes de buenas noches para Ale (cambia uno cada noche)','list']]},
   {t:'Cumpleaños de Ale',sec:'cumple',f:[['cumple','Fecha de su cumpleaños (el año no importa)','date'],['cartaCumple','Carta de cumpleaños (se abre solo ese día) · deja una línea vacía entre párrafos','textarea',8]]},
   {t:'Cumpleaños de Jon',sec:'cumpleyo',f:[['cumpleYo','Tu fecha de cumpleaños (el año no importa)','date']]},
   {t:'Fechas especiales',sec:'sanvalentin',f:[['cartaSanValentin','Carta de San Valentín para Ale (se abre el 14 de febrero)','textarea',6]]},
@@ -6383,17 +6384,24 @@ function b64buf(buf){const by=new Uint8Array(buf);let s='';for(let i=0;i<by.leng
 function autosize(t){t.style.height='auto';if(!t.offsetParent)return;t.style.height=(t.scrollHeight+(t.offsetHeight-t.clientHeight)+1)+'px'}
 
 function initEditor(){
-  // ¿esta entrada se edita dentro de su sección de la página? (si no existe o está oculta/vacía, va al panel)
+  // ¿esta entrada se edita dentro de su sección de la página? Siempre que la sección exista, su .sec-ed vive dentro de ella:
+  // si la sección no se ve (fecha, horario, oculta, subpestaña inactiva) el editor se esconde con ella y reaparece cuando se ve.
+  // Solo si la sección no existe en la página, la entrada va al panel.
   function inlineEl(e){
     if(!e.sec||!e.f)return null;
-    const el=document.getElementById(e.sec);
-    return el&&!(el.hidden||el.classList.contains('oculta')||el.classList.contains('fuera'))?el:null;
+    return document.getElementById(e.sec)||null;
   }
-  // Una sección que ahora no se ve (por fecha, sin contenido u oculta) NO se muestra en la app ni para Jon:
-  // su editor aparece en el panel, bajo «Secciones que ahora no se ven».
-  const secOff=id=>{const el=document.getElementById(id);return !!el&&(el.hidden||el.classList.contains('oculta')||el.classList.contains('fuera'))};
-  const hidEnt=e=>!!(e.sec&&e.f&&secOff(e.sec));
-  function grpShown(i){for(let j=i+1;j<SCHEMA.length&&!SCHEMA[j].g;j++){if(!inlineEl(SCHEMA[j])&&!hidEnt(SCHEMA[j]))return true}return false}
+  // Secciones que se esconden solas por no tener contenido (lista vacía, sin fecha…). Su edición va al panel, en «Secciones vacías».
+  // No entran: las ocultas a propósito (C.ocultas) ni las que solo están fuera de fecha (cumpleaños 'auto' → clase «fuera»; San Valentín).
+  const OCU=(CUR.ocultas&&typeof CUR.ocultas==='object')?CUR.ocultas:{};
+  function emptyEnt(e){
+    if(!e.sec||!e.f||OCU[e.sec]||e.sec==='sanvalentin')return false;
+    const el=document.getElementById(e.sec);
+    if(!el||!el.hidden||el.classList.contains('oculta')||el.classList.contains('fuera'))return false;
+    if(e.sec==='fotoreto')return !(CUR.retosFoto||[]).filter(Boolean).length;
+    return true;
+  }
+  function grpShown(i){for(let j=i+1;j<SCHEMA.length&&!SCHEMA[j].g;j++){if(!inlineEl(SCHEMA[j])||emptyEnt(SCHEMA[j]))return true}return false}
   let D=JSON.parse(JSON.stringify(CUR)), dirty=false;
   const markDirty=()=>{dirty=true;saveBtn.textContent='Guardar cambios •'};
   document.body.classList.add('editing');
@@ -6475,9 +6483,9 @@ function initEditor(){
   
 
   // Secciones de contenido
-  const hidEnts=[];
+  const emptyEnts=[];
   SCHEMA.forEach((sec,si)=>{
-    if(hidEnt(sec)){hidEnts.push(sec);return}
+    if(emptyEnt(sec)){emptyEnts.push(sec);return}
     {const host=inlineEl(sec);
       if(host){
         const key='sec-ed-'+sec.t; let open=false; try{open=sessionStorage.getItem(key)==='1'}catch(e){}
@@ -6788,11 +6796,11 @@ function initEditor(){
     }
     body.append(section(sec.t, sec.f.map(fd=>field(fd))));
   });
-  if(hidEnts.length){
-    body.append(h('div',{class:'ed-group',id:'edg-ocultas-ahora'},'📅 Secciones que ahora no se ven'),
-      h('div',{class:'ed-note'},'Estas secciones no aparecen en la app ahora (por fecha u ocultas). Aquí puedes editar su contenido.'));
-    hidEnts.forEach(sec=>body.append(section(sec.t,sec.f.map(fd=>field(fd)))));
-    if(jumpBox)jumpBox.append(h('button',{onclick:()=>{const e=document.getElementById('edg-ocultas-ahora');if(e)body.scrollTo({top:e.offsetTop-8,behavior:'smooth'})}},'📅 No se ven'));
+  if(emptyEnts.length){
+    body.append(h('div',{class:'ed-group',id:'edg-vacias'},'🫙 Secciones vacías'),
+      h('div',{class:'ed-note'},'No se ven porque no tienen contenido. Agrega algo aquí y aparecerán.'));
+    emptyEnts.forEach(sec=>body.append(section(sec.t,sec.f.map(fd=>field(fd)))));
+    jumpBox.append(h('button',{onclick:()=>{const e=document.getElementById('edg-vacias');if(e)body.scrollTo({top:e.offsetTop-8,behavior:'smooth'})}},'🫙 Vacías'));
   }
   body.append(conSec);
 
@@ -6817,6 +6825,10 @@ function initEditor(){
       const i=h('input',{class:'ed-in',type:type==='text'?'text':type,value:getP(D,path)??''});
       i.addEventListener('input',()=>{setP(D,path,type==='number'?(+i.value||1):i.value);markDirty()});
       wrap.append(h('label',{class:'ed-lab'},h('span',null,label),i));
+    }else if(type==='switch'){
+      const cb=h('input',{type:'checkbox',style:'width:22px;height:22px;flex:none;accent-color:#e85d84'});cb.checked=getP(D,path)!==false;
+      cb.addEventListener('change',()=>{setP(D,path,cb.checked);markDirty()});
+      wrap.append(h('label',{class:'ed-lab',style:'display:flex;align-items:center;gap:10px;cursor:pointer'},cb,h('span',{style:'font-weight:700'},label)));
     }else if(type==='textarea'){
       const t=h('textarea',{class:'ed-in',rows:extra||4});t.value=getP(D,path)??'';
       t.addEventListener('input',()=>{setP(D,path,t.value);markDirty();autosize(t)});
