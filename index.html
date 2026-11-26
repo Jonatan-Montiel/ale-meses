@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wLxW3qzrIG4aFQTNiD+x3mbFnRKoocG1ZHP0KRr64aw='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-9eNQIP1MB2AESkrSjjJTeyrRz1bjZwBUQNUQlKEl1NA='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -907,6 +907,11 @@
   body.light .ma-r i{background:rgba(120,40,70,.18)}
   .auth-warn{position:fixed;left:10px;right:10px;bottom:84px;z-index:46;background:#9b2c3c;color:#fff;border-radius:14px;padding:12px 40px 12px 14px;font:700 13.5px 'Nunito';box-shadow:0 10px 24px rgba(0,0,0,.4)}
   .auth-warn button{position:absolute;top:8px;right:8px;border:0;background:none;color:#fff;font-size:16px;cursor:pointer}
+  .pin-warn{position:fixed;left:10px;right:10px;top:calc(10px + var(--sat,0px));z-index:96;background:#9b2c3c;color:#fff;border-radius:14px;padding:12px 40px 12px 14px;font:700 13.5px 'Nunito',sans-serif;box-shadow:0 10px 24px rgba(0,0,0,.35);cursor:pointer}
+  .pin-warn button{position:absolute;top:8px;right:8px;border:0;background:none;color:#fff;font-size:16px;cursor:pointer}
+  body.locked .pin-warn,body:has(.ed-panel.open) .pin-warn{display:none}
+  /* En la app, el candado es la huella o el bloqueo del celular: sin teclado de código */
+  #lock.nat .pin-dots,#lock.nat .pad{display:none}
   /* Barra de edición discreta */
   body.editing:not(.ed-inactiva) .ed-bar{display:none}
   body.editing:not(.ed-inactiva){padding-top:0}
@@ -2725,12 +2730,17 @@ galRender();
   /* ---- Huella (solo dentro de la app de Android) ---- */
   const bioB=document.getElementById('bioBtn');
   const hasBio=()=>{try{return !!(window.AndroidApp&&AndroidApp.hasBio&&AndroidApp.hasBio())}catch(e){return false}};
-  const askBio=()=>{if(open||lockedFor()>0||!hasBio())return;try{AndroidApp.bio()}catch(e){}};
-  window.__bioOk=()=>{if(!open){v='';paint();ok()}};
+  /* La app nueva expone AndroidApp.bioOk(): la huella o el bloqueo del celular se validó en nativo hace poco.
+     Si existe, la página solo se abre cuando devuelve true (nadie puede "decir" que ya pasó la huella).
+     Con una app vieja (sin bioOk) todo sigue como antes. */
+  const nativeBio=()=>{try{return !!(window.AndroidApp&&typeof AndroidApp.bioOk==='function')}catch(e){return false}};
+  const nativeOk=()=>{try{return nativeBio()&&AndroidApp.bioOk()===true}catch(e){return false}};
+  const askBio=()=>{if(open||(lockedFor()>0&&!nativeBio())||!hasBio())return;try{AndroidApp.bio()}catch(e){}};
+  window.__bioOk=()=>{if(open)return; if(nativeBio()&&!nativeOk())return; v='';paint();ok()};
   // después de guardar en el editor, la página se recarga: no vuelvas a pedir el código
   let edU=0; try{edU=+(sessionStorage.getItem('ed-unlock')||0);sessionStorage.removeItem('ed-unlock')}catch(e){}
   if(PV_MODE||(EDIT&&edU>Date.now())){lock.style.display='none';lock.classList.add('out');document.body.classList.remove('locked');open=true;setTimeout(()=>{try{last=Date.now()}catch(e){}window.dispatchEvent(new Event('unlocked'))},50)}
-  else if(hasBio()){bioB.hidden=false;bioB.onclick=askBio;setTimeout(askBio,500)}
+  else if(hasBio()){bioB.hidden=false;bioB.onclick=askBio;if(nativeBio())lock.classList.add('nat');setTimeout(askBio,500)}
   /* ---- Volver a bloquear si se deja sin usar o al regresar de otra app ---- */
   function relock(){
     if(PV_MODE||!open||!document.getElementById('lock'))return; open=false; v=''; paint();
@@ -6409,6 +6419,10 @@ function initEditor(){
   document.body.classList.add('editing');
   document.body.append(h('div',{class:'ed-bar'},'✏️ Modo edición · tus cambios van directo a la página publicada'));
   const fab=h('button',{class:'ed-fab',onclick:()=>openPanel(true)},'✏️ Editar');
+  if(String(CUR.pin||'').padStart(4,'0')==='0000'){
+    const pw=h('div',{class:'pin-warn',role:'alert',onclick:()=>{pw.remove();openPanel(true)}},'🔓 El código del candado sigue siendo 0000. Cámbialo en Editar › Nombres, fecha y candado.',h('button',{'aria-label':'Cerrar',onclick:e=>{e.stopPropagation();pw.remove()}},'×'));
+    document.body.append(pw);
+  }
   const status=h('div',{class:'ed-status'});
   const saveBtn=h('button',{class:'ed-save',onclick:()=>save()},'Guardar cambios');
   const body=h('div',{class:'ed-body'});

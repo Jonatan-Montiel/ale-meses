@@ -449,6 +449,12 @@ public class MainActivity extends Activity {
     }
 
     boolean bioBusy = false;
+    /** Momento (SystemClock.elapsedRealtime) en que la huella o el bloqueo del celular se validó en ESTA Activity; 0 = nunca. */
+    volatile long bioAt = 0;
+    static final long BIO_VALID_MS = 30 * 1000L;
+
+    /** Verdadero solo si se validó hace poco; lo consulta la página por el puente (no puede falsificarse desde JS). */
+    boolean bioFresh() { long t = bioAt; return t > 0 && android.os.SystemClock.elapsedRealtime() - t <= BIO_VALID_MS; }
 
     boolean bioAvailable() {
         try {
@@ -465,20 +471,44 @@ public class MainActivity extends Activity {
         return false;
     }
 
+    /** El celular tiene patrón, PIN o contraseña de pantalla configurado. */
+    boolean deviceSecure() {
+        try {
+            android.app.KeyguardManager km = (android.app.KeyguardManager) getSystemService(KEYGUARD_SERVICE);
+            return km != null && km.isDeviceSecure();
+        } catch (Exception e) { return false; }
+    }
+
+    /** Se puede usar el candado nativo: huella, o (API 29+) el bloqueo de pantalla del celular como respaldo. */
+    boolean nativeLockAvailable() {
+        if (Build.VERSION.SDK_INT < 28) return false;
+        if (Build.VERSION.SDK_INT >= 29 && deviceSecure()) return true;
+        return bioAvailable();
+    }
+
     void askBio() {
-        if (bioBusy || Build.VERSION.SDK_INT < 28 || !bioAvailable()) return;
+        if (bioBusy || !nativeLockAvailable()) return;
         bioBusy = true;
         try {
             BiometricPrompt.Builder b = new BiometricPrompt.Builder(this)
                     .setTitle("Nuestro lugar 💗")
-                    .setSubtitle("Usa tu huella para entrar")
-                    .setNegativeButton("Usar código", getMainExecutor(), (d, w) -> bioBusy = false);
-            if (Build.VERSION.SDK_INT >= 30) b.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK);
+                    .setSubtitle("Desbloquea para entrar");
+            if (Build.VERSION.SDK_INT >= 30) {
+                // Huella (si hay) o bloqueo de pantalla del celular; el sistema muestra su propio respaldo.
+                int auth = BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+                if (bioAvailable()) auth |= BiometricManager.Authenticators.BIOMETRIC_WEAK;
+                b.setAllowedAuthenticators(auth);
+            } else if (Build.VERSION.SDK_INT == 29 && deviceSecure()) {
+                b.setDeviceCredentialAllowed(true);
+            } else {
+                b.setNegativeButton("Cancelar", getMainExecutor(), (d, w) -> bioBusy = false);
+            }
             b.build().authenticate(new CancellationSignal(), getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
                 @Override
                 public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult r) {
                     bioBusy = false;
-                    if (wv != null) wv.evaluateJavascript("window.__bioOk&&window.__bioOk()", null);
+                    bioAt = android.os.SystemClock.elapsedRealtime();
+                    if (wv != null && fromOurPage()) wv.evaluateJavascript("window.__bioOk&&window.__bioOk()", null);
                 }
                 @Override
                 public void onAuthenticationError(int code, CharSequence msg) { bioBusy = false; }
@@ -685,7 +715,10 @@ public class MainActivity extends Activity {
         public boolean isApp() { if (!fromOurPage()) { return false; } return true; }
 
         @JavascriptInterface
-        public boolean hasBio() { if (!fromOurPage()) { return false; } return bioAvailable(); }
+        public boolean hasBio() { if (!fromOurPage()) { return false; } return nativeLockAvailable(); }
+        /** true solo si la huella o el bloqueo del celular se validó en esta Activity hace menos de BIO_VALID_MS. */
+        @JavascriptInterface
+        public boolean bioOk() { if (!fromOurPage()) { return false; } return bioFresh(); }
         @JavascriptInterface
         public void setWidget(String json) { if (!fromOurPage()) { return; } sp.edit().putString("widget", json).apply(); Widget.refresh(MainActivity.this); }
 
