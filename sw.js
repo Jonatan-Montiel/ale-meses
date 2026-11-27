@@ -1,7 +1,7 @@
 /* Service worker de «Nuestro lugar»: solo guarda la cáscara de la página (index.html, manifest, iconos)
    para que abra sin internet. NUNCA toca api.github.com, gists, ntfy ni ningún otro dominio, ni data.bin, fotos o audios:
    todo eso sigue yendo directo a la red como siempre (el contenido ya se guarda cifrado en el propio celular). */
-const V = 'nl-shell-v1';
+const V = 'nl-shell-v2';
 const SCOPE = self.registration.scope;
 const INDEX = new URL('index.html', SCOPE).href;
 const STATIC = ['manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/maskable-512.png'].map(p => new URL(p, SCOPE).href);
