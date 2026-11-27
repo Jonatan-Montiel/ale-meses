@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-9eNQIP1MB2AESkrSjjJTeyrRz1bjZwBUQNUQlKEl1NA='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mnWmSTQ1h6SbxOsK3Os66XnAeDbRBAoUgqTOR5Kq0cQ='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src blob:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://gist.githubusercontent.com https://ntfy.sh; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -879,7 +879,7 @@
   html.lite .subtabs.sc{background:color-mix(in srgb,var(--bartop,#5e1532) 92%,transparent)}
   html.lite .pr-dot,html.lite .bell.has,html.lite .cap-ico,html.lite .rch-fire,html.lite .hh{animation:none!important}
   html.lite #hearts .fh{will-change:transform}
-  .ver-chk{margin-top:8px;justify-self:start;border:0;border-radius:999px;padding:8px 14px;background:var(--rose,#e8577f);color:#fff;font:800 13px 'Nunito',sans-serif;cursor:pointer}.ver-chk:disabled{opacity:.6}.ver-msg{font-size:12.5px}.ver-ask{margin-top:8px;justify-self:start;border:1.5px solid var(--rose,#e8577f);border-radius:999px;padding:7px 13px;background:transparent;color:var(--rose,#e8577f);font:800 13px 'Nunito',sans-serif;cursor:pointer}.ver-ask:disabled{opacity:.6}
+  .ver-chk{margin-top:8px;justify-self:start;border:0;border-radius:999px;padding:8px 14px;background:var(--rose,#e8577f);color:#fff;font:800 13px 'Nunito',sans-serif;cursor:pointer}.ver-chk:disabled{opacity:.6}.ver-msg{font-size:12.5px}.ver-last{font-size:11.5px;opacity:.65;margin-top:2px;word-break:break-word}.ver-ask{margin-top:8px;justify-self:start;border:1.5px solid var(--rose,#e8577f);border-radius:999px;padding:7px 13px;background:transparent;color:var(--rose,#e8577f);font:800 13px 'Nunito',sans-serif;cursor:pointer}.ver-ask:disabled{opacity:.6}
   .th-box .ver-w{margin-top:10px}.th-box .ver{background:rgba(120,40,70,.07)!important;border:0;color:#3d1f2a}.th-box .ver span{opacity:.7}.th-box .ver a{color:#b3204f}
   .th-out .logout{display:block;width:100%;margin:10px 0 0;text-align:left;padding:12px 14px;border-radius:14px;background:rgba(120,40,70,.07);border:0;color:#7a2244;font:800 14px 'Nunito',sans-serif;cursor:pointer}
   body.light .th-out .logout{background:rgba(0,0,0,.05)}
@@ -4236,13 +4236,16 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
     hbDone=true; render()}catch(e){}}
   const ago=t=>{const m=Math.max(0,Math.round((Date.now()-t)/6e4));return m<2?'hace un momento':m<60?'hace '+m+' min':m<1440?'hace '+Math.round(m/60)+' h':'el '+fmtDia(t)};
   setTimeout(beat,3000); setInterval(()=>{if(!document.hidden)beat()},5*60e3);
+  // última vez que la app intentó actualizarse (paso, error, hora): solo existe en apps nuevas
+  const lastUpd=()=>{try{if(!A||typeof A.updInfo!=='function')return '';const j=JSON.parse(A.updInfo()||'null');if(!j||!j.t||!j.step)return '';
+    return `<div class="ver-last">Última actualización: ${esc(j.step)}${j.err?' · '+esc(j.err):''} · ${fmtDia(j.t)} ${fmtHora(j.t)}</div>`}catch(e){return ''}};
   function render(){
     if(!box)return;
     const o=S.all().find(x=>x.id===oth&&!x.x), mv=mine(), num=v=>+String(v).replace(/\D/g,'')||0;
     const hbl=!hbDone?'':hb&&hb.t?`<div>📲 Su app: <b>instalada</b> <span>· activa ${ago(+hb.t)}</span></div>`:(o&&num(o.v)>=29?`<div>⚠️ <b>Sin señal de su app</b> en las últimas 12 h <span>· puede que la haya desinstalado o que el celular la tenga dormida</span></div>`:`<div><span>📲 Si tiene la app instalada se verá aquí cuando los dos tengan la v29</span></div>`);
     const st=v=>v==='web'||!latest?'':num(v)>=latest?' ✅':' ⚠️';
     if(me==='ella'){ // para Ale: solo su versión y el botón, sin el detalle de versiones
-      box.innerHTML=A?`<div class="ver ver-ella"><div>📱 Tu app: <b>${esc(lbl(mv))}</b>${st(mv)}</div><button type="button" class="ver-chk">🔄 Buscar actualización</button><div class="ver-msg"></div></div>`:'';
+      box.innerHTML=A?`<div class="ver ver-ella"><div>📱 Tu app: <b>${esc(lbl(mv))}</b>${st(mv)}</div><button type="button" class="ver-chk">🔄 Buscar actualización</button><div class="ver-msg"></div>${lastUpd()}</div>`:'';
       const c2=box.querySelector('.ver-chk'); if(c2)c2.onclick=chk;
       const bar=document.getElementById('updBar'); if(A&&latest&&num(mv)<latest&&!bar&&window.__showUpd)window.__showUpd(); return}
     box.innerHTML=`<div class="ver"><b>📱 Versiones de la app</b>
@@ -4251,7 +4254,7 @@ const COUPONS=C.vales.map(o=>[o.emoji,FILL(o.titulo),FILL(o.detalle)]);
       ${hbl}
       ${latest?`<div>La más nueva: <b>v${latest}</b></div>`:''}
       ${A&&latest&&num(mv)<latest?`<a href="${url(me)}" target="_blank" rel="noopener">⬇️ Actualizar mi app</a>`:''}
-      ${A?'<button type="button" class="ver-chk">🔄 Buscar actualización</button><div class="ver-msg"></div>':''}
+      ${A?'<button type="button" class="ver-chk">🔄 Buscar actualización</button><div class="ver-msg"></div>'+lastUpd():''}
       <button type="button" class="ver-ask">📲 Pedirle a ${esc(nm(oth))} que actualice</button><div class="ver-ask-msg ver-msg">${askMsg}</div></div>`;
     const ck=box.querySelector('.ver-chk'); if(ck)ck.onclick=chk;
     const ak=box.querySelector('.ver-ask'); if(ak){ak.onclick=ask;askTick()}

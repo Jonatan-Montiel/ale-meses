@@ -40,10 +40,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.net.URL;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -68,10 +73,60 @@ class Updater {
     static final String CH = "actualizacion";
     static final long BG_EVERY = 6 * 60 * 60 * 1000L;
     static final long MAX_APK = 80L * 1024 * 1024;
+    static final String RELEASE = "https://github.com/Jonatan-Montiel/ale-meses/releases/download/apk/";
     static volatile boolean showing = false;
     static final AtomicBoolean busy = new AtomicBoolean(false);
+    /** Flujo manual («Actualizar»): hay uno en curso / se espera la respuesta del instalador / diálogo de avance. */
+    static final AtomicBoolean manualBusy = new AtomicBoolean(false);
+    static volatile boolean awaiting = false;
+    static volatile AlertDialog prog = null;
+    static volatile String lastInstallErr = "";
 
     static class Remote { long vc = -1; String url, sha, src; }
+
+    interface Step { void on(String s); }
+
+    static void step(Step st, String s) { if (st != null) { try { st.on(s); } catch (Throwable ignored) { } } }
+
+    /** Descarga directa del APK de este sabor, para abrirla en el navegador (Vercel primero: llega aunque GitHub no). */
+    static String directUrl() { return MainActivity.MIRROR + "dl/" + apkName() + "?t=" + System.currentTimeMillis(); }
+
+    /** Fuentes del APK en orden: la que dio version.json primero, luego las demás. */
+    static List<String> candidates(Remote r) {
+        List<String> l = new ArrayList<>();
+        String a = apkName();
+        if (r.url != null) l.add(r.url);
+        for (String u : new String[]{MainActivity.MIRROR + "dl/" + a, MainActivity.BASE + "dl/" + a, RELEASE + a}) if (!l.contains(u)) l.add(u);
+        return l;
+    }
+
+    // ---------------------------------------------------------------- último resultado (para depurar desde la página)
+
+    static void rec(Context c, String step, String err) {
+        try { Loc.sp(c).edit().putString("upd-last-step", step).putString("upd-last-err", err == null ? "" : err).putLong("upd-last-t", System.currentTimeMillis()).apply(); }
+        catch (Throwable ignored) { }
+        Log.i(T, "estado: " + step + (err == null || err.isEmpty() ? "" : " · " + err));
+    }
+
+    /** JSON {step, err, t, vc, perm, silent} para la página (vacío si todavía no hubo ningún intento). */
+    static String info(Context c) {
+        try {
+            SharedPreferences sp = Loc.sp(c);
+            JSONObject o = new JSONObject();
+            o.put("step", sp.getString("upd-last-step", "")); o.put("err", sp.getString("upd-last-err", "")); o.put("t", sp.getLong("upd-last-t", 0));
+            o.put("vc", Beat.vc(c));
+            o.put("perm", Build.VERSION.SDK_INT < 26 || c.getPackageManager().canRequestPackageInstalls());
+            o.put("silent", canSilent(c));
+            return o.toString();
+        } catch (Exception e) { return ""; }
+    }
+
+    static String why(Throwable e) {
+        if (e instanceof UnknownHostException || e instanceof SocketTimeoutException || e instanceof ConnectException) return "No hubo conexión con el servidor de descargas.";
+        String m = e.getMessage();
+        if (m == null || m.isEmpty()) m = e.getClass().getSimpleName();
+        return m.length() > 160 ? m.substring(0, 160) : m;
+    }
 
     static String apkName() { return MainActivity.IS_JON ? "nuestro-lugar-jon.apk" : "nuestro-lugar.apk"; }
 
@@ -252,27 +307,61 @@ class Updater {
     }
 
     /** Descarga (si hace falta) y verifica el APK. Devuelve el archivo listo o lanza excepción. */
-    static File stage(Context c, Remote r, boolean background) throws Exception {
+    static File stage(Context c, Remote r, boolean background) throws Exception { return stage(c, r, background, r.url, null); }
+
+    static File stage(Context c, Remote r, boolean background, String url, Step st) throws Exception {
         File d = dir(c), f = staged(c, r.vc);
-        if (f.exists()) { if (verify(c, f, r) == null) return f; f.delete(); }
+        if (f.exists()) { step(st, "Verificando…"); if (verify(c, f, r) == null) return f; f.delete(); }
         File[] old = d.listFiles(); if (old != null) for (File o : old) o.delete();
         File part = new File(d, "nl-" + r.vc + ".part");
-        boolean api = r.url.startsWith("https://github.com/") || r.url.contains("githubusercontent.com");
-        HttpURLConnection h = open(r.url, !api, null);
+        boolean api = url.startsWith("https://github.com/") || url.contains("githubusercontent.com");
+        step(st, "Descargando…");
+        HttpURLConnection h = open(url, !api, null);
         try {
+            h.setUseCaches(false); h.setRequestProperty("Cache-Control", "no-cache");
             if (h.getResponseCode() != 200) throw new Exception("HTTP " + h.getResponseCode());
             long len = h.getContentLength();
             if (background && len > 15L * 1024 * 1024 && metered(c)) throw new Exception("APK grande con datos móviles: se espera a Wi-Fi");
             try (InputStream in = h.getInputStream(); OutputStream out = new FileOutputStream(part)) {
-                byte[] b = new byte[16384]; long t = 0; int n;
-                while ((n = in.read(b)) != -1) { t += n; if (t > MAX_APK) throw new IOException("APK demasiado grande"); out.write(b, 0, n); }
+                byte[] b = new byte[16384]; long t = 0; int n, lastPct = -10;
+                while ((n = in.read(b)) != -1) {
+                    t += n; if (t > MAX_APK) throw new IOException("APK demasiado grande"); out.write(b, 0, n);
+                    if (st != null && len > 0) { int pct = (int) (t * 100 / len); if (pct >= lastPct + 10) { lastPct = pct; step(st, "Descargando… " + pct + " %"); } }
+                }
             }
         } finally { h.disconnect(); }
         if (!part.renameTo(f)) { part.delete(); throw new IOException("no se pudo guardar el APK"); }
+        step(st, "Verificando…");
         String bad = verify(c, f, r);
         if (bad != null) { f.delete(); throw new Exception("verificación fallida: " + bad); }
         Log.i(T, "APK v" + r.vc + " descargado y verificado (" + f.length() + " bytes, sha256 " + (r.sha != null ? "ok" : "no publicado") + ")");
         return f;
+    }
+
+    /** Sha-256 publicado junto a esa fuente (null si no hay). */
+    static String shaOf(String url) {
+        try {
+            String x = get(url + ".sha256", !url.startsWith("https://github.com/")).trim().split("\\s+")[0];
+            return x.matches("[0-9a-fA-F]{64}") ? x.toLowerCase(Locale.ROOT) : null;
+        } catch (Exception e) { return null; }
+    }
+
+    /** Como stage, pero si una fuente falla (caché vieja, versión o SHA que no coinciden, HTTP) prueba las demás antes de rendirse. */
+    static File stageAny(Context c, Remote r, boolean background, Step st) throws Exception {
+        Exception last = null; boolean first = true;
+        for (String u : candidates(r)) {
+            try {
+                Remote q = r;
+                if (!first) { q = new Remote(); q.vc = r.vc; q.url = u; q.src = u; q.sha = shaOf(u); } // cada fuente se verifica con su propio hash
+                return stage(c, q, background, u, st);
+            } catch (Exception e) {
+                last = e; first = false;
+                Log.i(T, "falló la fuente " + u + ": " + e);
+                String m = String.valueOf(e.getMessage());
+                if (m.contains("Wi-Fi") || m.contains("demasiado grande")) throw e;
+            }
+        }
+        throw last != null ? last : new Exception("no hay fuente de descarga");
     }
 
     // ---------------------------------------------------------------- instalación
@@ -308,6 +397,7 @@ class Updater {
             return true;
         } catch (Exception e) {
             Log.i(T, "no se pudo instalar con PackageInstaller: " + e);
+            lastInstallErr = why(e);
             return false;
         }
     }
@@ -316,7 +406,8 @@ class Updater {
         SharedPreferences sp = Loc.sp(c);
         sp.edit().putInt("upd-n", sp.getInt("upd-n", 0) + 1).apply(); // intentos; con 2 se pasa al aviso con un toque
         Log.i(T, "instalando v" + vc + " sin preguntar");
-        installApk(c, f, true);
+        rec(c, "instalando sin preguntar (v" + vc + ")", null);
+        if (!installApk(c, f, true)) rec(c, "falló la instalación automática", lastInstallErr);
     }
 
     /** Al salir de la app (pantalla apagada, inicio…): si ya hay una versión lista y verificada, se instala sin molestar. */
@@ -388,12 +479,14 @@ class Updater {
         if (silent) {
             if (!online(c) || (!fg && !batteryOk(c))) return true;
             try {
-                File f = stage(c, r, !fg);
+                File f = stageAny(c, r, !fg, null);
+                rec(c, "descargada y verificada (v" + r.vc + ")", null);
                 sp.edit().putLong("upd-staged", r.vc).putString("upd-sha", r.sha == null ? "" : r.sha).apply();
                 // con la app a la vista no se instala (cerraría la app en la cara de Ale): se instala al salir (onLeave) o desde el job
                 if (!Notif.appVisible) commitSilent(c, f, r.vc);
             } catch (Exception e) {
                 Log.i(T, "descarga/verificación: " + e);
+                rec(c, "falló la descarga automática", why(e));
                 sp.edit().putInt("upd-d", sp.getInt("upd-d", 0) + 1).apply();
             }
             return true;
@@ -422,21 +515,92 @@ class Updater {
         });
     }
 
-    /** «Actualizar»: baja y verifica el APK y lo instala con la confirmación del sistema; si algo falla, abre la descarga como antes. */
+    /** Diálogo de avance del flujo manual: un solo diálogo cuyo texto va cambiando (Descargando…, Verificando…, Abriendo el instalador…). */
+    static void progress(final Activity a, final String msg) {
+        a.runOnUiThread(() -> {
+            try {
+                if (a.isFinishing()) return;
+                if (prog == null || !prog.isShowing()) {
+                    AlertDialog d = new AlertDialog.Builder(a).setTitle("Actualizando 💗").setMessage(msg).setCancelable(true).create();
+                    prog = d; d.show();
+                } else prog.setMessage(msg);
+            } catch (Throwable ignored) { }
+        });
+    }
+
+    static void closeProgress() {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            try { AlertDialog d = prog; prog = null; if (d != null && d.isShowing()) d.dismiss(); } catch (Throwable ignored) { }
+        });
+    }
+
+    /** Algo salió mal en el flujo manual: se dice el motivo corto y se ofrece bajarla desde el navegador (nunca falla en silencio). */
+    static void fail(final Activity a, final String motivo) {
+        rec(a.getApplicationContext(), "no se pudo actualizar", motivo);
+        a.runOnUiThread(() -> {
+            try {
+                closeProgress();
+                if (a.isFinishing()) return;
+                new AlertDialog.Builder(a)
+                        .setTitle("No pude actualizar solita 😕")
+                        .setMessage(motivo + "\n\nPuedes bajarla desde el navegador e instalarla encima; no se borra nada.")
+                        .setPositiveButton("Descargar en el navegador", (d, w) -> viewFallback(a))
+                        .setNegativeButton("Cerrar", null)
+                        .show();
+            } catch (Throwable ignored) { }
+        });
+    }
+
+    /** El instalador respondió (UpdRx): ya no hay que esperar. */
+    static void resolved() { awaiting = false; }
+
+    /** Fallo que llegó desde UpdRx: con la app a la vista, diálogo; si no, notificación. */
+    static void failFront(Context c, String motivo) {
+        MainActivity a = MainActivity.cur;
+        if (a != null) { fail(a, motivo); return; }
+        rec(c, "no se pudo actualizar", motivo);
+        Intent i = new Intent(c, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra("upd", 1);
+        note(c, 4101, "No se pudo actualizar 😕", motivo + " Toca para intentarlo de nuevo.",
+                PendingIntent.getActivity(c, 4101, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
+    }
+
+    /** «Actualizar»: baja y verifica el APK y lo instala con la confirmación del sistema; cada paso se ve y si algo falla se explica y se ofrece el navegador. */
     static void manual(final Activity a, final Remote r) {
         final Context c = a.getApplicationContext();
-        if (Build.VERSION.SDK_INT >= 26 && !c.getPackageManager().canRequestPackageInstalls()) { viewFallback(a, r.url); return; }
-        try { Toast.makeText(a, "Descargando la actualización…", Toast.LENGTH_SHORT).show(); } catch (Exception ignored) { }
+        if (Build.VERSION.SDK_INT >= 26 && !c.getPackageManager().canRequestPackageInstalls()) {
+            rec(c, "sin permiso de instalar", "se abrió la descarga en el navegador");
+            try { Toast.makeText(a, "Abriendo el navegador para bajar la actualización. Al terminar, toca el archivo descargado para instalarla.", Toast.LENGTH_LONG).show(); } catch (Exception ignored) { }
+            viewFallback(a);
+            return;
+        }
+        if (!manualBusy.compareAndSet(false, true)) { try { Toast.makeText(a, "Ya se está actualizando…", Toast.LENGTH_SHORT).show(); } catch (Exception ignored) { } return; }
+        rec(c, "descargando (v" + r.vc + ")", null);
+        progress(a, "Descargando…");
         new Thread(() -> {
-            boolean ok = false;
-            try { File f = stage(c, r, false); ok = installApk(c, f, false); }
-            catch (Exception e) { Log.i(T, "flujo con confirmación: " + e); }
-            if (!ok) a.runOnUiThread(() -> viewFallback(a, r.url));
+            try {
+                File f = stageAny(c, r, false, s -> progress(a, s));
+                rec(c, "verificada, abriendo el instalador", null);
+                progress(a, "Abriendo el instalador…");
+                awaiting = true;
+                if (!installApk(c, f, false)) { awaiting = false; fail(a, "El sistema no aceptó iniciar la instalación (" + lastInstallErr + ")."); return; }
+                // si el instalador no contesta, no se deja el diálogo colgado
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (awaiting) { awaiting = false; fail(a, "El instalador no respondió. Si te llegó una notificación de «versión nueva», tócala para instalarla."); }
+                }, 25000);
+            } catch (Throwable e) {
+                Log.i(T, "flujo con confirmación: " + e);
+                fail(a, "No se pudo bajar o verificar la actualización: " + why(e));
+            } finally { manualBusy.set(false); }
         }).start();
     }
 
-    static void viewFallback(Activity a, String url) {
-        try { a.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); } catch (Exception ignored) { }
+    static void viewFallback(Activity a) {
+        try {
+            rec(a.getApplicationContext(), "descarga en el navegador", null);
+            a.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(directUrl())));
+        } catch (Exception e) {
+            try { Toast.makeText(a, "No encontré un navegador para abrir la descarga.", Toast.LENGTH_LONG).show(); } catch (Exception ignored) { }
+        }
     }
 
     static void channel(Context c) {

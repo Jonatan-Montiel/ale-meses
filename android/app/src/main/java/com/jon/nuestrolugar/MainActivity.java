@@ -636,6 +636,10 @@ public class MainActivity extends Activity {
             sp.edit().putString("barTop", top).putString("barBot", bot).putBoolean("barLT", lightTop).putBoolean("barLB", lightBot).apply();
             runOnUiThread(() -> applyBars(top, bot, lightTop, lightBot));
         }
+        /** Último intento de actualización (paso, error, hora) para la línea «Última actualización» de la página. */
+        @JavascriptInterface
+        public String updInfo() { if (!fromOurPage()) { return ""; } return Updater.info(MainActivity.this); }
+
         @JavascriptInterface
         public int appVersion() { if (!fromOurPage()) { return 0; } try { android.content.pm.PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0); return (int) (Build.VERSION.SDK_INT >= 28 ? pi.getLongVersionCode() : pi.versionCode); } catch (Exception e) { return 0; } }
 
