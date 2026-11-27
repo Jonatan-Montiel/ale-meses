@@ -116,6 +116,7 @@ public class MainActivity extends Activity {
         setupShortcuts();
         handleIntent(getIntent());
         if (getIntent() != null && getIntent().hasExtra("upd")) Updater.force(this);
+        Updater.showBlockerIfAsked(this, getIntent());
     }
 
     @Override
@@ -124,6 +125,7 @@ public class MainActivity extends Activity {
         setIntent(i);
         handleIntent(i);
         if (i != null && i.hasExtra("upd")) Updater.force(this);
+        Updater.showBlockerIfAsked(this, i);
         // si al volver se va a recargar la página, se entrega después de recargar (si no, se pierde)
         boolean reload = wv != null && pausedAt > 0 && System.currentTimeMillis() - pausedAt > 2 * 60 * 1000L;
         if (!reload) deliver();

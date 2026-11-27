@@ -376,6 +376,7 @@ class Updater {
             p.setSize(f.length());
             if (Build.VERSION.SDK_INT >= 31) p.setRequireUserAction(silent ? PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED : PackageInstaller.SessionParams.USER_ACTION_REQUIRED);
             int id = pi.createSession(p);
+            Loc.sp(c).edit().putInt("upd-sid", id).remove("upd-pua").apply(); // sesión vigente; «upd-pua» = en esa sesión el sistema sí pidió confirmar al usuario
             PackageInstaller.Session s = pi.openSession(id);
             try {
                 try (InputStream in = new FileInputStream(f); OutputStream out = s.openWrite("nl.apk", 0, f.length())) {
@@ -564,6 +565,89 @@ class Updater {
                 PendingIntent.getActivity(c, 4101, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
     }
 
+    // ---------------------------------------------------------------- Bloqueador automático de Samsung
+
+    static final String BLK_TEXT = "Tu Samsung tiene activado el Bloqueador automático y no deja instalar la actualización. Desactívalo en Ajustes → Seguridad y privacidad → Bloqueador automático, actualiza y luego puedes volver a activarlo.";
+
+    static boolean isSamsung() { return Build.MANUFACTURER != null && Build.MANUFACTURER.trim().equalsIgnoreCase("samsung"); }
+
+    /**
+     * ¿Esta respuesta del instalador es el Bloqueador automático de Samsung? Solo en Samsung y solo con señales claras:
+     * BLOCKED; FAILURE con un mensaje que hable de bloqueo; ABORTED con ese tipo de mensaje o sin que el sistema haya pedido
+     * confirmar en esa misma sesión (si el usuario tocó «Cancelar» sí hubo confirmación, y entonces NO se trata como bloqueador).
+     * Si no se puede distinguir, devuelve false.
+     */
+    static boolean samsungBlock(Context c, Intent i, int st, String msg) {
+        if (!isSamsung()) return false;
+        String m = msg == null ? "" : msg.toLowerCase(Locale.ROOT);
+        boolean kw = (m.contains("block") || m.contains("auto blocker") || m.contains("autoblocker") || m.contains("no permitido")) && !m.contains("abandon");
+        if (st == PackageInstaller.STATUS_FAILURE_BLOCKED) return true;
+        if (st == PackageInstaller.STATUS_FAILURE) return kw;
+        if (st == PackageInstaller.STATUS_FAILURE_ABORTED) {
+            if (kw) return true;
+            SharedPreferences sp = Loc.sp(c);
+            int sid = i.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1);
+            // solo la sesión vigente (las anteriores se abandonan al crear una nueva y eso también llega como ABORTED)
+            return sid >= 0 && sid == sp.getInt("upd-sid", -2) && sp.getInt("upd-pua", -2) != sid && !m.contains("abandon");
+        }
+        return false;
+    }
+
+    /** Abre la pantalla de seguridad de Ajustes (y si no existe, Ajustes a secas). */
+    static void openSecuritySettings(Activity a) {
+        try { a.startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS)); }
+        catch (Throwable e) {
+            try { a.startActivity(new Intent(Settings.ACTION_SETTINGS)); }
+            catch (Throwable ignored) { try { Toast.makeText(a, "Abre Ajustes → Seguridad y privacidad → Bloqueador automático.", Toast.LENGTH_LONG).show(); } catch (Throwable ignored2) { } }
+        }
+    }
+
+    static void samsungDialog(final Activity a) {
+        a.runOnUiThread(() -> {
+            try {
+                closeProgress();
+                if (a.isFinishing() || showing) return;
+                showing = true;
+                new AlertDialog.Builder(a)
+                        .setTitle("Hay que desactivar un bloqueo 🔒")
+                        .setMessage(BLK_TEXT)
+                        .setPositiveButton("Abrir Ajustes", (d, w) -> openSecuritySettings(a))
+                        .setNegativeButton("Ahora no", null)
+                        .setOnDismissListener(d -> showing = false)
+                        .show();
+            } catch (Throwable ignored) { showing = false; }
+        });
+    }
+
+    /** Lo que trae la notificación del bloqueador al tocarla (extra «blk»): muestra el diálogo una sola vez. */
+    static void showBlockerIfAsked(Activity a, Intent i) {
+        if (i == null || !i.hasExtra("blk")) return;
+        i.removeExtra("blk");
+        samsungDialog(a);
+    }
+
+    /**
+     * La instalación se bloqueó por el Bloqueador automático de Samsung. Manual: aviso siempre (diálogo, o notificación si la app ya no está a la vista).
+     * Silencioso: como máximo un aviso por versión, y ya no se reintenta en silencio.
+     */
+    static void onSamsungBlock(Context c, boolean silent, String detail) {
+        SharedPreferences sp = Loc.sp(c);
+        rec(c, "bloqueador Samsung", detail);
+        awaiting = false;
+        closeProgress();
+        long vc = sp.getLong("upd-cv", 0);
+        if (silent) {
+            sp.edit().putInt("upd-n", 2).apply();
+            if (vc != 0 && sp.getLong("upd-blk", 0) == vc) return;
+            sp.edit().putLong("upd-blk", vc).apply();
+        }
+        MainActivity a = MainActivity.cur;
+        if (a != null) { samsungDialog(a); return; }
+        Intent it = new Intent(c, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra("blk", 1);
+        note(c, 4104, "No se pudo actualizar 🔒", "Tu Samsung tiene activado el Bloqueador automático y no deja instalar la actualización. Toca para ver cómo quitarlo.",
+                PendingIntent.getActivity(c, 4104, it, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
+    }
+
     /** «Actualizar»: baja y verifica el APK y lo instala con la confirmación del sistema; cada paso se ve y si algo falla se explica y se ofrece el navegador. */
     static void manual(final Activity a, final Remote r) {
         final Context c = a.getApplicationContext();
@@ -585,7 +669,11 @@ class Updater {
                 if (!installApk(c, f, false)) { awaiting = false; fail(a, "El sistema no aceptó iniciar la instalación (" + lastInstallErr + ")."); return; }
                 // si el instalador no contesta, no se deja el diálogo colgado
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    if (awaiting) { awaiting = false; fail(a, "El instalador no respondió. Si te llegó una notificación de «versión nueva», tócala para instalarla."); }
+                    if (awaiting) {
+                        awaiting = false;
+                        if (isSamsung()) { onSamsungBlock(c, false, "el instalador no respondió en 25 s"); return; }
+                        fail(a, "El instalador no respondió. Si te llegó una notificación de «versión nueva», tócala para instalarla.");
+                    }
                 }, 25000);
             } catch (Throwable e) {
                 Log.i(T, "flujo con confirmación: " + e);
@@ -623,7 +711,7 @@ class Updater {
     /** Segundo plano y sin instalación silenciosa: una sola notificación por versión; al tocarla sale el diálogo «Actualizar». */
     static void notifyAvailable(Context c, long vc) {
         SharedPreferences sp = Loc.sp(c);
-        if (sp.getLong("upd-notified", 0) == vc) return;
+        if (sp.getLong("upd-notified", 0) == vc || sp.getLong("upd-blk", 0) == vc) return;
         sp.edit().putLong("upd-notified", vc).apply();
         Intent i = new Intent(c, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra("upd", 1);
         note(c, 4103, "Hay una versión nueva 💗", "Toca para actualizar Nuestro lugar (versión " + vc + ").",

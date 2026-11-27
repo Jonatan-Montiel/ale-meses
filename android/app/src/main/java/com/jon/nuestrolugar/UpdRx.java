@@ -38,7 +38,7 @@ public class UpdRx extends BroadcastReceiver {
             SharedPreferences sp = Loc.sp(c);
             if (st == PackageInstaller.STATUS_PENDING_USER_ACTION) {
                 // El sistema pide confirmar (flujo con un toque, o no quiso instalar en silencio: la próxima vez ya no se intenta en silencio para esta versión).
-                sp.edit().putInt("upd-n", 2).apply();
+                sp.edit().putInt("upd-n", 2).putInt("upd-pua", i.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1)).apply();
                 Intent conf = Build.VERSION.SDK_INT >= 33 ? i.getParcelableExtra(Intent.EXTRA_INTENT, Intent.class) : (Intent) i.getParcelableExtra(Intent.EXTRA_INTENT);
                 if (conf == null) {
                     Updater.closeProgress();
@@ -63,6 +63,8 @@ public class UpdRx extends BroadcastReceiver {
                 } else Updater.closeProgress();
             } else if (st == PackageInstaller.STATUS_SUCCESS) {
                 Updater.rec(c, "instalada", null);
+            } else if (Updater.samsungBlock(c, i, st, msg)) {
+                Updater.onSamsungBlock(c, silent, "estado " + st + (msg == null || msg.isEmpty() ? "" : " · " + (msg.length() > 120 ? msg.substring(0, 120) : msg)));
             } else if (st == PackageInstaller.STATUS_FAILURE_ABORTED) {
                 Updater.rec(c, "instalación cancelada", msg);
                 if (silent) sp.edit().putInt("upd-n", 2).apply();
