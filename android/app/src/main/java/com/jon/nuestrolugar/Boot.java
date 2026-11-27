@@ -12,5 +12,14 @@ public class Boot extends BroadcastReceiver {
         StreamService.start(c);
         Reminder.schedule(c);
         Widget.refresh(c);
+        if (Intent.ACTION_MY_PACKAGE_REPLACED.equals(i.getAction())) {
+            // Recién actualizada: borra el APK descargado y avisa ya la versión nueva (para que Jon la vea en «Versiones»)
+            final Context app = c.getApplicationContext();
+            final PendingResult pr = goAsync();
+            new Thread(() -> {
+                try { Updater.cleanup(app); Loc.sp(app).edit().putLong("beat", 0).apply(); Beat.send(app); } catch (Throwable ignored) { }
+                finally { pr.finish(); }
+            }).start();
+        }
     }
 }

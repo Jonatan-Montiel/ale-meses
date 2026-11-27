@@ -42,6 +42,10 @@ jobs:
         run: |
           cp android/app/build/outputs/apk/ale/release/app-ale-release.apk nuestro-lugar.apk
           cp android/app/build/outputs/apk/jon/release/app-jon-release.apk nuestro-lugar-jon.apk
+          # SHA-256 de cada APK firmado (formato de sha256sum): la app lo verifica antes de instalar
+          sha256sum nuestro-lugar.apk > nuestro-lugar.apk.sha256
+          sha256sum nuestro-lugar-jon.apk > nuestro-lugar-jon.apk.sha256
+          cat nuestro-lugar.apk.sha256 nuestro-lugar-jon.apk.sha256
       - name: Borrar llave del runner
         if: always()
         run: rm -f "$RUNNER_TEMP/nl.jks"
@@ -84,12 +88,17 @@ jobs:
           files: |
             nuestro-lugar.apk
             nuestro-lugar-jon.apk
+            nuestro-lugar.apk.sha256
+            nuestro-lugar-jon.apk.sha256
           make_latest: true
       - name: Publicar copia para descargar desde Vercel (dl/)
         run: |
           git config user.name ci && git config user.email ci@users.noreply.github.com
           git fetch -q origin main && git checkout -q -B pub origin/main
-          mkdir -p dl && cp nuestro-lugar.apk nuestro-lugar-jon.apk dl/ && echo '{"vc":${{ github.run_number }}}' > dl/version.json
+          mkdir -p dl && cp nuestro-lugar.apk nuestro-lugar-jon.apk nuestro-lugar.apk.sha256 nuestro-lugar-jon.apk.sha256 dl/
+          # version.json: "vc" como siempre (la página y las apps viejas solo leen ese campo) + "sha" (aditivo)
+          SA=$(cut -d' ' -f1 nuestro-lugar.apk.sha256); SJ=$(cut -d' ' -f1 nuestro-lugar-jon.apk.sha256)
+          printf '{"vc":%s,"sha":{"nuestro-lugar.apk":"%s","nuestro-lugar-jon.apk":"%s"}}\n' "${{ github.run_number }}" "$SA" "$SJ" > dl/version.json
           git add dl && git commit -qm "App v${{ github.run_number }} lista para descargar"
           for i in 1 2 3 4; do git push -q origin pub:main && break; sleep 5; git fetch -q origin main && git rebase -q origin/main; done
           git checkout -q ${{ github.sha }}

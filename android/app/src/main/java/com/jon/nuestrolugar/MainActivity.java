@@ -115,6 +115,7 @@ public class MainActivity extends Activity {
         Reminder.schedule(this);
         setupShortcuts();
         handleIntent(getIntent());
+        if (getIntent() != null && getIntent().hasExtra("upd")) Updater.force(this);
     }
 
     @Override
@@ -122,6 +123,7 @@ public class MainActivity extends Activity {
         super.onNewIntent(i);
         setIntent(i);
         handleIntent(i);
+        if (i != null && i.hasExtra("upd")) Updater.force(this);
         // si al volver se va a recargar la página, se entrega después de recargar (si no, se pierde)
         boolean reload = wv != null && pausedAt > 0 && System.currentTimeMillis() - pausedAt > 2 * 60 * 1000L;
         if (!reload) deliver();
@@ -266,9 +268,16 @@ public class MainActivity extends Activity {
         Notif.appVisible = true; // lo que llegue mientras la ve, ya lo ve en la página
         cur = this;
         new Thread(() -> Beat.send(getApplicationContext())).start();
-        Updater.check(this); // cada vez que la abre (máximo cada 30 min) revisa si hay versión nueva
+        Updater.check(this); // cada vez que la abre (máximo cada 10 min) revisa si hay versión nueva
+        Updater.afterOpen(this); // «Se actualizó a la vN» y (una vez) invitación a las actualizaciones automáticas
         // Si estuvo cerrada un rato, carga la versión más nueva de la página.
         if (wv != null && pausedAt > 0 && System.currentTimeMillis() - pausedAt > 2 * 60 * 1000L) { loadedAt = System.currentTimeMillis(); loadHome(null); }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try { Updater.onLeave(getApplicationContext()); } catch (Throwable ignored) { } // si ya hay una versión lista, se instala sola al salir
     }
 
     @Override

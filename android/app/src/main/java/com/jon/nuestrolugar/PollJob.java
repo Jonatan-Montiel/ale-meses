@@ -36,6 +36,7 @@ public class PollJob extends JobService {
         new Thread(() -> {
             try { poll(getApplicationContext()); } catch (Exception ignored) { }
             try { Beat.send(getApplicationContext()); } catch (Exception ignored) { }
+            try { Updater.background(getApplicationContext()); } catch (Throwable ignored) { }
             try { WidgetCuenta.refresh(getApplicationContext()); WidgetEstado.refresh(getApplicationContext()); } catch (Exception ignored) { }
             jobFinished(p, false);
         }).start();

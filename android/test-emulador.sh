@@ -47,8 +47,14 @@ adb shell monkey -p $APP2 -c android.intent.category.LAUNCHER 1 > $OUT/start-jon
 sleep 10
 viva $APP2 || falla "$APP2 no esta corriendo tras abrir"
 adb exec-out screencap -p > $OUT/4-app-jon.png
+# Fuerza una vuelta del job (revisa avisos y el actualizador). En el emulador el actualizador solo registra: no descarga ni instala.
+timeout 30 adb shell cmd jobscheduler run -f $APP1 1203 > $OUT/job-run.txt 2>&1 || true
+sleep 8
+viva $APP1 || falla "$APP1 murio tras la vuelta del job"
 adb logcat -d > $OUT/logcat-todo.txt
 grep "NLUpd" $OUT/logcat-todo.txt > $OUT/updater.txt
+# durante la prueba nadie debe intentar instalar una actualizacion
+grep -qE "NLUpd.*(commit de la sesi|instalando v|descargado y verificado)" $OUT/logcat-todo.txt && falla "el actualizador intento instalar durante la prueba (ver updater.txt)"
 # errores.txt: solo lo de nuestros paquetes (es lo unico que se sube como resumen)
 { grep -A12 "FATAL EXCEPTION" $OUT/logcat-todo.txt | grep -E "FATAL|Process: com\.jon\.nuestrolugar|^.*at com\.jon\."; grep -E "nuestrolugar|NLUpd" $OUT/logcat-todo.txt | grep -v "WindowManager"; } | head -200 > $OUT/errores.txt
 # un FATAL EXCEPTION cuenta solo si el proceso es de nuestros paquetes
